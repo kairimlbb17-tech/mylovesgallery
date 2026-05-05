@@ -471,42 +471,533 @@ button:active{
         <select id="filterStatus" onchange="render()">
           <option value="all">All Status</option>
           <option value="featured">Featured Only</option>
-          <option value="enabled">Enabled Only</option>
-          <option value="disabled">Disabled Only</option>
+          <option value="enabled">Enabled Only</option><!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Warlito Admin Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+<style>
+:root{
+  --bg:#060913;
+  --panel:#0c1220;
+  --panel2:#11192b;
+  --line:rgba(100,180,255,.18);
+  --text:#eef6ff;
+  --muted:#8fa1ba;
+  --cyan:#28e7ff;
+  --blue:#2c7dff;
+  --red:#ff335f;
+  --green:#22f59a;
+  --yellow:#ffcc4d;
+  --purple:#9b6cff;
+}
+
+*{
+  box-sizing:border-box;
+  max-width:100%;
+}
+
+html,body{
+  margin:0;
+  width:100%;
+  min-height:100%;
+  overflow-x:hidden;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(40,231,255,.16),transparent 30%),
+    radial-gradient(circle at 90% 0%,rgba(255,51,95,.13),transparent 30%),
+    linear-gradient(145deg,#02040a,#08101d 55%,#02040a);
+  color:var(--text);
+  font-family:"Trebuchet MS", Arial, sans-serif;
+}
+
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    linear-gradient(rgba(44,125,255,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(44,125,255,.05) 1px, transparent 1px);
+  background-size:34px 34px;
+  pointer-events:none;
+}
+
+.app{
+  width:100%;
+  max-width:980px;
+  margin:auto;
+  padding:12px;
+  position:relative;
+  z-index:1;
+}
+
+.cut{
+  clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px));
+}
+
+.topbar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:6px 0 12px;
+}
+
+.logoBox{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  color:#02050c;
+}
+
+.brand{
+  min-width:0;
+  flex:1;
+}
+
+.brand h1{
+  margin:0;
+  font-size:21px;
+  line-height:1.1;
+  font-weight:900;
+  letter-spacing:.4px;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.brand p{
+  margin:3px 0 0;
+  color:var(--muted);
+  font-size:12px;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.card{
+  width:100%;
+  background:linear-gradient(180deg,rgba(17,25,43,.96),rgba(6,11,22,.98));
+  border:1px solid var(--line);
+  padding:14px;
+  margin-bottom:12px;
+  box-shadow:0 16px 36px rgba(0,0,0,.38);
+}
+
+.cardTitle{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:17px;
+  font-weight:900;
+  margin-bottom:10px;
+}
+
+.icon{
+  width:18px;
+  height:18px;
+  flex-shrink:0;
+  stroke:currentColor;
+  stroke-width:2.2;
+  fill:none;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+input,select{
+  width:100%;
+  min-width:0;
+  background:#050a15;
+  color:var(--text);
+  border:1px solid rgba(100,180,255,.18);
+  outline:none;
+  padding:12px;
+  margin:5px 0;
+  font-size:14px;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+}
+
+input:focus,select:focus{
+  border-color:var(--cyan);
+  box-shadow:0 0 0 3px rgba(40,231,255,.08);
+}
+
+button{
+  border:0;
+  color:white;
+  font-weight:900;
+  font-size:13px;
+  padding:10px 11px;
+  min-height:39px;
+  cursor:pointer;
+  background:linear-gradient(135deg,#1558dc,var(--blue));
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,9px 100%,0 calc(100% - 9px));
+}
+
+button:active{transform:scale(.97)}
+
+.btnDark{background:#1c2537}
+.btnGreen{background:linear-gradient(135deg,#00a767,var(--green));color:#02110a}
+.btnBlue{background:linear-gradient(135deg,#1264ff,var(--cyan));color:#021017}
+.btnRed{background:linear-gradient(135deg,#d51b43,var(--red))}
+.btnYellow{background:linear-gradient(135deg,#d68d00,var(--yellow));color:#201300}
+
+.hidden{display:none!important}
+
+.login{
+  max-width:430px;
+  margin:8vh auto 0;
+}
+
+.row,.toolbar,.stats{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+}
+
+@media(min-width:760px){
+  .row{grid-template-columns:1fr 1fr}
+  .toolbar{grid-template-columns:1.4fr 1fr 1fr}
+  .stats{grid-template-columns:repeat(3,1fr)}
+}
+
+.stat{
+  background:#07101e;
+  border:1px solid rgba(100,180,255,.14);
+  padding:12px;
+}
+
+.stat span{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.stat b{
+  display:block;
+  margin-top:3px;
+  font-size:23px;
+  color:var(--cyan);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+
+@media(min-width:820px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+}
+
+.hero{
+  width:100%;
+  min-width:0;
+  background:linear-gradient(180deg,#101827,#060c17);
+  border:1px solid rgba(100,180,255,.15);
+  padding:12px;
+  overflow:hidden;
+}
+
+.heroName{
+  font-size:24px;
+  font-weight:900;
+  text-transform:uppercase;
+  line-height:1;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.heroId{
+  margin-top:4px;
+  color:var(--muted);
+  font-size:12px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.badges{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+
+.badge{
+  max-width:100%;
+  font-size:10px;
+  font-weight:900;
+  padding:5px 7px;
+  color:var(--cyan);
+  border:1px solid rgba(40,231,255,.22);
+  background:rgba(40,231,255,.08);
+  text-transform:uppercase;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px));
+}
+
+.badgeRed{color:var(--red);border-color:rgba(255,51,95,.25);background:rgba(255,51,95,.08)}
+.badgeGreen{color:var(--green);border-color:rgba(34,245,154,.25);background:rgba(34,245,154,.08)}
+.badgeYellow{color:var(--yellow);border-color:rgba(255,204,77,.25);background:rgba(255,204,77,.08)}
+.badgeOff{color:#9da8ba;border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.05)}
+
+.actions{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px;
+  margin-top:10px;
+}
+
+.actions button{
+  width:100%;
+  margin:0;
+  min-width:0;
+}
+
+@media(min-width:520px){
+  .actions{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+
+.skin{
+  width:100%;
+  min-width:0;
+  display:grid;
+  grid-template-columns:72px minmax(0,1fr);
+  gap:9px;
+  background:#050a14;
+  border:1px solid rgba(100,180,255,.13);
+  padding:8px;
+  margin-top:10px;
+  overflow:hidden;
+}
+
+.skin.featured{
+  border-color:rgba(255,204,77,.55);
+  box-shadow:0 0 15px rgba(255,204,77,.08);
+}
+
+.skin.disabled{
+  opacity:.48;
+  filter:grayscale(1);
+}
+
+.skin img{
+  width:72px;
+  height:100px;
+  object-fit:cover;
+  background:#141b29;
+  clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,9px 100%,0 calc(100% - 9px));
+}
+
+.skinBody{
+  min-width:0;
+  overflow:hidden;
+}
+
+.skinTitle{
+  font-size:15px;
+  font-weight:900;
+  line-height:1.2;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.small{
+  display:block;
+  width:100%;
+  max-width:100%;
+  color:var(--muted);
+  font-size:11px;
+  margin-top:3px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.skin .actions{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+.skin .actions button{
+  font-size:11px;
+  padding:9px 6px;
+  min-height:36px;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.78);
+  padding:10px;
+  z-index:99;
+}
+
+.modalBox{
+  width:100%;
+  max-width:520px;
+  max-height:90vh;
+  overflow:auto;
+  background:linear-gradient(180deg,#111827,#070d18);
+  border:1px solid rgba(40,231,255,.25);
+  padding:14px;
+  box-shadow:0 0 45px rgba(40,231,255,.12);
+}
+
+.preview{
+  display:grid;
+  grid-template-columns:78px minmax(0,1fr);
+  gap:10px;
+  align-items:center;
+  background:#050a14;
+  border:1px solid rgba(100,180,255,.13);
+  padding:9px;
+  margin-top:9px;
+}
+
+.preview img{
+  width:78px;
+  height:108px;
+  object-fit:cover;
+  background:#141b29;
+}
+
+#log{
+  height:105px;
+  overflow:auto;
+  background:#040812;
+  color:var(--green);
+  border:1px solid rgba(34,245,154,.16);
+  padding:10px;
+  font-size:12px;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="logoBox cut">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 10-13h-7V2z"/></svg>
+    </div>
+    <div class="brand">
+      <h1>Warlito Admin Panel</h1>
+      <p>Saber Storm Skin Manager</p>
+    </div>
+  </div>
+
+  <div id="loginCard" class="card cut login">
+    <div class="cardTitle">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M12 17v-4"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><rect x="5" y="11" width="14" height="10" rx="2"/></svg>
+      Admin Access
+    </div>
+    <input id="password" type="password" placeholder="Admin password">
+    <input id="token" type="password" placeholder="GitHub token">
+    <button class="btnBlue" onclick="login()">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+      Enter Dashboard
+    </button>
+  </div>
+
+  <div id="panel" class="hidden">
+
+    <div class="card cut">
+      <div class="stats">
+        <div class="stat cut"><span>Heroes</span><b id="statHeroes">0</b></div>
+        <div class="stat cut"><span>Skins</span><b id="statSkins">0</b></div>
+        <div class="stat cut"><span>Enabled</span><b id="statEnabled">0</b></div>
+      </div>
+    </div>
+
+    <div class="card cut">
+      <div class="cardTitle">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        Add Hero
+      </div>
+      <div class="row">
+        <input id="newHeroName" placeholder="Hero name">
+        <select id="newHeroCategory">
+          <option value="assassin">Assassin</option>
+          <option value="fighter">Fighter</option>
+          <option value="mage">Mage</option>
+          <option value="marksman">Marksman</option>
+          <option value="tank">Tank</option>
+          <option value="support">Support</option>
+        </select>
+      </div>
+      <button class="btnGreen" onclick="addHero()">Add Hero</button>
+    </div>
+
+    <div class="card cut">
+      <div class="cardTitle">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        Search & Filter
+      </div>
+      <div class="toolbar">
+        <input id="search" placeholder="Search hero, tag, URL..." oninput="render()">
+        <select id="filterCategory" onchange="render()">
+          <option value="all">All Categories</option>
+          <option value="assassin">Assassin</option>
+          <option value="fighter">Fighter</option>
+          <option value="mage">Mage</option>
+          <option value="marksman">Marksman</option>
+          <option value="tank">Tank</option>
+          <option value="support">Support</option>
+        </select>
+        <select id="filterStatus" onchange="render()">
+          <option value="all">All Status</option>
+          <option value="featured">Featured</option>
+          <option value="enabled">Enabled</option>
+          <option value="disabled">Disabled</option>
         </select>
       </div>
     </div>
 
-    <div class="card">
-      <h2>🧩 Heroes</h2>
+    <div class="card cut">
+      <div class="cardTitle">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
+        Heroes
+      </div>
       <div id="heroesList" class="grid"></div>
     </div>
 
-    <div class="card">
-      <h2>📈 Analytics</h2>
-      <div id="analytics" class="analytics-list"></div>
-    </div>
-
-    <div class="card">
-      <h3>📟 Logs</h3>
-      <div id="log"></div>
+    <div class="card cut">
+      <div class="cardTitle">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 16v-5"/><path d="M12 16V8"/><path d="M16 16v-3"/></svg>
+        Logs
+      </div>
+      <div id="log" class="cut"></div>
     </div>
 
   </div>
 </div>
 
 <div class="modal" id="skinModal">
-  <div class="modal-box">
-    <h2 id="modalTitle">Add Skin</h2>
+  <div class="modalBox cut">
+    <div class="cardTitle" id="modalTitle">Add Skin</div>
 
     <input id="skinImage" placeholder="Image URL" oninput="livePreview(); smartTag();">
     <input id="skinScript" placeholder="Script ZIP URL" oninput="smartTag();">
-    <input id="skinTags" placeholder="Tags: legend, starlight, anime">
+    <input id="skinTags" placeholder="Tags: legend, anime, starlight">
 
     <div class="row">
       <select id="skinFeatured">
         <option value="false">Normal</option>
-        <option value="true">Featured / Highlight</option>
+        <option value="true">Featured</option>
       </select>
 
       <select id="skinEnabled">
@@ -515,7 +1006,7 @@ button:active{
       </select>
     </div>
 
-    <div class="preview">
+    <div class="preview cut">
       <img id="previewImg" src="">
       <div>
         <b>Live Preview</b>
@@ -524,15 +1015,14 @@ button:active{
     </div>
 
     <div class="actions">
-      <button class="btn-green" onclick="saveSkinModal()">SAVE SKIN</button>
-      <button class="btn-dark" onclick="closeModal()">CANCEL</button>
+      <button class="btnGreen" onclick="saveSkinModal()">Save</button>
+      <button class="btnDark" onclick="closeModal()">Cancel</button>
     </div>
   </div>
 </div>
 
 <script>
 const PASS = "123456";
-
 const OWNER = "kairimlbb17-tech";
 const REPO = "shesh";
 const FILE = "skins.json";
@@ -543,18 +1033,27 @@ const CATEGORIES = ["assassin","fighter","mage","marksman","tank","support"];
 let TOKEN = "";
 let SHA = "";
 let DATA = { heroes: [] };
-
 let currentHeroIndex = null;
 let currentSkinIndex = null;
 
 const API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
 
+function icon(name){
+  const icons = {
+    plus:`<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>`,
+    edit:`<svg class="icon" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>`,
+    eye:`<svg class="icon" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>`,
+    eyeOff:`<svg class="icon" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 10.6A3 3 0 0 0 13.4 13.4"/><path d="M9.9 4.2A10.5 10.5 0 0 1 12 4c6 0 10 8 10 8a18 18 0 0 1-3.2 4.5"/><path d="M6.1 6.1C3.5 7.9 2 12 2 12s4 8 10 8a10.5 10.5 0 0 0 4.1-.8"/></svg>`,
+    star:`<svg class="icon" viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1L12 2z"/></svg>`,
+    up:`<svg class="icon" viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>`,
+    down:`<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg>`,
+    trash:`<svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 15H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>`
+  };
+  return icons[name] || "";
+}
+
 function slugify(text){
-  return String(text || "")
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g,"_")
-    .replace(/^_+|_+$/g,"");
+  return String(text || "").toLowerCase().trim().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"");
 }
 
 function makeHeroId(name){
@@ -589,14 +1088,8 @@ function login(){
   const p = document.getElementById("password").value.trim();
   TOKEN = document.getElementById("token").value.trim();
 
-  if(p !== PASS){
-    alert("Wrong password");
-    return;
-  }
-  if(!TOKEN){
-    alert("Enter GitHub token");
-    return;
-  }
+  if(p !== PASS){ alert("Wrong password"); return; }
+  if(!TOKEN){ alert("Enter GitHub token"); return; }
 
   document.getElementById("loginCard").classList.add("hidden");
   document.getElementById("panel").classList.remove("hidden");
@@ -614,12 +1107,11 @@ function normalizeData(){
     if(typeof hero.enabled === "undefined") hero.enabled = true;
     if(!hero.skins) hero.skins = [];
 
-    hero.skins.forEach((skin, index)=>{
+    hero.skins.forEach((skin,index)=>{
       if(!skin.id) skin.id = `${hero.id}_${String(index + 1).padStart(3,"0")}`;
       if(typeof skin.featured === "undefined") skin.featured = false;
       if(typeof skin.enabled === "undefined") skin.enabled = true;
       if(!skin.tags) skin.tags = smartTagsFromText(`${skin.image} ${skin.script} ${hero.name}`);
-      if(typeof skin.clicks === "undefined") skin.clicks = 0;
     });
   });
 }
@@ -649,17 +1141,14 @@ async function loadData(){
 
     normalizeData();
     render();
-    log("Loaded successfully.");
-  }catch(e){
-    log(e.toString());
-  }
+    log("Loaded.");
+  }catch(e){ log(e.toString()); }
 }
 
 async function saveToGithub(message){
   try{
     normalizeData();
-
-    log("Fetching latest SHA...");
+    log("Saving...");
 
     const latest = await fetch(`${API}?ref=${BRANCH}`, {
       headers:{
@@ -672,14 +1161,11 @@ async function saveToGithub(message){
 
     if(!latest.ok){
       log(JSON.stringify(latestFile,null,2));
-      alert("Cannot get latest file SHA");
+      alert("Cannot get latest SHA");
       return;
     }
 
     SHA = latestFile.sha;
-
-    log("Saving to GitHub...");
-
     const content = btoa(unescape(encodeURIComponent(JSON.stringify(DATA,null,2))));
 
     const res = await fetch(API,{
@@ -701,72 +1187,46 @@ async function saveToGithub(message){
 
     if(!res.ok){
       log(JSON.stringify(result,null,2));
-      alert("Save failed. Check token Contents Read/Write permission.");
+      alert("Save failed. Check token permission.");
       return;
     }
 
     SHA = result.content.sha;
     render();
-    log("Saved ✅");
-  }catch(e){
-    log(e.toString());
-  }
+    log("Saved.");
+  }catch(e){ log(e.toString()); }
 }
 
-function reloadAll(){
-  if(!TOKEN){
-    alert("Login first");
-    return;
-  }
-  loadData();
-}
+function reloadAll(){ if(!TOKEN){alert("Login first");return;} loadData(); }
 
 function addHero(){
   const name = document.getElementById("newHeroName").value.trim();
   const category = document.getElementById("newHeroCategory").value;
 
-  if(!name){
-    alert("Enter hero name");
+  if(!name){ alert("Enter hero name"); return; }
+  if(DATA.heroes.find(h => h.name.toLowerCase() === name.toLowerCase())){
+    alert("Duplicate hero.");
     return;
   }
 
-  const exists = DATA.heroes.find(h => h.name.toLowerCase() === name.toLowerCase());
-  if(exists){
-    alert("Duplicate hero name.");
-    return;
-  }
-
-  DATA.heroes.push({
-    id: makeHeroId(name),
-    name,
-    category,
-    enabled: true,
-    skins:[]
-  });
-
+  DATA.heroes.push({id:makeHeroId(name),name,category,enabled:true,skins:[]});
   document.getElementById("newHeroName").value = "";
   saveToGithub(`Add hero ${name}`);
 }
 
 function editHero(index){
   const hero = DATA.heroes[index];
-
   const newName = prompt("Hero name:", hero.name);
   if(!newName || !newName.trim()) return;
 
-  const newCategory = prompt("Category: assassin/fighter/mage/marksman/tank/support", hero.category || "assassin");
+  const newCategory = prompt("Category: assassin/fighter/mage/marksman/tank/support", hero.category);
   if(!newCategory || !newCategory.trim()) return;
 
-  const cleanCategory = newCategory.trim().toLowerCase();
-
-  if(!CATEGORIES.includes(cleanCategory)){
-    alert("Invalid category.");
-    return;
-  }
+  const cat = newCategory.trim().toLowerCase();
+  if(!CATEGORIES.includes(cat)){ alert("Invalid category."); return; }
 
   hero.name = newName.trim();
-  hero.category = cleanCategory;
-
+  hero.category = cat;
   saveToGithub(`Edit hero ${hero.name}`);
 }
 
@@ -777,7 +1237,6 @@ function toggleHero(index){
 
 function deleteHero(index){
   if(!confirm("Delete hero and all skins?")) return;
-
   const name = DATA.heroes[index].name;
   DATA.heroes.splice(index,1);
   saveToGithub(`Delete hero ${name}`);
@@ -786,7 +1245,6 @@ function deleteHero(index){
 function openAddSkin(heroIndex){
   currentHeroIndex = heroIndex;
   currentSkinIndex = null;
-
   const hero = DATA.heroes[heroIndex];
 
   document.getElementById("modalTitle").innerText = `Add Skin to ${hero.name}`;
@@ -822,18 +1280,12 @@ function saveSkinModal(){
   const image = document.getElementById("skinImage").value.trim();
   const script = document.getElementById("skinScript").value.trim();
 
-  let tags = document.getElementById("skinTags").value
-    .split(",")
-    .map(x=>x.trim().toLowerCase())
-    .filter(Boolean);
+  let tags = document.getElementById("skinTags").value.split(",").map(x=>x.trim().toLowerCase()).filter(Boolean);
 
   const featured = document.getElementById("skinFeatured").value === "true";
   const enabled = document.getElementById("skinEnabled").value === "true";
 
-  if(!image || !script){
-    alert("Fill image and script URL");
-    return;
-  }
+  if(!image || !script){ alert("Fill image and script URL"); return; }
 
   const hero = DATA.heroes[currentHeroIndex];
 
@@ -842,14 +1294,8 @@ function saveSkinModal(){
     return s.image === image || s.script === script;
   });
 
-  if(duplicate){
-    alert("Duplicate detected: same image or script already exists in this hero.");
-    return;
-  }
-
-  if(tags.length === 0){
-    tags = smartTagsFromText(`${image} ${script} ${hero.name}`);
-  }
+  if(duplicate){ alert("Duplicate image/script already exists."); return; }
+  if(tags.length === 0) tags = smartTagsFromText(`${image} ${script} ${hero.name}`);
 
   const old = currentSkinIndex !== null ? hero.skins[currentSkinIndex] : null;
 
@@ -859,8 +1305,7 @@ function saveSkinModal(){
     script,
     featured,
     enabled,
-    tags,
-    clicks: old ? (old.clicks || 0) : 0
+    tags
   };
 
   if(currentSkinIndex === null){
@@ -876,42 +1321,29 @@ function saveSkinModal(){
 
 function deleteSkin(heroIndex, skinIndex){
   if(!confirm("Delete this skin?")) return;
-
-  const hero = DATA.heroes[heroIndex];
-  hero.skins.splice(skinIndex,1);
-  saveToGithub(`Delete skin from ${hero.name}`);
+  DATA.heroes[heroIndex].skins.splice(skinIndex,1);
+  saveToGithub("Delete skin");
 }
 
 function moveSkin(heroIndex, skinIndex, dir){
   const skins = DATA.heroes[heroIndex].skins;
   const newIndex = skinIndex + dir;
-
   if(newIndex < 0 || newIndex >= skins.length) return;
 
   const temp = skins[skinIndex];
   skins[skinIndex] = skins[newIndex];
   skins[newIndex] = temp;
-
   saveToGithub("Reorder skins");
 }
 
 function toggleFeatured(heroIndex, skinIndex){
-  const skin = DATA.heroes[heroIndex].skins[skinIndex];
-  skin.featured = !skin.featured;
+  DATA.heroes[heroIndex].skins[skinIndex].featured = !DATA.heroes[heroIndex].skins[skinIndex].featured;
   saveToGithub("Toggle featured skin");
 }
 
 function toggleSkin(heroIndex, skinIndex){
-  const skin = DATA.heroes[heroIndex].skins[skinIndex];
-  skin.enabled = !skin.enabled;
+  DATA.heroes[heroIndex].skins[skinIndex].enabled = !DATA.heroes[heroIndex].skins[skinIndex].enabled;
   saveToGithub("Toggle skin visibility");
-}
-
-function recordClick(heroIndex, skinIndex){
-  const skin = DATA.heroes[heroIndex].skins[skinIndex];
-  skin.clicks = (skin.clicks || 0) + 1;
-  render();
-  saveToGithub("Add click analytics");
 }
 
 function livePreview(){
@@ -931,19 +1363,9 @@ function livePreview(){
 
 function smartTagsFromText(text){
   const raw = String(text || "").toLowerCase();
-  const rules = [
-    "legend","starlight","collector","epic","elite","special",
-    "aspirant","lightborn","summer","christmas","valentine",
-    "anniversary","anime","aot","luckybox","backup","default",
-    "fanny","gusion","valentines"
-  ];
-
+  const rules = ["legend","starlight","collector","epic","elite","special","aspirant","lightborn","summer","christmas","valentine","anniversary","anime","aot","luckybox","backup","default","fanny","gusion","valentines"];
   const tags = [];
-
-  rules.forEach(tag=>{
-    if(raw.includes(tag)) tags.push(tag === "valentines" ? "valentine" : tag);
-  });
-
+  rules.forEach(tag=>{ if(raw.includes(tag)) tags.push(tag === "valentines" ? "valentine" : tag); });
   return [...new Set(tags)];
 }
 
@@ -951,10 +1373,7 @@ function smartTag(){
   const image = document.getElementById("skinImage").value;
   const script = document.getElementById("skinScript").value;
   const tags = smartTagsFromText(`${image} ${script}`);
-
-  if(tags.length){
-    document.getElementById("skinTags").value = tags.join(", ");
-  }
+  if(tags.length) document.getElementById("skinTags").value = tags.join(", ");
 }
 
 function closeModal(){
@@ -972,75 +1391,56 @@ function render(){
   list.innerHTML = "";
 
   let totalSkins = 0;
-  let totalFeatured = 0;
   let totalEnabled = 0;
 
   DATA.heroes.forEach((hero,hi)=>{
     totalSkins += hero.skins.length;
-
-    hero.skins.forEach(s=>{
-      if(s.featured) totalFeatured++;
-      if(s.enabled) totalEnabled++;
-    });
+    hero.skins.forEach(s=>{ if(s.enabled) totalEnabled++; });
 
     if(cat !== "all" && hero.category !== cat) return;
 
-    const heroMatches = [
-      hero.id,
-      hero.name,
-      hero.category
-    ].join(" ").toLowerCase().includes(q);
+    const heroMatches = [hero.id,hero.name,hero.category].join(" ").toLowerCase().includes(q);
 
-    let skins = hero.skins
-      .map((skin,si)=>({skin,si}))
-      .filter(obj=>{
-        const skin = obj.skin;
+    let skins = hero.skins.map((skin,si)=>({skin,si})).filter(obj=>{
+      const skin = obj.skin;
 
-        if(status === "featured" && !skin.featured) return false;
-        if(status === "enabled" && !skin.enabled) return false;
-        if(status === "disabled" && skin.enabled) return false;
+      if(status === "featured" && !skin.featured) return false;
+      if(status === "enabled" && !skin.enabled) return false;
+      if(status === "disabled" && skin.enabled) return false;
 
-        const searchable = [
-          hero.id,
-          hero.name,
-          hero.category,
-          skin.id,
-          skin.image,
-          skin.script,
-          ...(skin.tags || [])
-        ].join(" ").toLowerCase();
+      const searchable = [hero.id,hero.name,hero.category,skin.id,skin.image,skin.script,...(skin.tags || [])].join(" ").toLowerCase();
 
-        return !q || heroMatches || searchable.includes(q);
-      });
+      return !q || heroMatches || searchable.includes(q);
+    });
 
     if(q && !heroMatches && skins.length === 0) return;
 
     const card = document.createElement("div");
-    card.className = "hero-card";
+    card.className = "hero cut";
 
     let skinsHtml = "";
 
     skins.forEach(({skin,si})=>{
       skinsHtml += `
-        <div class="skin ${skin.featured ? "featured" : ""} ${skin.enabled ? "" : "disabled"}">
+        <div class="skin cut ${skin.featured ? "featured" : ""} ${skin.enabled ? "" : "disabled"}">
           <img src="${skin.image}" onerror="this.style.opacity=.25">
-          <div>
-            <div class="skin-title">${skin.featured ? "⭐ Featured" : "Skin"} • ${skin.enabled ? "ON" : "OFF"}</div>
+          <div class="skinBody">
+            <div class="skinTitle">${skin.featured ? "Featured Skin" : "Skin"} • ${skin.enabled ? "Visible" : "Hidden"}</div>
             <div class="small">ID: ${skin.id}</div>
             <div class="small">IMG: ${skin.image}</div>
             <div class="small">ZIP: ${skin.script}</div>
+
             <div class="badges">
-              ${(skin.tags || []).map(t=>`<span class="badge purple">${t}</span>`).join("")}
-              <span class="badge green">${skin.clicks || 0} clicks</span>
+              ${(skin.tags || []).map(t=>`<span class="badge">${t}</span>`).join("")}
             </div>
+
             <div class="actions">
-              <button class="btn-blue" onclick="openEditSkin(${hi},${si})">Edit</button>
-              <button class="btn-yellow" onclick="toggleFeatured(${hi},${si})">★</button>
-              <button class="btn-dark" onclick="toggleSkin(${hi},${si})">${skin.enabled ? "Disable" : "Enable"}</button>
-              <button class="btn-dark" onclick="moveSkin(${hi},${si},-1)">↑</button>
-              <button class="btn-dark" onclick="moveSkin(${hi},${si},1)">↓</button>
-              <button class="btn-purple" onclick="recordClick(${hi},${si})">+Click</button>
-              <button class="btn-red" onclick="deleteSkin(${hi},${si})">Delete</button>
+              <button class="btnBlue" onclick="openEditSkin(${hi},${si})">${icon("edit")}Edit</button>
+              <button class="btnYellow" onclick="toggleFeatured(${hi},${si})">${icon("star")}</button>
+              <button class="btnDark" onclick="toggleSkin(${hi},${si})">${skin.enabled ? icon("eyeOff") + "Hide" : icon("eye") + "Show"}</button>
+              <button class="btnDark" onclick="moveSkin(${hi},${si},-1)">${icon("up")}</button>
+              <button class="btnDark" onclick="moveSkin(${hi},${si},1)">${icon("down")}</button>
+              <button class="btnRed" onclick="deleteSkin(${hi},${si})">${icon("trash")}Delete</button>
             </div>
           </div>
         </div>
@@ -1048,26 +1448,24 @@ function render(){
     });
 
     card.innerHTML = `
-      <div class="hero-head">
-        <div>
-          <div class="hero-title">${hero.name}</div>
-          <div class="hero-id">ID: ${hero.id}</div>
-          <div class="badges">
-            <span class="badge red">${hero.category}</span>
-            <span class="badge">${hero.skins.length} skins</span>
-            <span class="badge ${hero.enabled ? "green" : "off"}">${hero.enabled ? "hero on" : "hero off"}</span>
-          </div>
+      <div>
+        <div class="heroName">${hero.name}</div>
+        <div class="heroId">ID: ${hero.id}</div>
+        <div class="badges">
+          <span class="badge badgeRed">${hero.category}</span>
+          <span class="badge">${hero.skins.length} skins</span>
+          <span class="badge ${hero.enabled ? "badgeGreen" : "badgeOff"}">${hero.enabled ? "visible" : "hidden"}</span>
         </div>
       </div>
 
       <div class="actions">
-        <button class="btn-green" onclick="openAddSkin(${hi})">+ Add Skin</button>
-        <button class="btn-blue" onclick="editHero(${hi})">Edit Hero</button>
-        <button class="btn-dark" onclick="toggleHero(${hi})">${hero.enabled ? "Disable Hero" : "Enable Hero"}</button>
-        <button class="btn-red" onclick="deleteHero(${hi})">Delete Hero</button>
+        <button class="btnGreen" onclick="openAddSkin(${hi})">${icon("plus")}Skin</button>
+        <button class="btnBlue" onclick="editHero(${hi})">${icon("edit")}Edit</button>
+        <button class="btnDark" onclick="toggleHero(${hi})">${hero.enabled ? icon("eyeOff") + "Hide" : icon("eye") + "Show"}</button>
+        <button class="btnRed" onclick="deleteHero(${hi})">${icon("trash")}Delete</button>
       </div>
 
-      ${skinsHtml || `<div style="color:#777;margin-top:12px">No matching skins.</div>`}
+      ${skinsHtml || `<div style="color:#7f8da8;margin-top:12px">No skins found.</div>`}
     `;
 
     list.appendChild(card);
@@ -1075,43 +1473,7 @@ function render(){
 
   document.getElementById("statHeroes").innerText = DATA.heroes.length;
   document.getElementById("statSkins").innerText = totalSkins;
-  document.getElementById("statFeatured").innerText = totalFeatured;
   document.getElementById("statEnabled").innerText = totalEnabled;
-
-  renderAnalytics();
-}
-
-function renderAnalytics(){
-  const box = document.getElementById("analytics");
-
-  let rows = [];
-
-  DATA.heroes.forEach(hero=>{
-    hero.skins.forEach(skin=>{
-      rows.push({
-        hero:hero.name,
-        category:hero.category,
-        clicks:skin.clicks || 0,
-        featured:skin.featured,
-        enabled:skin.enabled
-      });
-    });
-  });
-
-  rows.sort((a,b)=>b.clicks-a.clicks);
-  rows = rows.slice(0,10);
-
-  if(rows.length === 0){
-    box.innerHTML = `<div style="color:#777">No analytics yet.</div>`;
-    return;
-  }
-
-  box.innerHTML = rows.map(r=>`
-    <div class="analytics-item">
-      <span>${r.featured ? "⭐ " : ""}${r.hero} <small style="color:#888">${r.category}</small></span>
-      <b>${r.clicks} clicks</b>
-    </div>
-  `).join("");
 }
 </script>
 </body>
