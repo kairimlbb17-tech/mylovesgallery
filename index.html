@@ -2,500 +2,29 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Future Skin Admin</title>
+<title>Warlito Admin Panel</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 :root{
-  --bg:#020205;
-  --panel:#090912;
-  --panel2:#11111d;
+  --bg:#06060b;
+  --panel:#101018;
+  --panel2:#171725;
   --line:rgba(255,255,255,.10);
+  --text:#f5f7ff;
+  --muted:#8d92a8;
   --red:#ff174d;
   --pink:#ff2bd6;
-  --violet:#8b5cf6;
+  --purple:#8b5cf6;
   --blue:#00b7ff;
   --cyan:#00f5ff;
   --green:#00ff9c;
   --yellow:#ffd166;
-  --text:#f8fafc;
-  --muted:#9ca3af;
-  --danger:#ff3b3b;
 }
 
 *{
   box-sizing:border-box;
   -webkit-tap-highlight-color:transparent;
-}
-
-body{
-  margin:0;
-  min-height:100vh;
-  color:var(--text);
-  font-family:Arial, Helvetica, sans-serif;
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,23,77,.30), transparent 30%),
-    radial-gradient(circle at 85% 5%, rgba(0,245,255,.20), transparent 28%),
-    radial-gradient(circle at 50% 100%, rgba(139,92,246,.20), transparent 35%),
-    linear-gradient(160deg,#020205,#070711 45%,#020205);
-  overflow-x:hidden;
-}
-
-body:before{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:
-    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
-  background-size:34px 34px;
-  pointer-events:none;
-  opacity:.45;
-  mask-image:linear-gradient(to bottom, black, transparent 90%);
-}
-
-body:after{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:linear-gradient(90deg, transparent, rgba(255,255,255,.04), transparent);
-  transform:translateX(-120%);
-  animation:scan 7s infinite;
-  pointer-events:none;
-}
-
-@keyframes scan{
-  0%{transform:translateX(-120%)}
-  60%{transform:translateX(120%)}
-  100%{transform:translateX(120%)}
-}
-
-.app{
-  max-width:1180px;
-  margin:auto;
-  padding:14px;
-  position:relative;
-  z-index:1;
-}
-
-.topbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin:10px 0 16px;
-}
-
-.brand h1{
-  margin:0;
-  font-size:28px;
-  font-weight:1000;
-  letter-spacing:.8px;
-  background:linear-gradient(90deg,#fff,var(--cyan),var(--red));
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  filter:drop-shadow(0 0 12px rgba(0,245,255,.35));
-}
-
-.brand p{
-  margin:3px 0 0;
-  color:var(--muted);
-  font-size:12px;
-}
-
-.card{
-  background:linear-gradient(145deg,rgba(17,17,29,.94),rgba(5,5,10,.94));
-  border:1px solid var(--line);
-  padding:16px;
-  margin-bottom:14px;
-  box-shadow:0 18px 42px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.025);
-  clip-path:polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
-}
-
-.neon{
-  border-color:rgba(0,245,255,.28);
-  box-shadow:0 0 28px rgba(0,245,255,.12),0 18px 42px rgba(0,0,0,.45);
-}
-
-h2,h3{
-  margin:0 0 12px;
-}
-
-input,select,textarea{
-  width:100%;
-  background:#05050b;
-  color:white;
-  border:1px solid rgba(255,255,255,.11);
-  outline:none;
-  padding:13px;
-  margin:6px 0;
-  font-size:14px;
-  clip-path:polygon(0 0, calc(100% - 11px) 0, 100% 11px, 100% 100%, 11px 100%, 0 calc(100% - 11px));
-}
-
-input:focus,select:focus,textarea:focus{
-  border-color:var(--cyan);
-  box-shadow:0 0 16px rgba(0,245,255,.22);
-}
-
-button{
-  border:0;
-  color:white;
-  font-weight:900;
-  cursor:pointer;
-  padding:12px 14px;
-  margin:4px;
-  background:linear-gradient(135deg,var(--red),var(--violet));
-  box-shadow:0 0 18px rgba(255,23,77,.22);
-  clip-path:polygon(0 0, calc(100% - 11px) 0, 100% 11px, 100% 100%, 11px 100%, 0 calc(100% - 11px));
-}
-
-button:active{
-  transform:scale(.97);
-}
-
-.btn-dark{background:#1d1d2a}
-.btn-green{background:linear-gradient(135deg,#00b86b,var(--green)); color:#04100b}
-.btn-blue{background:linear-gradient(135deg,#2563eb,var(--cyan))}
-.btn-red{background:linear-gradient(135deg,#ff174d,#ff3b3b)}
-.btn-yellow{background:linear-gradient(135deg,#ffd166,#ff8c00); color:#1d1100}
-.btn-purple{background:linear-gradient(135deg,#7c3aed,#ff2bd6)}
-
-.hidden{display:none!important}
-
-.login{
-  max-width:480px;
-  margin:7vh auto 0;
-}
-
-.row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.toolbar{
-  display:grid;
-  grid-template-columns:1.2fr 1fr 1fr;
-  gap:10px;
-}
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
-}
-
-.stat{
-  background:#05050b;
-  border:1px solid rgba(255,255,255,.08);
-  padding:14px;
-  clip-path:polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
-}
-
-.stat span{
-  color:var(--muted);
-  font-size:12px;
-}
-
-.stat b{
-  display:block;
-  margin-top:4px;
-  font-size:24px;
-  color:var(--green);
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(315px,1fr));
-  gap:14px;
-}
-
-.hero-card{
-  background:linear-gradient(160deg,#10101b,#05050b);
-  border:1px solid rgba(255,255,255,.09);
-  padding:14px;
-  position:relative;
-  overflow:hidden;
-  clip-path:polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
-}
-
-.hero-card:before{
-  content:"";
-  position:absolute;
-  inset:-1px;
-  background:linear-gradient(120deg,transparent,rgba(0,245,255,.16),transparent);
-  transform:translateX(-120%);
-  animation:shine 6s infinite;
-  pointer-events:none;
-}
-
-@keyframes shine{
-  0%{transform:translateX(-120%)}
-  45%{transform:translateX(120%)}
-  100%{transform:translateX(120%)}
-}
-
-.hero-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:8px;
-  position:relative;
-  z-index:1;
-}
-
-.hero-title{
-  font-size:21px;
-  font-weight:1000;
-  text-transform:uppercase;
-}
-
-.hero-id{
-  font-size:11px;
-  color:var(--muted);
-}
-
-.badges{
-  display:flex;
-  gap:6px;
-  flex-wrap:wrap;
-  margin-top:7px;
-}
-
-.badge{
-  font-size:10px;
-  color:#030306;
-  background:var(--cyan);
-  padding:4px 7px;
-  font-weight:900;
-  text-transform:uppercase;
-  clip-path:polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
-}
-
-.badge.red{background:var(--red); color:white}
-.badge.green{background:var(--green)}
-.badge.yellow{background:var(--yellow)}
-.badge.purple{background:var(--violet); color:white}
-.badge.off{background:#555;color:#ddd}
-
-.skin{
-  display:grid;
-  grid-template-columns:76px 1fr;
-  gap:10px;
-  background:#080811;
-  border:1px solid rgba(255,255,255,.08);
-  padding:8px;
-  margin-top:10px;
-  position:relative;
-  clip-path:polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
-}
-
-.skin.featured{
-  border-color:rgba(255,209,102,.9);
-  box-shadow:0 0 18px rgba(255,209,102,.18);
-}
-
-.skin.disabled{
-  opacity:.45;
-  filter:grayscale(1);
-}
-
-.skin img{
-  width:76px;
-  height:108px;
-  object-fit:cover;
-  background:#1f1f2a;
-  clip-path:polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 9px 100%, 0 calc(100% - 9px));
-}
-
-.skin-title{
-  font-weight:900;
-  font-size:13px;
-}
-
-.small{
-  font-size:11px;
-  color:var(--muted);
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.actions{
-  display:flex;
-  gap:4px;
-  flex-wrap:wrap;
-  margin-top:7px;
-}
-
-.preview{
-  display:flex;
-  gap:12px;
-  align-items:center;
-  background:#05050b;
-  border:1px solid rgba(255,255,255,.08);
-  padding:10px;
-  margin-top:8px;
-}
-
-.preview img{
-  width:88px;
-  height:126px;
-  object-fit:cover;
-  background:#222;
-}
-
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.86);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:14px;
-  z-index:50;
-}
-
-.modal-box{
-  width:100%;
-  max-width:560px;
-  max-height:90vh;
-  overflow:auto;
-  background:linear-gradient(145deg,#11111d,#05050b);
-  border:1px solid rgba(0,245,255,.35);
-  box-shadow:0 0 45px rgba(0,245,255,.18);
-  padding:16px;
-  clip-path:polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
-}
-
-#log{
-  height:120px;
-  overflow:auto;
-  background:#020204;
-  color:#00ff9c;
-  padding:10px;
-  font-size:12px;
-  border:1px solid rgba(0,255,156,.18);
-}
-
-.analytics-list{
-  display:grid;
-  gap:8px;
-}
-
-.analytics-item{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:#05050b;
-  padding:10px;
-  border:1px solid rgba(255,255,255,.07);
-}
-
-@media(max-width:740px){
-  .app{padding:10px}
-  .topbar{align-items:flex-start; flex-direction:column}
-  .brand h1{font-size:23px}
-  .row,.toolbar,.stats{grid-template-columns:1fr}
-  .grid{grid-template-columns:1fr}
-  button{width:100%; margin:4px 0}
-  .actions button{width:auto; flex:1; font-size:11px; padding:10px 8px}
-  .skin{grid-template-columns:70px 1fr}
-  .skin img{width:70px;height:100px}
-}
-</style>
-</head>
-
-<body>
-<div class="app">
-
-  <div class="topbar">
-    <div class="brand">
-      <h1>⚔️ FUTURE SKIN ADMIN</h1>
-      <p>GitHub JSON CMS • Phone/WebView Ready</p>
-    </div>
-    <button class="btn-dark" onclick="reloadAll()">Reload JSON</button>
-  </div>
-
-  <div id="loginCard" class="card neon login">
-    <h2>🔐 Admin Access</h2>
-    <input id="password" type="password" placeholder="Admin Password">
-    <input id="token" type="password" placeholder="GitHub Token">
-    <button onclick="login()">ENTER PANEL</button>
-    <p style="color:#aaa;font-size:12px">
-      Token nasa HTML/WebView, kaya pang private admin use lang ito.
-    </p>
-  </div>
-
-  <div id="panel" class="hidden">
-
-    <div class="card">
-      <div class="stats">
-        <div class="stat"><span>Heroes</span><b id="statHeroes">0</b></div>
-        <div class="stat"><span>Skins</span><b id="statSkins">0</b></div>
-        <div class="stat"><span>Featured</span><b id="statFeatured">0</b></div>
-        <div class="stat"><span>Enabled</span><b id="statEnabled">0</b></div>
-      </div>
-    </div>
-
-    <div class="card neon">
-      <h2>➕ Add Hero</h2>
-      <div class="row">
-        <input id="newHeroName" placeholder="Hero name">
-        <select id="newHeroCategory">
-          <option value="assassin">Assassin</option>
-          <option value="fighter">Fighter</option>
-          <option value="mage">Mage</option>
-          <option value="marksman">Marksman</option>
-          <option value="tank">Tank</option>
-          <option value="support">Support</option>
-        </select>
-      </div>
-      <button class="btn-green" onclick="addHero()">ADD HERO ONLY</button>
-    </div>
-
-    <div class="card">
-      <h2>🔎 Search / Filter</h2>
-      <div class="toolbar">
-        <input id="search" placeholder="Search hero / skin URL / tag..." oninput="render()">
-        <select id="filterCategory" onchange="render()">
-          <option value="all">All Categories</option>
-          <option value="assassin">Assassin</option>
-          <option value="fighter">Fighter</option>
-          <option value="mage">Mage</option>
-          <option value="marksman">Marksman</option>
-          <option value="tank">Tank</option>
-          <option value="support">Support</option>
-        </select>
-        <select id="filterStatus" onchange="render()">
-          <option value="all">All Status</option>
-          <option value="featured">Featured Only</option>
-          <option value="enabled">Enabled Only</option><!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Warlito Admin Panel</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-
-<style>
-:root{
-  --bg:#060913;
-  --panel:#0c1220;
-  --panel2:#11192b;
-  --line:rgba(100,180,255,.18);
-  --text:#eef6ff;
-  --muted:#8fa1ba;
-  --cyan:#28e7ff;
-  --blue:#2c7dff;
-  --red:#ff335f;
-  --green:#22f59a;
-  --yellow:#ffcc4d;
-  --purple:#9b6cff;
-}
-
-*{
-  box-sizing:border-box;
   max-width:100%;
 }
 
@@ -504,12 +33,15 @@ html,body{
   width:100%;
   min-height:100%;
   overflow-x:hidden;
-  background:
-    radial-gradient(circle at 10% 0%,rgba(40,231,255,.16),transparent 30%),
-    radial-gradient(circle at 90% 0%,rgba(255,51,95,.13),transparent 30%),
-    linear-gradient(145deg,#02040a,#08101d 55%,#02040a);
+}
+
+body{
   color:var(--text);
-  font-family:"Trebuchet MS", Arial, sans-serif;
+  font-family:"Segoe UI", Arial, sans-serif;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(255,23,77,.22), transparent 32%),
+    radial-gradient(circle at 100% 0%, rgba(0,245,255,.15), transparent 30%),
+    linear-gradient(145deg,#050508,#090915 55%,#050508);
 }
 
 body:before{
@@ -517,15 +49,15 @@ body:before{
   position:fixed;
   inset:0;
   background:
-    linear-gradient(rgba(44,125,255,.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(44,125,255,.05) 1px, transparent 1px);
+    linear-gradient(rgba(255,255,255,.026) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.026) 1px, transparent 1px);
   background-size:34px 34px;
   pointer-events:none;
 }
 
 .app{
   width:100%;
-  max-width:980px;
+  max-width:1000px;
   margin:auto;
   padding:12px;
   position:relative;
@@ -533,61 +65,57 @@ body:before{
 }
 
 .cut{
-  clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px));
+  clip-path:polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
 }
 
 .topbar{
   display:flex;
   align-items:center;
+  justify-content:space-between;
   gap:10px;
-  margin:6px 0 12px;
-}
-
-.logoBox{
-  width:44px;
-  height:44px;
-  flex:0 0 44px;
-  display:grid;
-  place-items:center;
-  background:linear-gradient(135deg,var(--blue),var(--cyan));
-  color:#02050c;
+  margin:8px 0 14px;
 }
 
 .brand{
   min-width:0;
-  flex:1;
 }
 
 .brand h1{
   margin:0;
-  font-size:21px;
-  line-height:1.1;
+  font-size:24px;
   font-weight:900;
-  letter-spacing:.4px;
-  overflow:hidden;
+  letter-spacing:.3px;
+  background:linear-gradient(90deg,#fff,var(--cyan),var(--red));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
   white-space:nowrap;
+  overflow:hidden;
   text-overflow:ellipsis;
 }
 
 .brand p{
   margin:3px 0 0;
-  color:var(--muted);
   font-size:12px;
-  overflow:hidden;
+  color:var(--muted);
   white-space:nowrap;
+  overflow:hidden;
   text-overflow:ellipsis;
 }
 
 .card{
-  width:100%;
-  background:linear-gradient(180deg,rgba(17,25,43,.96),rgba(6,11,22,.98));
+  background:linear-gradient(145deg,rgba(20,20,32,.95),rgba(8,8,15,.97));
   border:1px solid var(--line);
   padding:14px;
-  margin-bottom:12px;
-  box-shadow:0 16px 36px rgba(0,0,0,.38);
+  margin-bottom:13px;
+  box-shadow:0 16px 40px rgba(0,0,0,.38);
 }
 
-.cardTitle{
+.cardGlow{
+  border-color:rgba(255,23,77,.32);
+  box-shadow:0 0 24px rgba(255,23,77,.12),0 16px 40px rgba(0,0,0,.38);
+}
+
+.title{
   display:flex;
   align-items:center;
   gap:8px;
@@ -599,7 +127,7 @@ body:before{
 .icon{
   width:18px;
   height:18px;
-  flex-shrink:0;
+  min-width:18px;
   stroke:currentColor;
   stroke-width:2.2;
   fill:none;
@@ -610,44 +138,44 @@ body:before{
 input,select{
   width:100%;
   min-width:0;
-  background:#050a15;
-  color:var(--text);
-  border:1px solid rgba(100,180,255,.18);
+  color:white;
+  background:#080811;
+  border:1px solid rgba(255,255,255,.10);
   outline:none;
   padding:12px;
   margin:5px 0;
   font-size:14px;
-  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+  clip-path:polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
 }
 
 input:focus,select:focus{
-  border-color:var(--cyan);
-  box-shadow:0 0 0 3px rgba(40,231,255,.08);
+  border-color:var(--red);
+  box-shadow:0 0 0 3px rgba(255,23,77,.08);
 }
 
 button{
   border:0;
   color:white;
-  font-weight:900;
+  background:linear-gradient(135deg,var(--red),var(--purple));
+  padding:11px 12px;
+  min-height:40px;
   font-size:13px;
-  padding:10px 11px;
-  min-height:39px;
+  font-weight:900;
   cursor:pointer;
-  background:linear-gradient(135deg,#1558dc,var(--blue));
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  gap:5px;
-  clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,9px 100%,0 calc(100% - 9px));
+  gap:6px;
+  clip-path:polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
 }
 
 button:active{transform:scale(.97)}
 
-.btnDark{background:#1c2537}
-.btnGreen{background:linear-gradient(135deg,#00a767,var(--green));color:#02110a}
-.btnBlue{background:linear-gradient(135deg,#1264ff,var(--cyan));color:#021017}
-.btnRed{background:linear-gradient(135deg,#d51b43,var(--red))}
-.btnYellow{background:linear-gradient(135deg,#d68d00,var(--yellow));color:#201300}
+.btnDark{background:#232333}
+.btnGreen{background:linear-gradient(135deg,#00b86b,var(--green));color:#06110c}
+.btnBlue{background:linear-gradient(135deg,#2563eb,var(--cyan));color:#031018}
+.btnRed{background:linear-gradient(135deg,#ff174d,#ff3b3b)}
+.btnYellow{background:linear-gradient(135deg,#ffd166,#ff8c00);color:#1b1100}
 
 .hidden{display:none!important}
 
@@ -664,14 +192,14 @@ button:active{transform:scale(.97)}
 
 @media(min-width:760px){
   .row{grid-template-columns:1fr 1fr}
-  .toolbar{grid-template-columns:1.4fr 1fr 1fr}
+  .toolbar{grid-template-columns:1.3fr 1fr 1fr}
   .stats{grid-template-columns:repeat(3,1fr)}
 }
 
 .stat{
-  background:#07101e;
-  border:1px solid rgba(100,180,255,.14);
-  padding:12px;
+  background:#080811;
+  border:1px solid rgba(255,255,255,.08);
+  padding:13px;
 }
 
 .stat span{
@@ -681,9 +209,9 @@ button:active{transform:scale(.97)}
 
 .stat b{
   display:block;
-  margin-top:3px;
+  margin-top:4px;
   font-size:23px;
-  color:var(--cyan);
+  color:var(--green);
 }
 
 .grid{
@@ -697,37 +225,40 @@ button:active{transform:scale(.97)}
 }
 
 .hero{
-  width:100%;
+  background:linear-gradient(160deg,#11111c,#07070d);
+  border:1px solid rgba(255,255,255,.08);
+  padding:13px;
   min-width:0;
-  background:linear-gradient(180deg,#101827,#060c17);
-  border:1px solid rgba(100,180,255,.15);
-  padding:12px;
   overflow:hidden;
+}
+
+.heroTop{
+  min-width:0;
 }
 
 .heroName{
   font-size:24px;
+  line-height:1;
   font-weight:900;
   text-transform:uppercase;
-  line-height:1;
+  white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-  white-space:nowrap;
 }
 
 .heroId{
   margin-top:4px;
-  color:var(--muted);
   font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-  white-space:nowrap;
 }
 
 .badges{
   display:flex;
-  gap:6px;
   flex-wrap:wrap;
+  gap:6px;
   margin-top:8px;
 }
 
@@ -735,21 +266,21 @@ button:active{transform:scale(.97)}
   max-width:100%;
   font-size:10px;
   font-weight:900;
+  color:#050508;
+  background:var(--cyan);
   padding:5px 7px;
-  color:var(--cyan);
-  border:1px solid rgba(40,231,255,.22);
-  background:rgba(40,231,255,.08);
   text-transform:uppercase;
+  white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-  white-space:nowrap;
-  clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px));
+  clip-path:polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
 }
 
-.badgeRed{color:var(--red);border-color:rgba(255,51,95,.25);background:rgba(255,51,95,.08)}
-.badgeGreen{color:var(--green);border-color:rgba(34,245,154,.25);background:rgba(34,245,154,.08)}
-.badgeYellow{color:var(--yellow);border-color:rgba(255,204,77,.25);background:rgba(255,204,77,.08)}
-.badgeOff{color:#9da8ba;border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.05)}
+.badgeRed{background:var(--red);color:white}
+.badgeGreen{background:var(--green)}
+.badgeYellow{background:var(--yellow)}
+.badgePurple{background:var(--purple);color:white}
+.badgeOff{background:#555;color:#eee}
 
 .actions{
   display:grid;
@@ -769,25 +300,24 @@ button:active{transform:scale(.97)}
 }
 
 .skin{
-  width:100%;
-  min-width:0;
   display:grid;
   grid-template-columns:72px minmax(0,1fr);
-  gap:9px;
-  background:#050a14;
-  border:1px solid rgba(100,180,255,.13);
+  gap:10px;
+  background:#090911;
+  border:1px solid rgba(255,255,255,.08);
   padding:8px;
   margin-top:10px;
+  min-width:0;
   overflow:hidden;
 }
 
 .skin.featured{
-  border-color:rgba(255,204,77,.55);
-  box-shadow:0 0 15px rgba(255,204,77,.08);
+  border-color:rgba(255,209,102,.75);
+  box-shadow:0 0 16px rgba(255,209,102,.10);
 }
 
 .skin.disabled{
-  opacity:.48;
+  opacity:.45;
   filter:grayscale(1);
 }
 
@@ -795,8 +325,8 @@ button:active{transform:scale(.97)}
   width:72px;
   height:100px;
   object-fit:cover;
-  background:#141b29;
-  clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,9px 100%,0 calc(100% - 9px));
+  background:#1f1f2a;
+  clip-path:polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
 }
 
 .skinBody{
@@ -805,24 +335,22 @@ button:active{transform:scale(.97)}
 }
 
 .skinTitle{
-  font-size:15px;
   font-weight:900;
-  line-height:1.2;
+  font-size:14px;
+  white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-  white-space:nowrap;
 }
 
 .small{
   display:block;
   width:100%;
-  max-width:100%;
   color:var(--muted);
   font-size:11px;
   margin-top:3px;
+  white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-  white-space:nowrap;
 }
 
 .skin .actions{
@@ -832,7 +360,7 @@ button:active{transform:scale(.97)}
 .skin .actions button{
   font-size:11px;
   padding:9px 6px;
-  min-height:36px;
+  min-height:35px;
 }
 
 .modal{
@@ -851,36 +379,36 @@ button:active{transform:scale(.97)}
   max-width:520px;
   max-height:90vh;
   overflow:auto;
-  background:linear-gradient(180deg,#111827,#070d18);
-  border:1px solid rgba(40,231,255,.25);
+  background:linear-gradient(145deg,#141420,#080811);
+  border:1px solid rgba(255,23,77,.32);
   padding:14px;
-  box-shadow:0 0 45px rgba(40,231,255,.12);
+  box-shadow:0 0 45px rgba(255,23,77,.15);
 }
 
 .preview{
   display:grid;
   grid-template-columns:78px minmax(0,1fr);
   gap:10px;
-  align-items:center;
-  background:#050a14;
-  border:1px solid rgba(100,180,255,.13);
+  background:#090911;
+  border:1px solid rgba(255,255,255,.08);
   padding:9px;
   margin-top:9px;
+  align-items:center;
 }
 
 .preview img{
   width:78px;
   height:108px;
   object-fit:cover;
-  background:#141b29;
+  background:#222;
 }
 
 #log{
   height:105px;
   overflow:auto;
-  background:#040812;
+  background:#050509;
   color:var(--green);
-  border:1px solid rgba(34,245,154,.16);
+  border:1px solid rgba(0,255,156,.16);
   padding:10px;
   font-size:12px;
 }
@@ -891,19 +419,20 @@ button:active{transform:scale(.97)}
 <div class="app">
 
   <div class="topbar">
-    <div class="logoBox cut">
-      <svg class="icon" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 10-13h-7V2z"/></svg>
-    </div>
     <div class="brand">
       <h1>Warlito Admin Panel</h1>
-      <p>Saber Storm Skin Manager</p>
+      <p>Opera GX Style Skin Manager</p>
     </div>
+    <button class="btnDark" onclick="reloadAll()">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+      Reload
+    </button>
   </div>
 
-  <div id="loginCard" class="card cut login">
-    <div class="cardTitle">
+  <div id="loginCard" class="card cut cardGlow login">
+    <div class="title">
       <svg class="icon" viewBox="0 0 24 24"><path d="M12 17v-4"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><rect x="5" y="11" width="14" height="10" rx="2"/></svg>
-      Admin Access
+      Admin Login
     </div>
     <input id="password" type="password" placeholder="Admin password">
     <input id="token" type="password" placeholder="GitHub token">
@@ -923,8 +452,8 @@ button:active{transform:scale(.97)}
       </div>
     </div>
 
-    <div class="card cut">
-      <div class="cardTitle">
+    <div class="card cut cardGlow">
+      <div class="title">
         <svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
         Add Hero
       </div>
@@ -943,7 +472,7 @@ button:active{transform:scale(.97)}
     </div>
 
     <div class="card cut">
-      <div class="cardTitle">
+      <div class="title">
         <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         Search & Filter
       </div>
@@ -968,7 +497,7 @@ button:active{transform:scale(.97)}
     </div>
 
     <div class="card cut">
-      <div class="cardTitle">
+      <div class="title">
         <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
         Heroes
       </div>
@@ -976,7 +505,7 @@ button:active{transform:scale(.97)}
     </div>
 
     <div class="card cut">
-      <div class="cardTitle">
+      <div class="title">
         <svg class="icon" viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 16v-5"/><path d="M12 16V8"/><path d="M16 16v-3"/></svg>
         Logs
       </div>
@@ -988,7 +517,7 @@ button:active{transform:scale(.97)}
 
 <div class="modal" id="skinModal">
   <div class="modalBox cut">
-    <div class="cardTitle" id="modalTitle">Add Skin</div>
+    <div class="title" id="modalTitle">Add Skin</div>
 
     <input id="skinImage" placeholder="Image URL" oninput="livePreview(); smartTag();">
     <input id="skinScript" placeholder="Script ZIP URL" oninput="smartTag();">
@@ -1027,7 +556,6 @@ const OWNER = "kairimlbb17-tech";
 const REPO = "shesh";
 const FILE = "skins.json";
 const BRANCH = "main";
-
 const CATEGORIES = ["assassin","fighter","mage","marksman","tank","support"];
 
 let TOKEN = "";
@@ -1040,14 +568,14 @@ const API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
 
 function icon(name){
   const icons = {
-    plus:`<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>`,
     edit:`<svg class="icon" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>`,
     eye:`<svg class="icon" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>`,
     eyeOff:`<svg class="icon" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 10.6A3 3 0 0 0 13.4 13.4"/><path d="M9.9 4.2A10.5 10.5 0 0 1 12 4c6 0 10 8 10 8a18 18 0 0 1-3.2 4.5"/><path d="M6.1 6.1C3.5 7.9 2 12 2 12s4 8 10 8a10.5 10.5 0 0 0 4.1-.8"/></svg>`,
     star:`<svg class="icon" viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1L12 2z"/></svg>`,
     up:`<svg class="icon" viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>`,
     down:`<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg>`,
-    trash:`<svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 15H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>`
+    trash:`<svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 15H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>`,
+    plus:`<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>`
   };
   return icons[name] || "";
 }
@@ -1197,25 +725,37 @@ async function saveToGithub(message){
   }catch(e){ log(e.toString()); }
 }
 
-function reloadAll(){ if(!TOKEN){alert("Login first");return;} loadData(); }
+function reloadAll(){
+  if(!TOKEN){ alert("Login first"); return; }
+  loadData();
+}
 
 function addHero(){
   const name = document.getElementById("newHeroName").value.trim();
   const category = document.getElementById("newHeroCategory").value;
 
   if(!name){ alert("Enter hero name"); return; }
+
   if(DATA.heroes.find(h => h.name.toLowerCase() === name.toLowerCase())){
     alert("Duplicate hero.");
     return;
   }
 
-  DATA.heroes.push({id:makeHeroId(name),name,category,enabled:true,skins:[]});
+  DATA.heroes.push({
+    id:makeHeroId(name),
+    name,
+    category,
+    enabled:true,
+    skins:[]
+  });
+
   document.getElementById("newHeroName").value = "";
   saveToGithub(`Add hero ${name}`);
 }
 
 function editHero(index){
   const hero = DATA.heroes[index];
+
   const newName = prompt("Hero name:", hero.name);
   if(!newName || !newName.trim()) return;
 
@@ -1227,6 +767,7 @@ function editHero(index){
 
   hero.name = newName.trim();
   hero.category = cat;
+
   saveToGithub(`Edit hero ${hero.name}`);
 }
 
@@ -1245,6 +786,7 @@ function deleteHero(index){
 function openAddSkin(heroIndex){
   currentHeroIndex = heroIndex;
   currentSkinIndex = null;
+
   const hero = DATA.heroes[heroIndex];
 
   document.getElementById("modalTitle").innerText = `Add Skin to ${hero.name}`;
@@ -1280,12 +822,18 @@ function saveSkinModal(){
   const image = document.getElementById("skinImage").value.trim();
   const script = document.getElementById("skinScript").value.trim();
 
-  let tags = document.getElementById("skinTags").value.split(",").map(x=>x.trim().toLowerCase()).filter(Boolean);
+  let tags = document.getElementById("skinTags").value
+    .split(",")
+    .map(x=>x.trim().toLowerCase())
+    .filter(Boolean);
 
   const featured = document.getElementById("skinFeatured").value === "true";
   const enabled = document.getElementById("skinEnabled").value === "true";
 
-  if(!image || !script){ alert("Fill image and script URL"); return; }
+  if(!image || !script){
+    alert("Fill image and script URL");
+    return;
+  }
 
   const hero = DATA.heroes[currentHeroIndex];
 
@@ -1294,8 +842,14 @@ function saveSkinModal(){
     return s.image === image || s.script === script;
   });
 
-  if(duplicate){ alert("Duplicate image/script already exists."); return; }
-  if(tags.length === 0) tags = smartTagsFromText(`${image} ${script} ${hero.name}`);
+  if(duplicate){
+    alert("Duplicate image/script already exists.");
+    return;
+  }
+
+  if(tags.length === 0){
+    tags = smartTagsFromText(`${image} ${script} ${hero.name}`);
+  }
 
   const old = currentSkinIndex !== null ? hero.skins[currentSkinIndex] : null;
 
@@ -1328,11 +882,13 @@ function deleteSkin(heroIndex, skinIndex){
 function moveSkin(heroIndex, skinIndex, dir){
   const skins = DATA.heroes[heroIndex].skins;
   const newIndex = skinIndex + dir;
+
   if(newIndex < 0 || newIndex >= skins.length) return;
 
   const temp = skins[skinIndex];
   skins[skinIndex] = skins[newIndex];
   skins[newIndex] = temp;
+
   saveToGithub("Reorder skins");
 }
 
@@ -1365,7 +921,11 @@ function smartTagsFromText(text){
   const raw = String(text || "").toLowerCase();
   const rules = ["legend","starlight","collector","epic","elite","special","aspirant","lightborn","summer","christmas","valentine","anniversary","anime","aot","luckybox","backup","default","fanny","gusion","valentines"];
   const tags = [];
-  rules.forEach(tag=>{ if(raw.includes(tag)) tags.push(tag === "valentines" ? "valentine" : tag); });
+
+  rules.forEach(tag=>{
+    if(raw.includes(tag)) tags.push(tag === "valentines" ? "valentine" : tag);
+  });
+
   return [...new Set(tags)];
 }
 
@@ -1373,7 +933,10 @@ function smartTag(){
   const image = document.getElementById("skinImage").value;
   const script = document.getElementById("skinScript").value;
   const tags = smartTagsFromText(`${image} ${script}`);
-  if(tags.length) document.getElementById("skinTags").value = tags.join(", ");
+
+  if(tags.length){
+    document.getElementById("skinTags").value = tags.join(", ");
+  }
 }
 
 function closeModal(){
@@ -1401,17 +964,23 @@ function render(){
 
     const heroMatches = [hero.id,hero.name,hero.category].join(" ").toLowerCase().includes(q);
 
-    let skins = hero.skins.map((skin,si)=>({skin,si})).filter(obj=>{
-      const skin = obj.skin;
+    let skins = hero.skins
+      .map((skin,si)=>({skin,si}))
+      .filter(obj=>{
+        const skin = obj.skin;
 
-      if(status === "featured" && !skin.featured) return false;
-      if(status === "enabled" && !skin.enabled) return false;
-      if(status === "disabled" && skin.enabled) return false;
+        if(status === "featured" && !skin.featured) return false;
+        if(status === "enabled" && !skin.enabled) return false;
+        if(status === "disabled" && skin.enabled) return false;
 
-      const searchable = [hero.id,hero.name,hero.category,skin.id,skin.image,skin.script,...(skin.tags || [])].join(" ").toLowerCase();
+        const searchable = [
+          hero.id,hero.name,hero.category,
+          skin.id,skin.image,skin.script,
+          ...(skin.tags || [])
+        ].join(" ").toLowerCase();
 
-      return !q || heroMatches || searchable.includes(q);
-    });
+        return !q || heroMatches || searchable.includes(q);
+      });
 
     if(q && !heroMatches && skins.length === 0) return;
 
@@ -1431,7 +1000,7 @@ function render(){
             <div class="small">ZIP: ${skin.script}</div>
 
             <div class="badges">
-              ${(skin.tags || []).map(t=>`<span class="badge">${t}</span>`).join("")}
+              ${(skin.tags || []).map(t=>`<span class="badge badgePurple">${t}</span>`).join("")}
             </div>
 
             <div class="actions">
@@ -1448,7 +1017,7 @@ function render(){
     });
 
     card.innerHTML = `
-      <div>
+      <div class="heroTop">
         <div class="heroName">${hero.name}</div>
         <div class="heroId">ID: ${hero.id}</div>
         <div class="badges">
@@ -1465,7 +1034,7 @@ function render(){
         <button class="btnRed" onclick="deleteHero(${hi})">${icon("trash")}Delete</button>
       </div>
 
-      ${skinsHtml || `<div style="color:#7f8da8;margin-top:12px">No skins found.</div>`}
+      ${skinsHtml || `<div style="color:#777;margin-top:12px">No skins found.</div>`}
     `;
 
     list.appendChild(card);
