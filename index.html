@@ -71,7 +71,8 @@ button{
 }
 button:disabled{opacity:.45;filter:grayscale(1);pointer-events:none}
 button:active{transform:scale(.97)}
-.btnDark{background:#232333}.btnGreen{background:linear-gradient(135deg,#00b86b,var(--green));color:#06110c}
+.btnDark{background:#232333}
+.btnGreen{background:linear-gradient(135deg,#00b86b,var(--green));color:#06110c}
 .btnBlue{background:linear-gradient(135deg,#2563eb,var(--cyan));color:#031018}
 .btnRed{background:linear-gradient(135deg,#ff174d,#ff3b3b)}
 .btnYellow{background:linear-gradient(135deg,#ffd166,#ff8c00);color:#1b1100}
@@ -96,6 +97,7 @@ button:active{transform:scale(.97)}
 }
 .badgeRed{background:var(--red);color:white}.badgeGreen{background:var(--green)}.badgeYellow{background:var(--yellow)}
 .badgePurple{background:var(--purple);color:white}.badgeOff{background:#555;color:#eee}
+.unsavedBadge{background:var(--yellow);color:#151000}
 .actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:10px}
 .actions button{width:100%;margin:0;min-width:0}
 @media(min-width:520px){.actions{grid-template-columns:repeat(4,minmax(0,1fr))}}
@@ -150,7 +152,7 @@ button:active{transform:scale(.97)}
   <div class="topbar">
     <div class="brand">
       <h1>Warlito Admin Panel</h1>
-      <p>Opera GX Style Skin Manager</p>
+      <p>Batch Save Mode • Opera GX Style</p>
     </div>
     <button class="btnDark" onclick="reloadAll()">⟳ Reload</button>
   </div>
@@ -163,7 +165,16 @@ button:active{transform:scale(.97)}
   </div>
 
   <div id="panel" class="hidden">
-    <div class="card cut">
+
+    <div class="card cut cardGlow">
+      <div class="title">Publish Center</div>
+      <div class="badges">
+        <span id="saveStatus" class="badge badgeGreen">Saved</span>
+      </div>
+      <div class="actions" style="grid-template-columns:1fr 1fr">
+        <button class="btnGreen" onclick="publishChanges()">Publish Changes</button>
+        <button class="btnDark" onclick="discardChanges()">Discard / Reload</button>
+      </div>
       <div class="actions" style="grid-template-columns:1fr 1fr">
         <button class="btnDark" onclick="logout()">Logout</button>
         <button class="btnDark" onclick="clearSavedLogin()">Clear Saved Login</button>
@@ -243,7 +254,7 @@ button:active{transform:scale(.97)}
       <div><b>Live Preview</b><div class="small" id="previewText">Paste image URL...</div></div>
     </div>
     <div class="actions">
-      <button class="btnGreen" onclick="saveSkinModal()">Save</button>
+      <button class="btnGreen" onclick="saveSkinModal()">Save Local</button>
       <button class="btnDark" onclick="closeModal()">Cancel</button>
     </div>
   </div>
@@ -262,7 +273,7 @@ button:active{transform:scale(.97)}
       <option value="support">Support</option>
     </select>
     <div class="actions">
-      <button class="btnGreen" onclick="saveHeroEdit()">Save Hero</button>
+      <button class="btnGreen" onclick="saveHeroEdit()">Save Local</button>
       <button class="btnDark" onclick="closeHeroEdit()">Cancel</button>
     </div>
   </div>
@@ -301,6 +312,8 @@ const API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
 let TOKEN = "";
 let SHA = "";
 let DATA = { heroes: [] };
+let ORIGINAL = null;
+let dirty = false;
 let currentHeroIndex = null;
 let currentSkinIndex = null;
 let currentEditHeroIndex = null;
@@ -313,28 +326,88 @@ function setBusy(state,text){
   document.getElementById("loadingText").innerText = text || "Processing...";
   document.getElementById("loading").style.display = state ? "flex" : "none";
 }
+
 function showToast(msg){
   const t=document.getElementById("toast");
-  t.innerText=msg;t.style.display="block";
+  t.innerText=msg;
+  t.style.display="block";
   setTimeout(()=>t.style.display="none",2400);
 }
-function slugify(text){return String(text||"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"")}
-function makeHeroId(name){let base=slugify(name)||"hero",id=base,n=2;while(DATA.heroes.some(h=>h.id===id)){id=`${base}_${n}`;n++}return id}
-function makeSkinId(hero){let n=hero.skins.length+1,id=`${hero.id}_${String(n).padStart(3,"0")}`;while(hero.skins.some(s=>s.id===id)){n++;id=`${hero.id}_${String(n).padStart(3,"0")}`}return id}
-function log(msg){const box=document.getElementById("log");if(!box)return;box.innerText+=`[${new Date().toLocaleTimeString()}] ${msg}\n`;box.scrollTop=box.scrollHeight}
-function saveLogin(){localStorage.setItem("warlito_pass",document.getElementById("password").value.trim());localStorage.setItem("warlito_token",TOKEN)}
-function clearSavedLogin(){localStorage.removeItem("warlito_pass");localStorage.removeItem("warlito_token");showToast("Saved login cleared.")}
-function logout(){document.getElementById("panel").classList.add("hidden");document.getElementById("loginCard").classList.remove("hidden")}
+
+function markDirty(){
+  dirty = true;
+  const s = document.getElementById("saveStatus");
+  if(s){
+    s.innerText = "Unsaved Changes";
+    s.className = "badge unsavedBadge";
+  }
+}
+
+function markSaved(){
+  dirty = false;
+  const s = document.getElementById("saveStatus");
+  if(s){
+    s.innerText = "Saved";
+    s.className = "badge badgeGreen";
+  }
+}
+
+function clone(obj){
+  return JSON.parse(JSON.stringify(obj));
+}
+
+function slugify(text){
+  return String(text||"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"");
+}
+
+function makeHeroId(name){
+  let base=slugify(name)||"hero",id=base,n=2;
+  while(DATA.heroes.some(h=>h.id===id)){id=`${base}_${n}`;n++}
+  return id;
+}
+
+function makeSkinId(hero){
+  let n=hero.skins.length+1,id=`${hero.id}_${String(n).padStart(3,"0")}`;
+  while(hero.skins.some(s=>s.id===id)){n++;id=`${hero.id}_${String(n).padStart(3,"0")}`}
+  return id;
+}
+
+function log(msg){
+  const box=document.getElementById("log");
+  if(!box)return;
+  box.innerText+=`[${new Date().toLocaleTimeString()}] ${msg}\n`;
+  box.scrollTop=box.scrollHeight;
+}
+
+function saveLogin(){
+  localStorage.setItem("warlito_pass",document.getElementById("password").value.trim());
+  localStorage.setItem("warlito_token",TOKEN);
+}
+
+function clearSavedLogin(){
+  localStorage.removeItem("warlito_pass");
+  localStorage.removeItem("warlito_token");
+  showToast("Saved login cleared.");
+}
+
+function logout(){
+  document.getElementById("panel").classList.add("hidden");
+  document.getElementById("loginCard").classList.remove("hidden");
+}
+
 function login(){
   const p=document.getElementById("password").value.trim();
   TOKEN=document.getElementById("token").value.trim();
+
   if(p!==PASS){showToast("Wrong password");return}
   if(!TOKEN){showToast("Enter GitHub token");return}
+
   saveLogin();
   document.getElementById("loginCard").classList.add("hidden");
   document.getElementById("panel").classList.remove("hidden");
   loadData();
 }
+
 window.addEventListener("load",()=>{
   const p=localStorage.getItem("warlito_pass");
   const t=localStorage.getItem("warlito_token");
@@ -370,223 +443,100 @@ async function loadData(){
   try{
     setBusy(true,"Loading JSON...");
     log("Loading skins.json...");
-    const res=await fetch(`${API}?ref=${BRANCH}`,{headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json"}});
+
+    const res=await fetch(`${API}?ref=${BRANCH}`,{
+      headers:{
+        "Authorization":`Bearer ${TOKEN}`,
+        "Accept":"application/vnd.github+json"
+      }
+    });
+
     const file=await res.json();
-    if(!res.ok){log(JSON.stringify(file,null,2));showToast("Failed to load JSON");return}
+
+    if(!res.ok){
+      log(JSON.stringify(file,null,2));
+      showToast("Failed to load JSON");
+      return;
+    }
+
     SHA=file.sha;
     const text=decodeURIComponent(escape(atob(file.content.replace(/\n/g,""))));
     DATA=JSON.parse(text);
-    normalizeData();render();log("Loaded.");showToast("Dashboard updated.");
-  }catch(e){log(e.toString());showToast("Load error");}
-  finally{setBusy(false)}
-}
-async function saveToGithub(message){
-  try{
+
     normalizeData();
-    setBusy(true,message || "Saving...");
-    log("Saving...");
-    const latest=await fetch(`${API}?ref=${BRANCH}`,{headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json"}});
-    const latestFile=await latest.json();
-    if(!latest.ok){log(JSON.stringify(latestFile,null,2));showToast("Cannot get latest SHA");return}
-    SHA=latestFile.sha;
-    const content=btoa(unescape(encodeURIComponent(JSON.stringify(DATA,null,2))));
-    const res=await fetch(API,{method:"PUT",headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json","Content-Type":"application/json"},body:JSON.stringify({message,content,sha:SHA,branch:BRANCH})});
-    const result=await res.json();
-    if(!res.ok){log(JSON.stringify(result,null,2));showToast("Save failed. Check token.");return}
-    SHA=result.content.sha;render();log("Saved.");showToast("Saved successfully.");
-  }catch(e){log(e.toString());showToast("Save error");}
-  finally{setBusy(false)}
-}
-function reloadAll(){if(!TOKEN){showToast("Login first");return}loadData()}
-
-function addHero(){
-  const name=document.getElementById("newHeroName").value.trim();
-  const category=document.getElementById("newHeroCategory").value;
-  if(!name){showToast("Enter hero name");return}
-  if(DATA.heroes.find(h=>h.name.toLowerCase()===name.toLowerCase())){showToast("Duplicate hero.");return}
-  DATA.heroes.push({id:makeHeroId(name),name,category,enabled:true,skins:[]});
-  document.getElementById("newHeroName").value="";
-  saveToGithub(`Add hero ${name}`);
-}
-function editHero(index){
-  currentEditHeroIndex=index;
-  const hero=DATA.heroes[index];
-  document.getElementById("editHeroName").value=hero.name;
-  document.getElementById("editHeroCategory").value=hero.category;
-  document.getElementById("heroEditModal").style.display="flex";
-}
-function saveHeroEdit(){
-  const hero=DATA.heroes[currentEditHeroIndex];
-  const name=document.getElementById("editHeroName").value.trim();
-  const cat=document.getElementById("editHeroCategory").value;
-  if(!name){showToast("Hero name required");return}
-  hero.name=name;hero.category=cat;
-  closeHeroEdit();
-  saveToGithub(`Edit hero ${name}`);
-}
-function closeHeroEdit(){document.getElementById("heroEditModal").style.display="none"}
-function toggleHero(index){DATA.heroes[index].enabled=!DATA.heroes[index].enabled;saveToGithub(`Toggle hero ${DATA.heroes[index].name}`)}
-function deleteHero(index){
-  const hero=DATA.heroes[index];
-  showConfirm("Delete Hero",`Deleting "${hero.name}" will remove the hero and all ${hero.skins.length} skin(s). This cannot be undone.`,()=>{
-    DATA.heroes.splice(index,1);
-    saveToGithub(`Delete hero ${hero.name}`);
-  });
+    ORIGINAL=clone(DATA);
+    markSaved();
+    render();
+    log("Loaded.");
+    showToast("Dashboard updated.");
+  }catch(e){
+    log(e.toString());
+    showToast("Load error");
+  }finally{
+    setBusy(false);
+  }
 }
 
-function openAddSkin(heroIndex){
-  currentHeroIndex=heroIndex;currentSkinIndex=null;
-  const hero=DATA.heroes[heroIndex];
-  document.getElementById("modalTitle").innerText=`Add Skin to ${hero.name}`;
-  document.getElementById("skinImage").value="";
-  document.getElementById("skinScript").value="";
-  document.getElementById("skinTags").value="";
-  document.getElementById("skinFeatured").value="false";
-  document.getElementById("skinEnabled").value="true";
-  livePreview();
-  document.getElementById("skinModal").style.display="flex";
-}
-function openEditSkin(heroIndex,skinIndex){
-  currentHeroIndex=heroIndex;currentSkinIndex=skinIndex;
-  const hero=DATA.heroes[heroIndex],skin=hero.skins[skinIndex];
-  document.getElementById("modalTitle").innerText=`Edit Skin - ${hero.name}`;
-  document.getElementById("skinImage").value=skin.image||"";
-  document.getElementById("skinScript").value=skin.script||"";
-  document.getElementById("skinTags").value=(skin.tags||[]).join(", ");
-  document.getElementById("skinFeatured").value=skin.featured?"true":"false";
-  document.getElementById("skinEnabled").value=skin.enabled?"true":"false";
-  livePreview();
-  document.getElementById("skinModal").style.display="flex";
-}
-function saveSkinModal(){
-  const image=document.getElementById("skinImage").value.trim();
-  const script=document.getElementById("skinScript").value.trim();
-  let tags=document.getElementById("skinTags").value.split(",").map(x=>x.trim().toLowerCase()).filter(Boolean);
-  const featured=document.getElementById("skinFeatured").value==="true";
-  const enabled=document.getElementById("skinEnabled").value==="true";
-  if(!image||!script){showToast("Fill image and script URL");return}
-  const hero=DATA.heroes[currentHeroIndex];
-  const duplicate=hero.skins.find((s,i)=>{if(currentSkinIndex!==null&&i===currentSkinIndex)return false;return s.image===image||s.script===script});
-  if(duplicate){showToast("Duplicate image/script exists.");return}
-  if(tags.length===0)tags=smartTagsFromText(`${image} ${script} ${hero.name}`);
-  const old=currentSkinIndex!==null?hero.skins[currentSkinIndex]:null;
-  const skinData={id:old?old.id:makeSkinId(hero),image,script,featured,enabled,tags};
-  if(currentSkinIndex===null){hero.skins.push(skinData);closeModal();saveToGithub(`Add skin to ${hero.name}`)}
-  else{hero.skins[currentSkinIndex]=skinData;closeModal();saveToGithub(`Edit skin of ${hero.name}`)}
-}
-function deleteSkin(heroIndex,skinIndex){
-  const hero=DATA.heroes[heroIndex],skin=hero.skins[skinIndex];
-  showConfirm("Delete Skin",`Deleting skin "${skin.id}" from ${hero.name}. This cannot be undone.`,()=>{
-    hero.skins.splice(skinIndex,1);
-    saveToGithub("Delete skin");
-  });
-}
-function moveSkin(heroIndex,skinIndex,dir){
-  const skins=DATA.heroes[heroIndex].skins,newIndex=skinIndex+dir;
-  if(newIndex<0||newIndex>=skins.length)return;
-  const temp=skins[skinIndex];skins[skinIndex]=skins[newIndex];skins[newIndex]=temp;
-  saveToGithub("Reorder skins");
-}
-function toggleFeatured(heroIndex,skinIndex){DATA.heroes[heroIndex].skins[skinIndex].featured=!DATA.heroes[heroIndex].skins[skinIndex].featured;saveToGithub("Toggle featured skin")}
-function toggleSkin(heroIndex,skinIndex){DATA.heroes[heroIndex].skins[skinIndex].enabled=!DATA.heroes[heroIndex].skins[skinIndex].enabled;saveToGithub("Toggle skin visibility")}
-function toggleCollapse(heroId){collapsed[heroId]=!collapsed[heroId];render()}
+async function publishChanges(){
+  if(!dirty){
+    showToast("No changes to publish.");
+    return;
+  }
 
-function livePreview(){
-  const url=document.getElementById("skinImage").value.trim(),img=document.getElementById("previewImg"),txt=document.getElementById("previewText");
-  if(!url){img.removeAttribute("src");txt.innerText="Paste image URL...";return}
-  img.src=url;txt.innerText=url;
-}
-function smartTagsFromText(text){
-  const raw=String(text||"").toLowerCase();
-  const rules=["legend","starlight","collector","epic","elite","special","aspirant","lightborn","summer","christmas","valentine","anniversary","anime","aot","luckybox","backup","default","fanny","gusion","valentines"];
-  const tags=[];rules.forEach(tag=>{if(raw.includes(tag))tags.push(tag==="valentines"?"valentine":tag)});
-  return[...new Set(tags)];
-}
-function smartTag(){const tags=smartTagsFromText(`${document.getElementById("skinImage").value} ${document.getElementById("skinScript").value}`);if(tags.length)document.getElementById("skinTags").value=tags.join(", ")}
-function closeModal(){document.getElementById("skinModal").style.display="none"}
-function showConfirm(title,desc,yesFn){
-  document.getElementById("confirmTitle").innerText=title;
-  document.getElementById("confirmDesc").innerText=desc;
-  document.getElementById("confirmYes").onclick=()=>{closeConfirm();yesFn()};
-  document.getElementById("confirmModal").style.display="flex";
-}
-function closeConfirm(){document.getElementById("confirmModal").style.display="none"}
+  showConfirm("Publish Changes","This will commit all local edits to GitHub in one update. Continue?",async()=>{
+    try{
+      normalizeData();
+      setBusy(true,"Publishing changes...");
+      log("Publishing changes...");
 
-function render(){
-  normalizeData();
-  const q=document.getElementById("search").value.toLowerCase();
-  const cat=document.getElementById("filterCategory").value;
-  const status=document.getElementById("filterStatus").value;
-  const list=document.getElementById("heroesList");
-  list.innerHTML="";
-  let totalSkins=0,totalEnabled=0;
-  DATA.heroes.forEach((hero,hi)=>{
-    totalSkins+=hero.skins.length;
-    hero.skins.forEach(s=>{if(s.enabled)totalEnabled++});
-    if(cat!=="all"&&hero.category!==cat)return;
-    const heroMatches=[hero.id,hero.name,hero.category].join(" ").toLowerCase().includes(q);
-    let skins=hero.skins.map((skin,realIndex)=>({skin,realIndex})).filter(obj=>{
-      const skin=obj.skin;
-      if(status==="featured"&&!skin.featured)return false;
-      if(status==="enabled"&&!skin.enabled)return false;
-      if(status==="disabled"&&skin.enabled)return false;
-      const searchable=[hero.id,hero.name,hero.category,skin.id,skin.image,skin.script,...(skin.tags||[])].join(" ").toLowerCase();
-      return !q||heroMatches||searchable.includes(q);
-    });
-    if(q&&!heroMatches&&skins.length===0)return;
-    if(typeof collapsed[hero.id]==="undefined")collapsed[hero.id]=true;
-    const card=document.createElement("div");
-    card.className="hero cut";
-    let skinsHtml="";
-    skins.forEach(({skin,realIndex})=>{
-      skinsHtml+=`
-      <div class="skin cut ${skin.featured?"featured":""} ${skin.enabled?"":"disabled"}">
-        <img src="${skin.image}" onerror="this.style.opacity=.25">
-        <div class="skinBody">
-          <div class="skinTitle">${skin.featured?"Featured Skin":"Skin"} • ${skin.enabled?"Visible":"Hidden"}</div>
-          <div class="small">ID: ${skin.id}</div>
-          <div class="small">IMG: ${skin.image}</div>
-          <div class="small">ZIP: ${skin.script}</div>
-          <div class="badges">${(skin.tags||[]).map(t=>`<span class="badge badgePurple">${t}</span>`).join("")}</div>
-          <div class="actions">
-            <button class="btnBlue" onclick="openEditSkin(${hi},${realIndex})">Edit</button>
-            <button class="btnYellow" onclick="toggleFeatured(${hi},${realIndex})">★</button>
-            <button class="btnDark" onclick="toggleSkin(${hi},${realIndex})">${skin.enabled?"Hide":"Show"}</button>
-            <button class="btnDark" onclick="moveSkin(${hi},${realIndex},-1)">↑</button>
-            <button class="btnDark" onclick="moveSkin(${hi},${realIndex},1)">↓</button>
-            <button class="btnRed" onclick="deleteSkin(${hi},${realIndex})">Delete</button>
-          </div>
-        </div>
-      </div>`;
-    });
-    card.innerHTML=`
-      <div class="heroHead">
-        <div class="heroTop">
-          <div class="heroName">${hero.name}</div>
-          <div class="heroId">ID: ${hero.id}</div>
-          <div class="badges">
-            <span class="badge badgeRed">${hero.category}</span>
-            <span class="badge">${hero.skins.length} skins</span>
-            <span class="badge ${hero.enabled?"badgeGreen":"badgeOff"}">${hero.enabled?"visible":"hidden"}</span>
-          </div>
-        </div>
-      </div>
-      <div class="actions">
-        <button class="btnDark" onclick="toggleCollapse('${hero.id}')">${collapsed[hero.id]?"Expand":"Minimize"}</button>
-        <button class="btnGreen" onclick="openAddSkin(${hi})">+ Skin</button>
-        <button class="btnBlue" onclick="editHero(${hi})">Edit</button>
-        <button class="btnDark" onclick="toggleHero(${hi})">${hero.enabled?"Hide":"Show"}</button>
-        <button class="btnRed" onclick="deleteHero(${hi})">Delete</button>
-      </div>
-      <div class="skinList ${collapsed[hero.id]?"collapsed":""}">
-        ${skinsHtml||`<div style="color:#777;margin-top:12px">No skins found.</div>`}
-      </div>`;
-    list.appendChild(card);
-  });
-  document.getElementById("statHeroes").innerText=DATA.heroes.length;
-  document.getElementById("statSkins").innerText=totalSkins;
-  document.getElementById("statEnabled").innerText=totalEnabled;
-}
-</script>
-</body>
-</html>
+      const latest=await fetch(`${API}?ref=${BRANCH}`,{
+        headers:{
+          "Authorization":`Bearer ${TOKEN}`,
+          "Accept":"application/vnd.github+json"
+        }
+      });
+
+      const latestFile=await latest.json();
+
+      if(!latest.ok){
+        log(JSON.stringify(latestFile,null,2));
+        showToast("Cannot get latest SHA");
+        return;
+      }
+
+      SHA=latestFile.sha;
+
+      const content=btoa(unescape(encodeURIComponent(JSON.stringify(DATA,null,2))));
+
+      const res=await fetch(API,{
+        method:"PUT",
+        headers:{
+          "Authorization":`Bearer ${TOKEN}`,
+          "Accept":"application/vnd.github+json",
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          message:"Batch update skins.json from Warlito Admin Panel",
+          content,
+          sha:SHA,
+          branch:BRANCH
+        })
+      });
+
+      const result=await res.json();
+
+      if(!res.ok){
+        log(JSON.stringify(result,null,2));
+        showToast("Publish failed. Reload then try again.");
+        return;
+      }
+
+      SHA=result.content.sha;
+      ORIGINAL=clone(DATA);
+      markSaved();
+      render();
+      log("Published.");
+      showToast("Published to GitHub.");
+    }catch(e){
+      log(e.toString());
+      showToast("Pub
