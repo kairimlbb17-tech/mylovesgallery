@@ -539,4 +539,389 @@ async function publishChanges(){
       showToast("Published to GitHub.");
     }catch(e){
       log(e.toString());
-      showToast("Pub
+      showToast("Publish error");
+    }finally{
+      setBusy(false);
+    }
+  });
+}
+
+function discardChanges(){
+  if(!dirty){
+    loadData();
+    return;
+  }
+
+  showConfirm("Discard Changes","This will remove all local edits and reload the latest GitHub JSON.",()=>{
+    if(ORIGINAL){
+      DATA=clone(ORIGINAL);
+      markSaved();
+      render();
+      showToast("Local changes discarded.");
+    }else{
+      loadData();
+    }
+  });
+}
+
+function reloadAll(){
+  if(!TOKEN){showToast("Login first");return}
+
+  if(dirty){
+    showConfirm("Reload JSON","You have unsaved changes. Reloading will discard them.",()=>{
+      loadData();
+    });
+  }else{
+    loadData();
+  }
+}
+
+function addHero(){
+  const name=document.getElementById("newHeroName").value.trim();
+  const category=document.getElementById("newHeroCategory").value;
+
+  if(!name){showToast("Enter hero name");return}
+  if(DATA.heroes.find(h=>h.name.toLowerCase()===name.toLowerCase())){
+    showToast("Duplicate hero.");
+    return;
+  }
+
+  DATA.heroes.push({id:makeHeroId(name),name,category,enabled:true,skins:[]});
+  document.getElementById("newHeroName").value="";
+  markDirty();
+  render();
+  showToast("Hero added locally.");
+}
+
+function editHero(index){
+  currentEditHeroIndex=index;
+  const hero=DATA.heroes[index];
+  document.getElementById("editHeroName").value=hero.name;
+  document.getElementById("editHeroCategory").value=hero.category;
+  document.getElementById("heroEditModal").style.display="flex";
+}
+
+function saveHeroEdit(){
+  const hero=DATA.heroes[currentEditHeroIndex];
+  const name=document.getElementById("editHeroName").value.trim();
+  const cat=document.getElementById("editHeroCategory").value;
+
+  if(!name){showToast("Hero name required");return}
+
+  hero.name=name;
+  hero.category=cat;
+  closeHeroEdit();
+  markDirty();
+  render();
+  showToast("Hero edited locally.");
+}
+
+function closeHeroEdit(){
+  document.getElementById("heroEditModal").style.display="none";
+}
+
+function toggleHero(index){
+  DATA.heroes[index].enabled=!DATA.heroes[index].enabled;
+  markDirty();
+  render();
+  showToast("Hero visibility changed locally.");
+}
+
+function deleteHero(index){
+  const hero=DATA.heroes[index];
+  showConfirm("Delete Hero",`Deleting "${hero.name}" will remove the hero and all ${hero.skins.length} skin(s). This cannot be undone after publish.`,()=>{
+    DATA.heroes.splice(index,1);
+    markDirty();
+    render();
+    showToast("Hero deleted locally.");
+  });
+}
+
+function openAddSkin(heroIndex){
+  currentHeroIndex=heroIndex;
+  currentSkinIndex=null;
+
+  const hero=DATA.heroes[heroIndex];
+
+  document.getElementById("modalTitle").innerText=`Add Skin to ${hero.name}`;
+  document.getElementById("skinImage").value="";
+  document.getElementById("skinScript").value="";
+  document.getElementById("skinTags").value="";
+  document.getElementById("skinFeatured").value="false";
+  document.getElementById("skinEnabled").value="true";
+  livePreview();
+
+  document.getElementById("skinModal").style.display="flex";
+}
+
+function openEditSkin(heroIndex,skinIndex){
+  currentHeroIndex=heroIndex;
+  currentSkinIndex=skinIndex;
+
+  const hero=DATA.heroes[heroIndex];
+  const skin=hero.skins[skinIndex];
+
+  document.getElementById("modalTitle").innerText=`Edit Skin - ${hero.name}`;
+  document.getElementById("skinImage").value=skin.image||"";
+  document.getElementById("skinScript").value=skin.script||"";
+  document.getElementById("skinTags").value=(skin.tags||[]).join(", ");
+  document.getElementById("skinFeatured").value=skin.featured?"true":"false";
+  document.getElementById("skinEnabled").value=skin.enabled?"true":"false";
+  livePreview();
+
+  document.getElementById("skinModal").style.display="flex";
+}
+
+function saveSkinModal(){
+  const image=document.getElementById("skinImage").value.trim();
+  const script=document.getElementById("skinScript").value.trim();
+
+  let tags=document.getElementById("skinTags").value
+    .split(",")
+    .map(x=>x.trim().toLowerCase())
+    .filter(Boolean);
+
+  const featured=document.getElementById("skinFeatured").value==="true";
+  const enabled=document.getElementById("skinEnabled").value==="true";
+
+  if(!image||!script){
+    showToast("Fill image and script URL");
+    return;
+  }
+
+  const hero=DATA.heroes[currentHeroIndex];
+
+  const duplicate=hero.skins.find((s,i)=>{
+    if(currentSkinIndex!==null&&i===currentSkinIndex)return false;
+    return s.image===image||s.script===script;
+  });
+
+  if(duplicate){
+    showToast("Duplicate image/script exists.");
+    return;
+  }
+
+  if(tags.length===0){
+    tags=smartTagsFromText(`${image} ${script} ${hero.name}`);
+  }
+
+  const old=currentSkinIndex!==null?hero.skins[currentSkinIndex]:null;
+
+  const skinData={
+    id:old?old.id:makeSkinId(hero),
+    image,
+    script,
+    featured,
+    enabled,
+    tags
+  };
+
+  if(currentSkinIndex===null){
+    hero.skins.push(skinData);
+    closeModal();
+    markDirty();
+    render();
+    showToast("Skin added locally.");
+  }else{
+    hero.skins[currentSkinIndex]=skinData;
+    closeModal();
+    markDirty();
+    render();
+    showToast("Skin edited locally.");
+  }
+}
+
+function deleteSkin(heroIndex,skinIndex){
+  const hero=DATA.heroes[heroIndex];
+  const skin=hero.skins[skinIndex];
+
+  showConfirm("Delete Skin",`Deleting skin "${skin.id}" from ${hero.name}. This cannot be undone after publish.`,()=>{
+    hero.skins.splice(skinIndex,1);
+    markDirty();
+    render();
+    showToast("Skin deleted locally.");
+  });
+}
+
+function moveSkin(heroIndex,skinIndex,dir){
+  const skins=DATA.heroes[heroIndex].skins;
+  const newIndex=skinIndex+dir;
+
+  if(newIndex<0||newIndex>=skins.length)return;
+
+  const temp=skins[skinIndex];
+  skins[skinIndex]=skins[newIndex];
+  skins[newIndex]=temp;
+
+  markDirty();
+  render();
+  showToast("Skin order changed locally.");
+}
+
+function toggleFeatured(heroIndex,skinIndex){
+  DATA.heroes[heroIndex].skins[skinIndex].featured=!DATA.heroes[heroIndex].skins[skinIndex].featured;
+  markDirty();
+  render();
+  showToast("Featured changed locally.");
+}
+
+function toggleSkin(heroIndex,skinIndex){
+  DATA.heroes[heroIndex].skins[skinIndex].enabled=!DATA.heroes[heroIndex].skins[skinIndex].enabled;
+  markDirty();
+  render();
+  showToast("Skin visibility changed locally.");
+}
+
+function toggleCollapse(heroId){
+  collapsed[heroId]=!collapsed[heroId];
+  render();
+}
+
+function livePreview(){
+  const url=document.getElementById("skinImage").value.trim();
+  const img=document.getElementById("previewImg");
+  const txt=document.getElementById("previewText");
+
+  if(!url){
+    img.removeAttribute("src");
+    txt.innerText="Paste image URL...";
+    return;
+  }
+
+  img.src=url;
+  txt.innerText=url;
+}
+
+function smartTagsFromText(text){
+  const raw=String(text||"").toLowerCase();
+  const rules=["legend","starlight","collector","epic","elite","special","aspirant","lightborn","summer","christmas","valentine","anniversary","anime","aot","luckybox","backup","default","fanny","gusion","valentines"];
+  const tags=[];
+
+  rules.forEach(tag=>{
+    if(raw.includes(tag))tags.push(tag==="valentines"?"valentine":tag);
+  });
+
+  return[...new Set(tags)];
+}
+
+function smartTag(){
+  const tags=smartTagsFromText(`${document.getElementById("skinImage").value} ${document.getElementById("skinScript").value}`);
+  if(tags.length)document.getElementById("skinTags").value=tags.join(", ");
+}
+
+function closeModal(){
+  document.getElementById("skinModal").style.display="none";
+}
+
+function showConfirm(title,desc,yesFn){
+  document.getElementById("confirmTitle").innerText=title;
+  document.getElementById("confirmDesc").innerText=desc;
+  document.getElementById("confirmYes").onclick=()=>{
+    closeConfirm();
+    yesFn();
+  };
+  document.getElementById("confirmModal").style.display="flex";
+}
+
+function closeConfirm(){
+  document.getElementById("confirmModal").style.display="none";
+}
+
+function render(){
+  normalizeData();
+
+  const q=document.getElementById("search").value.toLowerCase();
+  const cat=document.getElementById("filterCategory").value;
+  const status=document.getElementById("filterStatus").value;
+
+  const list=document.getElementById("heroesList");
+  list.innerHTML="";
+
+  let totalSkins=0,totalEnabled=0;
+
+  DATA.heroes.forEach((hero,hi)=>{
+    totalSkins+=hero.skins.length;
+    hero.skins.forEach(s=>{if(s.enabled)totalEnabled++});
+
+    if(cat!=="all"&&hero.category!==cat)return;
+
+    const heroMatches=[hero.id,hero.name,hero.category].join(" ").toLowerCase().includes(q);
+
+    let skins=hero.skins.map((skin,realIndex)=>({skin,realIndex})).filter(obj=>{
+      const skin=obj.skin;
+
+      if(status==="featured"&&!skin.featured)return false;
+      if(status==="enabled"&&!skin.enabled)return false;
+      if(status==="disabled"&&skin.enabled)return false;
+
+      const searchable=[hero.id,hero.name,hero.category,skin.id,skin.image,skin.script,...(skin.tags||[])].join(" ").toLowerCase();
+
+      return !q||heroMatches||searchable.includes(q);
+    });
+
+    if(q&&!heroMatches&&skins.length===0)return;
+
+    if(typeof collapsed[hero.id]==="undefined")collapsed[hero.id]=true;
+
+    const card=document.createElement("div");
+    card.className="hero cut";
+
+    let skinsHtml="";
+
+    skins.forEach(({skin,realIndex})=>{
+      skinsHtml+=`
+      <div class="skin cut ${skin.featured?"featured":""} ${skin.enabled?"":"disabled"}">
+        <img src="${skin.image}" onerror="this.style.opacity=.25">
+        <div class="skinBody">
+          <div class="skinTitle">${skin.featured?"Featured Skin":"Skin"} • ${skin.enabled?"Visible":"Hidden"}</div>
+          <div class="small">ID: ${skin.id}</div>
+          <div class="small">IMG: ${skin.image}</div>
+          <div class="small">ZIP: ${skin.script}</div>
+          <div class="badges">${(skin.tags||[]).map(t=>`<span class="badge badgePurple">${t}</span>`).join("")}</div>
+          <div class="actions">
+            <button class="btnBlue" onclick="openEditSkin(${hi},${realIndex})">Edit</button>
+            <button class="btnYellow" onclick="toggleFeatured(${hi},${realIndex})">★</button>
+            <button class="btnDark" onclick="toggleSkin(${hi},${realIndex})">${skin.enabled?"Hide":"Show"}</button>
+            <button class="btnDark" onclick="moveSkin(${hi},${realIndex},-1)">↑</button>
+            <button class="btnDark" onclick="moveSkin(${hi},${realIndex},1)">↓</button>
+            <button class="btnRed" onclick="deleteSkin(${hi},${realIndex})">Delete</button>
+          </div>
+        </div>
+      </div>`;
+    });
+
+    card.innerHTML=`
+      <div class="heroHead">
+        <div class="heroTop">
+          <div class="heroName">${hero.name}</div>
+          <div class="heroId">ID: ${hero.id}</div>
+          <div class="badges">
+            <span class="badge badgeRed">${hero.category}</span>
+            <span class="badge">${hero.skins.length} skins</span>
+            <span class="badge ${hero.enabled?"badgeGreen":"badgeOff"}">${hero.enabled?"visible":"hidden"}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btnDark" onclick="toggleCollapse('${hero.id}')">${collapsed[hero.id]?"Expand":"Minimize"}</button>
+        <button class="btnGreen" onclick="openAddSkin(${hi})">+ Skin</button>
+        <button class="btnBlue" onclick="editHero(${hi})">Edit</button>
+        <button class="btnDark" onclick="toggleHero(${hi})">${hero.enabled?"Hide":"Show"}</button>
+        <button class="btnRed" onclick="deleteHero(${hi})">Delete</button>
+      </div>
+
+      <div class="skinList ${collapsed[hero.id]?"collapsed":""}">
+        ${skinsHtml||`<div style="color:#777;margin-top:12px">No skins found.</div>`}
+      </div>`;
+
+    list.appendChild(card);
+  });
+
+  document.getElementById("statHeroes").innerText=DATA.heroes.length;
+  document.getElementById("statSkins").innerText=totalSkins;
+  document.getElementById("statEnabled").innerText=totalEnabled;
+}
+</script>
+</body>
+</html>
