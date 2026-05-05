@@ -3,414 +3,143 @@
 <head>
 <meta charset="UTF-8">
 <title>Warlito Admin Panel</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <style>
 :root{
-  --bg:#06060b;
-  --panel:#101018;
-  --panel2:#171725;
+  --bg:#050509;
+  --card:#11111b;
+  --card2:#080811;
   --line:rgba(255,255,255,.10);
-  --text:#f5f7ff;
-  --muted:#8d92a8;
+  --text:#f7f7ff;
+  --muted:#8f91a5;
   --red:#ff174d;
-  --pink:#ff2bd6;
   --purple:#8b5cf6;
-  --blue:#00b7ff;
   --cyan:#00f5ff;
   --green:#00ff9c;
   --yellow:#ffd166;
 }
-
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-  max-width:100%;
-}
-
-html,body{
-  margin:0;
-  width:100%;
-  min-height:100%;
-  overflow-x:hidden;
-}
-
+*{box-sizing:border-box;max-width:100%;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;min-height:100%;overflow-x:hidden}
 body{
   color:var(--text);
-  font-family:"Segoe UI", Arial, sans-serif;
+  font-family:"Segoe UI",Arial,sans-serif;
   background:
-    radial-gradient(circle at 0% 0%, rgba(255,23,77,.22), transparent 32%),
-    radial-gradient(circle at 100% 0%, rgba(0,245,255,.15), transparent 30%),
+    radial-gradient(circle at 0 0,rgba(255,23,77,.22),transparent 32%),
+    radial-gradient(circle at 100% 0,rgba(0,245,255,.14),transparent 30%),
     linear-gradient(145deg,#050508,#090915 55%,#050508);
 }
-
 body:before{
   content:"";
-  position:fixed;
-  inset:0;
+  position:fixed;inset:0;
   background:
-    linear-gradient(rgba(255,255,255,.026) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.026) 1px, transparent 1px);
+    linear-gradient(rgba(255,255,255,.026) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.026) 1px,transparent 1px);
   background-size:34px 34px;
   pointer-events:none;
 }
-
-.app{
-  width:100%;
-  max-width:1000px;
-  margin:auto;
-  padding:12px;
-  position:relative;
-  z-index:1;
-}
-
-.cut{
-  clip-path:polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
-}
-
-.topbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin:8px 0 14px;
-}
-
-.brand{
-  min-width:0;
-}
-
+.app{width:100%;max-width:1000px;margin:auto;padding:12px;position:relative;z-index:1}
+.cut{clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px))}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0 14px}
+.brand{min-width:0}
 .brand h1{
-  margin:0;
-  font-size:24px;
-  font-weight:900;
-  letter-spacing:.3px;
+  margin:0;font-size:24px;font-weight:900;letter-spacing:.3px;
   background:linear-gradient(90deg,#fff,var(--cyan),var(--red));
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
 }
-
-.brand p{
-  margin:3px 0 0;
-  font-size:12px;
-  color:var(--muted);
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
+.brand p{margin:3px 0 0;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card{
   background:linear-gradient(145deg,rgba(20,20,32,.95),rgba(8,8,15,.97));
   border:1px solid var(--line);
-  padding:14px;
-  margin-bottom:13px;
-  box-shadow:0 16px 40px rgba(0,0,0,.38);
+  padding:14px;margin-bottom:13px;
+  box-shadow:0 16px 40px rgba(0,0,0,.38)
 }
-
-.cardGlow{
-  border-color:rgba(255,23,77,.32);
-  box-shadow:0 0 24px rgba(255,23,77,.12),0 16px 40px rgba(0,0,0,.38);
-}
-
-.title{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-size:17px;
-  font-weight:900;
-  margin-bottom:10px;
-}
-
-.icon{
-  width:18px;
-  height:18px;
-  min-width:18px;
-  stroke:currentColor;
-  stroke-width:2.2;
-  fill:none;
-  stroke-linecap:round;
-  stroke-linejoin:round;
-}
-
+.cardGlow{border-color:rgba(255,23,77,.32);box-shadow:0 0 24px rgba(255,23,77,.12),0 16px 40px rgba(0,0,0,.38)}
+.title{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:900;margin-bottom:10px}
 input,select{
-  width:100%;
-  min-width:0;
-  color:white;
-  background:#080811;
-  border:1px solid rgba(255,255,255,.10);
-  outline:none;
-  padding:12px;
-  margin:5px 0;
-  font-size:14px;
-  clip-path:polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  width:100%;min-width:0;color:white;background:#080811;border:1px solid rgba(255,255,255,.10);
+  outline:none;padding:12px;margin:5px 0;font-size:14px;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))
 }
-
-input:focus,select:focus{
-  border-color:var(--red);
-  box-shadow:0 0 0 3px rgba(255,23,77,.08);
-}
-
+input:focus,select:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(255,23,77,.08)}
 button{
-  border:0;
-  color:white;
-  background:linear-gradient(135deg,var(--red),var(--purple));
-  padding:11px 12px;
-  min-height:40px;
-  font-size:13px;
-  font-weight:900;
-  cursor:pointer;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  clip-path:polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  border:0;color:white;background:linear-gradient(135deg,var(--red),var(--purple));
+  padding:11px 12px;min-height:40px;font-size:13px;font-weight:900;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))
 }
-
+button:disabled{opacity:.45;filter:grayscale(1);pointer-events:none}
 button:active{transform:scale(.97)}
-
-.btnDark{background:#232333}
-.btnGreen{background:linear-gradient(135deg,#00b86b,var(--green));color:#06110c}
+.btnDark{background:#232333}.btnGreen{background:linear-gradient(135deg,#00b86b,var(--green));color:#06110c}
 .btnBlue{background:linear-gradient(135deg,#2563eb,var(--cyan));color:#031018}
 .btnRed{background:linear-gradient(135deg,#ff174d,#ff3b3b)}
 .btnYellow{background:linear-gradient(135deg,#ffd166,#ff8c00);color:#1b1100}
-
 .hidden{display:none!important}
-
-.login{
-  max-width:430px;
-  margin:8vh auto 0;
-}
-
-.row,.toolbar,.stats{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:8px;
-}
-
-@media(min-width:760px){
-  .row{grid-template-columns:1fr 1fr}
-  .toolbar{grid-template-columns:1.3fr 1fr 1fr}
-  .stats{grid-template-columns:repeat(3,1fr)}
-}
-
-.stat{
-  background:#080811;
-  border:1px solid rgba(255,255,255,.08);
-  padding:13px;
-}
-
-.stat span{
-  color:var(--muted);
-  font-size:12px;
-}
-
-.stat b{
-  display:block;
-  margin-top:4px;
-  font-size:23px;
-  color:var(--green);
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:12px;
-}
-
-@media(min-width:820px){
-  .grid{grid-template-columns:repeat(2,1fr)}
-}
-
-.hero{
-  background:linear-gradient(160deg,#11111c,#07070d);
-  border:1px solid rgba(255,255,255,.08);
-  padding:13px;
-  min-width:0;
-  overflow:hidden;
-}
-
-.heroTop{
-  min-width:0;
-}
-
-.heroName{
-  font-size:24px;
-  line-height:1;
-  font-weight:900;
-  text-transform:uppercase;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.heroId{
-  margin-top:4px;
-  font-size:12px;
-  color:var(--muted);
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.badges{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-  margin-top:8px;
-}
-
+.login{max-width:430px;margin:8vh auto 0}
+.row,.toolbar,.stats{display:grid;grid-template-columns:1fr;gap:8px}
+@media(min-width:760px){.row{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1.3fr 1fr 1fr}.stats{grid-template-columns:repeat(3,1fr)}}
+.stat{background:#080811;border:1px solid rgba(255,255,255,.08);padding:13px}
+.stat span{color:var(--muted);font-size:12px}.stat b{display:block;margin-top:4px;font-size:23px;color:var(--green)}
+.grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:820px){.grid{grid-template-columns:repeat(2,1fr)}}
+.hero{background:linear-gradient(160deg,#11111c,#07070d);border:1px solid rgba(255,255,255,.08);padding:13px;min-width:0;overflow:hidden}
+.heroHead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.heroTop{min-width:0;flex:1}
+.heroName{font-size:24px;line-height:1;font-weight:900;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.heroId{margin-top:4px;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .badge{
-  max-width:100%;
-  font-size:10px;
-  font-weight:900;
-  color:#050508;
-  background:var(--cyan);
-  padding:5px 7px;
-  text-transform:uppercase;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  clip-path:polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+  max-width:100%;font-size:10px;font-weight:900;color:#050508;background:var(--cyan);
+  padding:5px 7px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))
 }
-
-.badgeRed{background:var(--red);color:white}
-.badgeGreen{background:var(--green)}
-.badgeYellow{background:var(--yellow)}
-.badgePurple{background:var(--purple);color:white}
-.badgeOff{background:#555;color:#eee}
-
-.actions{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:6px;
-  margin-top:10px;
-}
-
-.actions button{
-  width:100%;
-  margin:0;
-  min-width:0;
-}
-
-@media(min-width:520px){
-  .actions{grid-template-columns:repeat(4,minmax(0,1fr))}
-}
-
+.badgeRed{background:var(--red);color:white}.badgeGreen{background:var(--green)}.badgeYellow{background:var(--yellow)}
+.badgePurple{background:var(--purple);color:white}.badgeOff{background:#555;color:#eee}
+.actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:10px}
+.actions button{width:100%;margin:0;min-width:0}
+@media(min-width:520px){.actions{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.skinList.collapsed{display:none}
 .skin{
-  display:grid;
-  grid-template-columns:72px minmax(0,1fr);
-  gap:10px;
-  background:#090911;
-  border:1px solid rgba(255,255,255,.08);
-  padding:8px;
-  margin-top:10px;
-  min-width:0;
-  overflow:hidden;
+  display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px;background:#090911;
+  border:1px solid rgba(255,255,255,.08);padding:8px;margin-top:10px;min-width:0;overflow:hidden
 }
-
-.skin.featured{
-  border-color:rgba(255,209,102,.75);
-  box-shadow:0 0 16px rgba(255,209,102,.10);
-}
-
-.skin.disabled{
-  opacity:.45;
-  filter:grayscale(1);
-}
-
-.skin img{
-  width:72px;
-  height:100px;
-  object-fit:cover;
-  background:#1f1f2a;
-  clip-path:polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-}
-
-.skinBody{
-  min-width:0;
-  overflow:hidden;
-}
-
-.skinTitle{
-  font-weight:900;
-  font-size:14px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.small{
-  display:block;
-  width:100%;
-  color:var(--muted);
-  font-size:11px;
-  margin-top:3px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.skin .actions{
-  grid-template-columns:repeat(3,minmax(0,1fr));
-}
-
-.skin .actions button{
-  font-size:11px;
-  padding:9px 6px;
-  min-height:35px;
-}
-
+.skin.featured{border-color:rgba(255,209,102,.75);box-shadow:0 0 16px rgba(255,209,102,.10)}
+.skin.disabled{opacity:.45;filter:grayscale(1)}
+.skin img{width:72px;height:100px;object-fit:cover;background:#1f1f2a;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.skinBody{min-width:0;overflow:hidden}.skinTitle{font-weight:900;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.small{display:block;width:100%;color:var(--muted);font-size:11px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.skin .actions{grid-template-columns:repeat(3,minmax(0,1fr))}
+.skin .actions button{font-size:11px;padding:9px 6px;min-height:35px}
 .modal{
-  position:fixed;
-  inset:0;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  background:rgba(0,0,0,.78);
-  padding:10px;
-  z-index:99;
+  position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.78);padding:10px;z-index:99
 }
-
 .modalBox{
-  width:100%;
-  max-width:520px;
-  max-height:90vh;
-  overflow:auto;
+  width:100%;max-width:520px;max-height:90vh;overflow:auto;
   background:linear-gradient(145deg,#141420,#080811);
-  border:1px solid rgba(255,23,77,.32);
-  padding:14px;
-  box-shadow:0 0 45px rgba(255,23,77,.15);
+  border:1px solid rgba(255,23,77,.32);padding:14px;
+  box-shadow:0 0 45px rgba(255,23,77,.15)
 }
-
-.preview{
-  display:grid;
-  grid-template-columns:78px minmax(0,1fr);
-  gap:10px;
-  background:#090911;
-  border:1px solid rgba(255,255,255,.08);
-  padding:9px;
-  margin-top:9px;
-  align-items:center;
+.preview{display:grid;grid-template-columns:78px minmax(0,1fr);gap:10px;background:#090911;border:1px solid rgba(255,255,255,.08);padding:9px;margin-top:9px;align-items:center}
+.preview img{width:78px;height:108px;object-fit:cover;background:#222}
+#log{height:105px;overflow:auto;background:#050509;color:var(--green);border:1px solid rgba(0,255,156,.16);padding:10px;font-size:12px}
+.loading{
+  position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:150;display:none;
+  align-items:center;justify-content:center;padding:20px
 }
-
-.preview img{
-  width:78px;
-  height:108px;
-  object-fit:cover;
-  background:#222;
+.loadingBox{
+  width:100%;max-width:330px;background:linear-gradient(145deg,#151522,#07070d);
+  border:1px solid rgba(0,245,255,.25);padding:18px;text-align:center
 }
-
-#log{
-  height:105px;
-  overflow:auto;
-  background:#050509;
-  color:var(--green);
-  border:1px solid rgba(0,255,156,.16);
-  padding:10px;
-  font-size:12px;
+.loader{
+  width:42px;height:42px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--cyan);
+  margin:0 auto 12px;border-radius:50%;animation:spin .8s linear infinite
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{
+  position:fixed;left:12px;right:12px;bottom:18px;background:#101018;border:1px solid rgba(0,245,255,.22);
+  color:white;padding:12px;z-index:160;display:none
 }
 </style>
 </head>
@@ -423,26 +152,23 @@ button:active{transform:scale(.97)}
       <h1>Warlito Admin Panel</h1>
       <p>Opera GX Style Skin Manager</p>
     </div>
-    <button class="btnDark" onclick="reloadAll()">
-      <svg class="icon" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
-      Reload
-    </button>
+    <button class="btnDark" onclick="reloadAll()">⟳ Reload</button>
   </div>
 
   <div id="loginCard" class="card cut cardGlow login">
-    <div class="title">
-      <svg class="icon" viewBox="0 0 24 24"><path d="M12 17v-4"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><rect x="5" y="11" width="14" height="10" rx="2"/></svg>
-      Admin Login
-    </div>
+    <div class="title">Admin Login</div>
     <input id="password" type="password" placeholder="Admin password">
     <input id="token" type="password" placeholder="GitHub token">
-    <button class="btnBlue" onclick="login()">
-      <svg class="icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
-      Enter Dashboard
-    </button>
+    <button class="btnBlue" onclick="login()">Enter Dashboard</button>
   </div>
 
   <div id="panel" class="hidden">
+    <div class="card cut">
+      <div class="actions" style="grid-template-columns:1fr 1fr">
+        <button class="btnDark" onclick="logout()">Logout</button>
+        <button class="btnDark" onclick="clearSavedLogin()">Clear Saved Login</button>
+      </div>
+    </div>
 
     <div class="card cut">
       <div class="stats">
@@ -453,10 +179,7 @@ button:active{transform:scale(.97)}
     </div>
 
     <div class="card cut cardGlow">
-      <div class="title">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-        Add Hero
-      </div>
+      <div class="title">+ Add Hero</div>
       <div class="row">
         <input id="newHeroName" placeholder="Hero name">
         <select id="newHeroCategory">
@@ -472,10 +195,7 @@ button:active{transform:scale(.97)}
     </div>
 
     <div class="card cut">
-      <div class="title">
-        <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        Search & Filter
-      </div>
+      <div class="title">Search & Filter</div>
       <div class="toolbar">
         <input id="search" placeholder="Search hero, tag, URL..." oninput="render()">
         <select id="filterCategory" onchange="render()">
@@ -497,58 +217,77 @@ button:active{transform:scale(.97)}
     </div>
 
     <div class="card cut">
-      <div class="title">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
-        Heroes
-      </div>
+      <div class="title">Heroes</div>
       <div id="heroesList" class="grid"></div>
     </div>
 
     <div class="card cut">
-      <div class="title">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 16v-5"/><path d="M12 16V8"/><path d="M16 16v-3"/></svg>
-        Logs
-      </div>
+      <div class="title">Logs</div>
       <div id="log" class="cut"></div>
     </div>
-
   </div>
 </div>
 
 <div class="modal" id="skinModal">
   <div class="modalBox cut">
     <div class="title" id="modalTitle">Add Skin</div>
-
     <input id="skinImage" placeholder="Image URL" oninput="livePreview(); smartTag();">
     <input id="skinScript" placeholder="Script ZIP URL" oninput="smartTag();">
     <input id="skinTags" placeholder="Tags: legend, anime, starlight">
-
     <div class="row">
-      <select id="skinFeatured">
-        <option value="false">Normal</option>
-        <option value="true">Featured</option>
-      </select>
-
-      <select id="skinEnabled">
-        <option value="true">Enabled / Visible</option>
-        <option value="false">Disabled / Hidden</option>
-      </select>
+      <select id="skinFeatured"><option value="false">Normal</option><option value="true">Featured</option></select>
+      <select id="skinEnabled"><option value="true">Enabled / Visible</option><option value="false">Disabled / Hidden</option></select>
     </div>
-
     <div class="preview cut">
       <img id="previewImg" src="">
-      <div>
-        <b>Live Preview</b>
-        <div class="small" id="previewText">Paste image URL...</div>
-      </div>
+      <div><b>Live Preview</b><div class="small" id="previewText">Paste image URL...</div></div>
     </div>
-
     <div class="actions">
       <button class="btnGreen" onclick="saveSkinModal()">Save</button>
       <button class="btnDark" onclick="closeModal()">Cancel</button>
     </div>
   </div>
 </div>
+
+<div class="modal" id="heroEditModal">
+  <div class="modalBox cut">
+    <div class="title">Edit Hero</div>
+    <input id="editHeroName" placeholder="Hero name">
+    <select id="editHeroCategory">
+      <option value="assassin">Assassin</option>
+      <option value="fighter">Fighter</option>
+      <option value="mage">Mage</option>
+      <option value="marksman">Marksman</option>
+      <option value="tank">Tank</option>
+      <option value="support">Support</option>
+    </select>
+    <div class="actions">
+      <button class="btnGreen" onclick="saveHeroEdit()">Save Hero</button>
+      <button class="btnDark" onclick="closeHeroEdit()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="confirmModal">
+  <div class="modalBox cut">
+    <div class="title" id="confirmTitle">Confirm Action</div>
+    <div id="confirmDesc" style="color:var(--muted);font-size:14px;line-height:1.5"></div>
+    <div class="actions">
+      <button class="btnRed" id="confirmYes">Confirm</button>
+      <button class="btnDark" onclick="closeConfirm()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="loading" id="loading">
+  <div class="loadingBox cut">
+    <div class="loader"></div>
+    <b id="loadingText">Processing...</b>
+    <div style="color:var(--muted);font-size:12px;margin-top:6px">Please wait, do not tap buttons.</div>
+  </div>
+</div>
+
+<div class="toast cut" id="toast"></div>
 
 <script>
 const PASS = "123456";
@@ -557,492 +296,296 @@ const REPO = "shesh";
 const FILE = "skins.json";
 const BRANCH = "main";
 const CATEGORIES = ["assassin","fighter","mage","marksman","tank","support"];
+const API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
 
 let TOKEN = "";
 let SHA = "";
 let DATA = { heroes: [] };
 let currentHeroIndex = null;
 let currentSkinIndex = null;
+let currentEditHeroIndex = null;
+let collapsed = {};
+let isBusy = false;
 
-const API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
-
-function icon(name){
-  const icons = {
-    edit:`<svg class="icon" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>`,
-    eye:`<svg class="icon" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>`,
-    eyeOff:`<svg class="icon" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 10.6A3 3 0 0 0 13.4 13.4"/><path d="M9.9 4.2A10.5 10.5 0 0 1 12 4c6 0 10 8 10 8a18 18 0 0 1-3.2 4.5"/><path d="M6.1 6.1C3.5 7.9 2 12 2 12s4 8 10 8a10.5 10.5 0 0 0 4.1-.8"/></svg>`,
-    star:`<svg class="icon" viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1L12 2z"/></svg>`,
-    up:`<svg class="icon" viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>`,
-    down:`<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg>`,
-    trash:`<svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 15H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>`,
-    plus:`<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>`
-  };
-  return icons[name] || "";
+function setBusy(state,text){
+  isBusy = state;
+  document.querySelectorAll("button,input,select").forEach(el=>el.disabled = state);
+  document.getElementById("loadingText").innerText = text || "Processing...";
+  document.getElementById("loading").style.display = state ? "flex" : "none";
 }
-
-function slugify(text){
-  return String(text || "").toLowerCase().trim().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"");
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.innerText=msg;t.style.display="block";
+  setTimeout(()=>t.style.display="none",2400);
 }
-
-function makeHeroId(name){
-  let base = slugify(name) || "hero";
-  let id = base;
-  let n = 2;
-  while(DATA.heroes.some(h => h.id === id)){
-    id = `${base}_${n}`;
-    n++;
-  }
-  return id;
-}
-
-function makeSkinId(hero){
-  let n = hero.skins.length + 1;
-  let id = `${hero.id}_${String(n).padStart(3,"0")}`;
-  while(hero.skins.some(s => s.id === id)){
-    n++;
-    id = `${hero.id}_${String(n).padStart(3,"0")}`;
-  }
-  return id;
-}
-
-function log(msg){
-  const box = document.getElementById("log");
-  if(!box) return;
-  box.innerText += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
-  box.scrollTop = box.scrollHeight;
-}
-
+function slugify(text){return String(text||"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"")}
+function makeHeroId(name){let base=slugify(name)||"hero",id=base,n=2;while(DATA.heroes.some(h=>h.id===id)){id=`${base}_${n}`;n++}return id}
+function makeSkinId(hero){let n=hero.skins.length+1,id=`${hero.id}_${String(n).padStart(3,"0")}`;while(hero.skins.some(s=>s.id===id)){n++;id=`${hero.id}_${String(n).padStart(3,"0")}`}return id}
+function log(msg){const box=document.getElementById("log");if(!box)return;box.innerText+=`[${new Date().toLocaleTimeString()}] ${msg}\n`;box.scrollTop=box.scrollHeight}
+function saveLogin(){localStorage.setItem("warlito_pass",document.getElementById("password").value.trim());localStorage.setItem("warlito_token",TOKEN)}
+function clearSavedLogin(){localStorage.removeItem("warlito_pass");localStorage.removeItem("warlito_token");showToast("Saved login cleared.")}
+function logout(){document.getElementById("panel").classList.add("hidden");document.getElementById("loginCard").classList.remove("hidden")}
 function login(){
-  const p = document.getElementById("password").value.trim();
-  TOKEN = document.getElementById("token").value.trim();
-
-  if(p !== PASS){ alert("Wrong password"); return; }
-  if(!TOKEN){ alert("Enter GitHub token"); return; }
-
+  const p=document.getElementById("password").value.trim();
+  TOKEN=document.getElementById("token").value.trim();
+  if(p!==PASS){showToast("Wrong password");return}
+  if(!TOKEN){showToast("Enter GitHub token");return}
+  saveLogin();
   document.getElementById("loginCard").classList.add("hidden");
   document.getElementById("panel").classList.remove("hidden");
   loadData();
 }
+window.addEventListener("load",()=>{
+  const p=localStorage.getItem("warlito_pass");
+  const t=localStorage.getItem("warlito_token");
+  if(p&&t){
+    document.getElementById("password").value=p;
+    document.getElementById("token").value=t;
+    TOKEN=t;
+    document.getElementById("loginCard").classList.add("hidden");
+    document.getElementById("panel").classList.remove("hidden");
+    loadData();
+  }
+});
 
 function normalizeData(){
-  if(!DATA.heroes) DATA.heroes = [];
-
+  if(!DATA.heroes)DATA.heroes=[];
   DATA.heroes.forEach(hero=>{
-    if(!hero.id) hero.id = makeHeroId(hero.name);
-    if(!hero.name) hero.name = hero.id;
-    if(!hero.category) hero.category = "assassin";
-    if(!CATEGORIES.includes(hero.category)) hero.category = "assassin";
-    if(typeof hero.enabled === "undefined") hero.enabled = true;
-    if(!hero.skins) hero.skins = [];
-
+    if(!hero.id)hero.id=makeHeroId(hero.name);
+    if(!hero.name)hero.name=hero.id;
+    if(!hero.category)hero.category="assassin";
+    if(!CATEGORIES.includes(hero.category))hero.category="assassin";
+    if(typeof hero.enabled==="undefined")hero.enabled=true;
+    if(!hero.skins)hero.skins=[];
     hero.skins.forEach((skin,index)=>{
-      if(!skin.id) skin.id = `${hero.id}_${String(index + 1).padStart(3,"0")}`;
-      if(typeof skin.featured === "undefined") skin.featured = false;
-      if(typeof skin.enabled === "undefined") skin.enabled = true;
-      if(!skin.tags) skin.tags = smartTagsFromText(`${skin.image} ${skin.script} ${hero.name}`);
+      if(!skin.id)skin.id=`${hero.id}_${String(index+1).padStart(3,"0")}`;
+      if(typeof skin.featured==="undefined")skin.featured=false;
+      if(typeof skin.enabled==="undefined")skin.enabled=true;
+      if(!skin.tags)skin.tags=smartTagsFromText(`${skin.image} ${skin.script} ${hero.name}`);
     });
   });
 }
 
 async function loadData(){
   try{
+    setBusy(true,"Loading JSON...");
     log("Loading skins.json...");
-
-    const res = await fetch(`${API}?ref=${BRANCH}`, {
-      headers:{
-        "Authorization":`Bearer ${TOKEN}`,
-        "Accept":"application/vnd.github+json"
-      }
-    });
-
-    const file = await res.json();
-
-    if(!res.ok){
-      log(JSON.stringify(file,null,2));
-      alert("Failed to load JSON");
-      return;
-    }
-
-    SHA = file.sha;
-    const text = decodeURIComponent(escape(atob(file.content.replace(/\n/g,""))));
-    DATA = JSON.parse(text);
-
-    normalizeData();
-    render();
-    log("Loaded.");
-  }catch(e){ log(e.toString()); }
+    const res=await fetch(`${API}?ref=${BRANCH}`,{headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json"}});
+    const file=await res.json();
+    if(!res.ok){log(JSON.stringify(file,null,2));showToast("Failed to load JSON");return}
+    SHA=file.sha;
+    const text=decodeURIComponent(escape(atob(file.content.replace(/\n/g,""))));
+    DATA=JSON.parse(text);
+    normalizeData();render();log("Loaded.");showToast("Dashboard updated.");
+  }catch(e){log(e.toString());showToast("Load error");}
+  finally{setBusy(false)}
 }
-
 async function saveToGithub(message){
   try{
     normalizeData();
+    setBusy(true,message || "Saving...");
     log("Saving...");
-
-    const latest = await fetch(`${API}?ref=${BRANCH}`, {
-      headers:{
-        "Authorization":`Bearer ${TOKEN}`,
-        "Accept":"application/vnd.github+json"
-      }
-    });
-
-    const latestFile = await latest.json();
-
-    if(!latest.ok){
-      log(JSON.stringify(latestFile,null,2));
-      alert("Cannot get latest SHA");
-      return;
-    }
-
-    SHA = latestFile.sha;
-    const content = btoa(unescape(encodeURIComponent(JSON.stringify(DATA,null,2))));
-
-    const res = await fetch(API,{
-      method:"PUT",
-      headers:{
-        "Authorization":`Bearer ${TOKEN}`,
-        "Accept":"application/vnd.github+json",
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        message,
-        content,
-        sha:SHA,
-        branch:BRANCH
-      })
-    });
-
-    const result = await res.json();
-
-    if(!res.ok){
-      log(JSON.stringify(result,null,2));
-      alert("Save failed. Check token permission.");
-      return;
-    }
-
-    SHA = result.content.sha;
-    render();
-    log("Saved.");
-  }catch(e){ log(e.toString()); }
+    const latest=await fetch(`${API}?ref=${BRANCH}`,{headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json"}});
+    const latestFile=await latest.json();
+    if(!latest.ok){log(JSON.stringify(latestFile,null,2));showToast("Cannot get latest SHA");return}
+    SHA=latestFile.sha;
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(DATA,null,2))));
+    const res=await fetch(API,{method:"PUT",headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json","Content-Type":"application/json"},body:JSON.stringify({message,content,sha:SHA,branch:BRANCH})});
+    const result=await res.json();
+    if(!res.ok){log(JSON.stringify(result,null,2));showToast("Save failed. Check token.");return}
+    SHA=result.content.sha;render();log("Saved.");showToast("Saved successfully.");
+  }catch(e){log(e.toString());showToast("Save error");}
+  finally{setBusy(false)}
 }
-
-function reloadAll(){
-  if(!TOKEN){ alert("Login first"); return; }
-  loadData();
-}
+function reloadAll(){if(!TOKEN){showToast("Login first");return}loadData()}
 
 function addHero(){
-  const name = document.getElementById("newHeroName").value.trim();
-  const category = document.getElementById("newHeroCategory").value;
-
-  if(!name){ alert("Enter hero name"); return; }
-
-  if(DATA.heroes.find(h => h.name.toLowerCase() === name.toLowerCase())){
-    alert("Duplicate hero.");
-    return;
-  }
-
-  DATA.heroes.push({
-    id:makeHeroId(name),
-    name,
-    category,
-    enabled:true,
-    skins:[]
-  });
-
-  document.getElementById("newHeroName").value = "";
+  const name=document.getElementById("newHeroName").value.trim();
+  const category=document.getElementById("newHeroCategory").value;
+  if(!name){showToast("Enter hero name");return}
+  if(DATA.heroes.find(h=>h.name.toLowerCase()===name.toLowerCase())){showToast("Duplicate hero.");return}
+  DATA.heroes.push({id:makeHeroId(name),name,category,enabled:true,skins:[]});
+  document.getElementById("newHeroName").value="";
   saveToGithub(`Add hero ${name}`);
 }
-
 function editHero(index){
-  const hero = DATA.heroes[index];
-
-  const newName = prompt("Hero name:", hero.name);
-  if(!newName || !newName.trim()) return;
-
-  const newCategory = prompt("Category: assassin/fighter/mage/marksman/tank/support", hero.category);
-  if(!newCategory || !newCategory.trim()) return;
-
-  const cat = newCategory.trim().toLowerCase();
-  if(!CATEGORIES.includes(cat)){ alert("Invalid category."); return; }
-
-  hero.name = newName.trim();
-  hero.category = cat;
-
-  saveToGithub(`Edit hero ${hero.name}`);
+  currentEditHeroIndex=index;
+  const hero=DATA.heroes[index];
+  document.getElementById("editHeroName").value=hero.name;
+  document.getElementById("editHeroCategory").value=hero.category;
+  document.getElementById("heroEditModal").style.display="flex";
 }
-
-function toggleHero(index){
-  DATA.heroes[index].enabled = !DATA.heroes[index].enabled;
-  saveToGithub(`Toggle hero ${DATA.heroes[index].name}`);
+function saveHeroEdit(){
+  const hero=DATA.heroes[currentEditHeroIndex];
+  const name=document.getElementById("editHeroName").value.trim();
+  const cat=document.getElementById("editHeroCategory").value;
+  if(!name){showToast("Hero name required");return}
+  hero.name=name;hero.category=cat;
+  closeHeroEdit();
+  saveToGithub(`Edit hero ${name}`);
 }
-
+function closeHeroEdit(){document.getElementById("heroEditModal").style.display="none"}
+function toggleHero(index){DATA.heroes[index].enabled=!DATA.heroes[index].enabled;saveToGithub(`Toggle hero ${DATA.heroes[index].name}`)}
 function deleteHero(index){
-  if(!confirm("Delete hero and all skins?")) return;
-  const name = DATA.heroes[index].name;
-  DATA.heroes.splice(index,1);
-  saveToGithub(`Delete hero ${name}`);
+  const hero=DATA.heroes[index];
+  showConfirm("Delete Hero",`Deleting "${hero.name}" will remove the hero and all ${hero.skins.length} skin(s). This cannot be undone.`,()=>{
+    DATA.heroes.splice(index,1);
+    saveToGithub(`Delete hero ${hero.name}`);
+  });
 }
 
 function openAddSkin(heroIndex){
-  currentHeroIndex = heroIndex;
-  currentSkinIndex = null;
-
-  const hero = DATA.heroes[heroIndex];
-
-  document.getElementById("modalTitle").innerText = `Add Skin to ${hero.name}`;
-  document.getElementById("skinImage").value = "";
-  document.getElementById("skinScript").value = "";
-  document.getElementById("skinTags").value = "";
-  document.getElementById("skinFeatured").value = "false";
-  document.getElementById("skinEnabled").value = "true";
+  currentHeroIndex=heroIndex;currentSkinIndex=null;
+  const hero=DATA.heroes[heroIndex];
+  document.getElementById("modalTitle").innerText=`Add Skin to ${hero.name}`;
+  document.getElementById("skinImage").value="";
+  document.getElementById("skinScript").value="";
+  document.getElementById("skinTags").value="";
+  document.getElementById("skinFeatured").value="false";
+  document.getElementById("skinEnabled").value="true";
   livePreview();
-
-  document.getElementById("skinModal").style.display = "flex";
+  document.getElementById("skinModal").style.display="flex";
 }
-
-function openEditSkin(heroIndex, skinIndex){
-  currentHeroIndex = heroIndex;
-  currentSkinIndex = skinIndex;
-
-  const hero = DATA.heroes[heroIndex];
-  const skin = hero.skins[skinIndex];
-
-  document.getElementById("modalTitle").innerText = `Edit Skin - ${hero.name}`;
-  document.getElementById("skinImage").value = skin.image || "";
-  document.getElementById("skinScript").value = skin.script || "";
-  document.getElementById("skinTags").value = (skin.tags || []).join(", ");
-  document.getElementById("skinFeatured").value = skin.featured ? "true" : "false";
-  document.getElementById("skinEnabled").value = skin.enabled ? "true" : "false";
+function openEditSkin(heroIndex,skinIndex){
+  currentHeroIndex=heroIndex;currentSkinIndex=skinIndex;
+  const hero=DATA.heroes[heroIndex],skin=hero.skins[skinIndex];
+  document.getElementById("modalTitle").innerText=`Edit Skin - ${hero.name}`;
+  document.getElementById("skinImage").value=skin.image||"";
+  document.getElementById("skinScript").value=skin.script||"";
+  document.getElementById("skinTags").value=(skin.tags||[]).join(", ");
+  document.getElementById("skinFeatured").value=skin.featured?"true":"false";
+  document.getElementById("skinEnabled").value=skin.enabled?"true":"false";
   livePreview();
-
-  document.getElementById("skinModal").style.display = "flex";
+  document.getElementById("skinModal").style.display="flex";
 }
-
 function saveSkinModal(){
-  const image = document.getElementById("skinImage").value.trim();
-  const script = document.getElementById("skinScript").value.trim();
-
-  let tags = document.getElementById("skinTags").value
-    .split(",")
-    .map(x=>x.trim().toLowerCase())
-    .filter(Boolean);
-
-  const featured = document.getElementById("skinFeatured").value === "true";
-  const enabled = document.getElementById("skinEnabled").value === "true";
-
-  if(!image || !script){
-    alert("Fill image and script URL");
-    return;
-  }
-
-  const hero = DATA.heroes[currentHeroIndex];
-
-  const duplicate = hero.skins.find((s,i)=>{
-    if(currentSkinIndex !== null && i === currentSkinIndex) return false;
-    return s.image === image || s.script === script;
+  const image=document.getElementById("skinImage").value.trim();
+  const script=document.getElementById("skinScript").value.trim();
+  let tags=document.getElementById("skinTags").value.split(",").map(x=>x.trim().toLowerCase()).filter(Boolean);
+  const featured=document.getElementById("skinFeatured").value==="true";
+  const enabled=document.getElementById("skinEnabled").value==="true";
+  if(!image||!script){showToast("Fill image and script URL");return}
+  const hero=DATA.heroes[currentHeroIndex];
+  const duplicate=hero.skins.find((s,i)=>{if(currentSkinIndex!==null&&i===currentSkinIndex)return false;return s.image===image||s.script===script});
+  if(duplicate){showToast("Duplicate image/script exists.");return}
+  if(tags.length===0)tags=smartTagsFromText(`${image} ${script} ${hero.name}`);
+  const old=currentSkinIndex!==null?hero.skins[currentSkinIndex]:null;
+  const skinData={id:old?old.id:makeSkinId(hero),image,script,featured,enabled,tags};
+  if(currentSkinIndex===null){hero.skins.push(skinData);closeModal();saveToGithub(`Add skin to ${hero.name}`)}
+  else{hero.skins[currentSkinIndex]=skinData;closeModal();saveToGithub(`Edit skin of ${hero.name}`)}
+}
+function deleteSkin(heroIndex,skinIndex){
+  const hero=DATA.heroes[heroIndex],skin=hero.skins[skinIndex];
+  showConfirm("Delete Skin",`Deleting skin "${skin.id}" from ${hero.name}. This cannot be undone.`,()=>{
+    hero.skins.splice(skinIndex,1);
+    saveToGithub("Delete skin");
   });
-
-  if(duplicate){
-    alert("Duplicate image/script already exists.");
-    return;
-  }
-
-  if(tags.length === 0){
-    tags = smartTagsFromText(`${image} ${script} ${hero.name}`);
-  }
-
-  const old = currentSkinIndex !== null ? hero.skins[currentSkinIndex] : null;
-
-  const skinData = {
-    id: old ? old.id : makeSkinId(hero),
-    image,
-    script,
-    featured,
-    enabled,
-    tags
-  };
-
-  if(currentSkinIndex === null){
-    hero.skins.push(skinData);
-    closeModal();
-    saveToGithub(`Add skin to ${hero.name}`);
-  }else{
-    hero.skins[currentSkinIndex] = skinData;
-    closeModal();
-    saveToGithub(`Edit skin of ${hero.name}`);
-  }
 }
-
-function deleteSkin(heroIndex, skinIndex){
-  if(!confirm("Delete this skin?")) return;
-  DATA.heroes[heroIndex].skins.splice(skinIndex,1);
-  saveToGithub("Delete skin");
-}
-
-function moveSkin(heroIndex, skinIndex, dir){
-  const skins = DATA.heroes[heroIndex].skins;
-  const newIndex = skinIndex + dir;
-
-  if(newIndex < 0 || newIndex >= skins.length) return;
-
-  const temp = skins[skinIndex];
-  skins[skinIndex] = skins[newIndex];
-  skins[newIndex] = temp;
-
+function moveSkin(heroIndex,skinIndex,dir){
+  const skins=DATA.heroes[heroIndex].skins,newIndex=skinIndex+dir;
+  if(newIndex<0||newIndex>=skins.length)return;
+  const temp=skins[skinIndex];skins[skinIndex]=skins[newIndex];skins[newIndex]=temp;
   saveToGithub("Reorder skins");
 }
-
-function toggleFeatured(heroIndex, skinIndex){
-  DATA.heroes[heroIndex].skins[skinIndex].featured = !DATA.heroes[heroIndex].skins[skinIndex].featured;
-  saveToGithub("Toggle featured skin");
-}
-
-function toggleSkin(heroIndex, skinIndex){
-  DATA.heroes[heroIndex].skins[skinIndex].enabled = !DATA.heroes[heroIndex].skins[skinIndex].enabled;
-  saveToGithub("Toggle skin visibility");
-}
+function toggleFeatured(heroIndex,skinIndex){DATA.heroes[heroIndex].skins[skinIndex].featured=!DATA.heroes[heroIndex].skins[skinIndex].featured;saveToGithub("Toggle featured skin")}
+function toggleSkin(heroIndex,skinIndex){DATA.heroes[heroIndex].skins[skinIndex].enabled=!DATA.heroes[heroIndex].skins[skinIndex].enabled;saveToGithub("Toggle skin visibility")}
+function toggleCollapse(heroId){collapsed[heroId]=!collapsed[heroId];render()}
 
 function livePreview(){
-  const url = document.getElementById("skinImage").value.trim();
-  const img = document.getElementById("previewImg");
-  const txt = document.getElementById("previewText");
-
-  if(!url){
-    img.removeAttribute("src");
-    txt.innerText = "Paste image URL...";
-    return;
-  }
-
-  img.src = url;
-  txt.innerText = url;
+  const url=document.getElementById("skinImage").value.trim(),img=document.getElementById("previewImg"),txt=document.getElementById("previewText");
+  if(!url){img.removeAttribute("src");txt.innerText="Paste image URL...";return}
+  img.src=url;txt.innerText=url;
 }
-
 function smartTagsFromText(text){
-  const raw = String(text || "").toLowerCase();
-  const rules = ["legend","starlight","collector","epic","elite","special","aspirant","lightborn","summer","christmas","valentine","anniversary","anime","aot","luckybox","backup","default","fanny","gusion","valentines"];
-  const tags = [];
-
-  rules.forEach(tag=>{
-    if(raw.includes(tag)) tags.push(tag === "valentines" ? "valentine" : tag);
-  });
-
-  return [...new Set(tags)];
+  const raw=String(text||"").toLowerCase();
+  const rules=["legend","starlight","collector","epic","elite","special","aspirant","lightborn","summer","christmas","valentine","anniversary","anime","aot","luckybox","backup","default","fanny","gusion","valentines"];
+  const tags=[];rules.forEach(tag=>{if(raw.includes(tag))tags.push(tag==="valentines"?"valentine":tag)});
+  return[...new Set(tags)];
 }
-
-function smartTag(){
-  const image = document.getElementById("skinImage").value;
-  const script = document.getElementById("skinScript").value;
-  const tags = smartTagsFromText(`${image} ${script}`);
-
-  if(tags.length){
-    document.getElementById("skinTags").value = tags.join(", ");
-  }
+function smartTag(){const tags=smartTagsFromText(`${document.getElementById("skinImage").value} ${document.getElementById("skinScript").value}`);if(tags.length)document.getElementById("skinTags").value=tags.join(", ")}
+function closeModal(){document.getElementById("skinModal").style.display="none"}
+function showConfirm(title,desc,yesFn){
+  document.getElementById("confirmTitle").innerText=title;
+  document.getElementById("confirmDesc").innerText=desc;
+  document.getElementById("confirmYes").onclick=()=>{closeConfirm();yesFn()};
+  document.getElementById("confirmModal").style.display="flex";
 }
-
-function closeModal(){
-  document.getElementById("skinModal").style.display = "none";
-}
+function closeConfirm(){document.getElementById("confirmModal").style.display="none"}
 
 function render(){
   normalizeData();
-
-  const q = document.getElementById("search").value.toLowerCase();
-  const cat = document.getElementById("filterCategory").value;
-  const status = document.getElementById("filterStatus").value;
-
-  const list = document.getElementById("heroesList");
-  list.innerHTML = "";
-
-  let totalSkins = 0;
-  let totalEnabled = 0;
-
+  const q=document.getElementById("search").value.toLowerCase();
+  const cat=document.getElementById("filterCategory").value;
+  const status=document.getElementById("filterStatus").value;
+  const list=document.getElementById("heroesList");
+  list.innerHTML="";
+  let totalSkins=0,totalEnabled=0;
   DATA.heroes.forEach((hero,hi)=>{
-    totalSkins += hero.skins.length;
-    hero.skins.forEach(s=>{ if(s.enabled) totalEnabled++; });
-
-    if(cat !== "all" && hero.category !== cat) return;
-
-    const heroMatches = [hero.id,hero.name,hero.category].join(" ").toLowerCase().includes(q);
-
-    let skins = hero.skins
-      .map((skin,si)=>({skin,si}))
-      .filter(obj=>{
-        const skin = obj.skin;
-
-        if(status === "featured" && !skin.featured) return false;
-        if(status === "enabled" && !skin.enabled) return false;
-        if(status === "disabled" && skin.enabled) return false;
-
-        const searchable = [
-          hero.id,hero.name,hero.category,
-          skin.id,skin.image,skin.script,
-          ...(skin.tags || [])
-        ].join(" ").toLowerCase();
-
-        return !q || heroMatches || searchable.includes(q);
-      });
-
-    if(q && !heroMatches && skins.length === 0) return;
-
-    const card = document.createElement("div");
-    card.className = "hero cut";
-
-    let skinsHtml = "";
-
-    skins.forEach(({skin,si})=>{
-      skinsHtml += `
-        <div class="skin cut ${skin.featured ? "featured" : ""} ${skin.enabled ? "" : "disabled"}">
-          <img src="${skin.image}" onerror="this.style.opacity=.25">
-          <div class="skinBody">
-            <div class="skinTitle">${skin.featured ? "Featured Skin" : "Skin"} • ${skin.enabled ? "Visible" : "Hidden"}</div>
-            <div class="small">ID: ${skin.id}</div>
-            <div class="small">IMG: ${skin.image}</div>
-            <div class="small">ZIP: ${skin.script}</div>
-
-            <div class="badges">
-              ${(skin.tags || []).map(t=>`<span class="badge badgePurple">${t}</span>`).join("")}
-            </div>
-
-            <div class="actions">
-              <button class="btnBlue" onclick="openEditSkin(${hi},${si})">${icon("edit")}Edit</button>
-              <button class="btnYellow" onclick="toggleFeatured(${hi},${si})">${icon("star")}</button>
-              <button class="btnDark" onclick="toggleSkin(${hi},${si})">${skin.enabled ? icon("eyeOff") + "Hide" : icon("eye") + "Show"}</button>
-              <button class="btnDark" onclick="moveSkin(${hi},${si},-1)">${icon("up")}</button>
-              <button class="btnDark" onclick="moveSkin(${hi},${si},1)">${icon("down")}</button>
-              <button class="btnRed" onclick="deleteSkin(${hi},${si})">${icon("trash")}Delete</button>
-            </div>
+    totalSkins+=hero.skins.length;
+    hero.skins.forEach(s=>{if(s.enabled)totalEnabled++});
+    if(cat!=="all"&&hero.category!==cat)return;
+    const heroMatches=[hero.id,hero.name,hero.category].join(" ").toLowerCase().includes(q);
+    let skins=hero.skins.map((skin,realIndex)=>({skin,realIndex})).filter(obj=>{
+      const skin=obj.skin;
+      if(status==="featured"&&!skin.featured)return false;
+      if(status==="enabled"&&!skin.enabled)return false;
+      if(status==="disabled"&&skin.enabled)return false;
+      const searchable=[hero.id,hero.name,hero.category,skin.id,skin.image,skin.script,...(skin.tags||[])].join(" ").toLowerCase();
+      return !q||heroMatches||searchable.includes(q);
+    });
+    if(q&&!heroMatches&&skins.length===0)return;
+    if(typeof collapsed[hero.id]==="undefined")collapsed[hero.id]=true;
+    const card=document.createElement("div");
+    card.className="hero cut";
+    let skinsHtml="";
+    skins.forEach(({skin,realIndex})=>{
+      skinsHtml+=`
+      <div class="skin cut ${skin.featured?"featured":""} ${skin.enabled?"":"disabled"}">
+        <img src="${skin.image}" onerror="this.style.opacity=.25">
+        <div class="skinBody">
+          <div class="skinTitle">${skin.featured?"Featured Skin":"Skin"} • ${skin.enabled?"Visible":"Hidden"}</div>
+          <div class="small">ID: ${skin.id}</div>
+          <div class="small">IMG: ${skin.image}</div>
+          <div class="small">ZIP: ${skin.script}</div>
+          <div class="badges">${(skin.tags||[]).map(t=>`<span class="badge badgePurple">${t}</span>`).join("")}</div>
+          <div class="actions">
+            <button class="btnBlue" onclick="openEditSkin(${hi},${realIndex})">Edit</button>
+            <button class="btnYellow" onclick="toggleFeatured(${hi},${realIndex})">★</button>
+            <button class="btnDark" onclick="toggleSkin(${hi},${realIndex})">${skin.enabled?"Hide":"Show"}</button>
+            <button class="btnDark" onclick="moveSkin(${hi},${realIndex},-1)">↑</button>
+            <button class="btnDark" onclick="moveSkin(${hi},${realIndex},1)">↓</button>
+            <button class="btnRed" onclick="deleteSkin(${hi},${realIndex})">Delete</button>
           </div>
         </div>
-      `;
+      </div>`;
     });
-
-    card.innerHTML = `
-      <div class="heroTop">
-        <div class="heroName">${hero.name}</div>
-        <div class="heroId">ID: ${hero.id}</div>
-        <div class="badges">
-          <span class="badge badgeRed">${hero.category}</span>
-          <span class="badge">${hero.skins.length} skins</span>
-          <span class="badge ${hero.enabled ? "badgeGreen" : "badgeOff"}">${hero.enabled ? "visible" : "hidden"}</span>
+    card.innerHTML=`
+      <div class="heroHead">
+        <div class="heroTop">
+          <div class="heroName">${hero.name}</div>
+          <div class="heroId">ID: ${hero.id}</div>
+          <div class="badges">
+            <span class="badge badgeRed">${hero.category}</span>
+            <span class="badge">${hero.skins.length} skins</span>
+            <span class="badge ${hero.enabled?"badgeGreen":"badgeOff"}">${hero.enabled?"visible":"hidden"}</span>
+          </div>
         </div>
       </div>
-
       <div class="actions">
-        <button class="btnGreen" onclick="openAddSkin(${hi})">${icon("plus")}Skin</button>
-        <button class="btnBlue" onclick="editHero(${hi})">${icon("edit")}Edit</button>
-        <button class="btnDark" onclick="toggleHero(${hi})">${hero.enabled ? icon("eyeOff") + "Hide" : icon("eye") + "Show"}</button>
-        <button class="btnRed" onclick="deleteHero(${hi})">${icon("trash")}Delete</button>
+        <button class="btnDark" onclick="toggleCollapse('${hero.id}')">${collapsed[hero.id]?"Expand":"Minimize"}</button>
+        <button class="btnGreen" onclick="openAddSkin(${hi})">+ Skin</button>
+        <button class="btnBlue" onclick="editHero(${hi})">Edit</button>
+        <button class="btnDark" onclick="toggleHero(${hi})">${hero.enabled?"Hide":"Show"}</button>
+        <button class="btnRed" onclick="deleteHero(${hi})">Delete</button>
       </div>
-
-      ${skinsHtml || `<div style="color:#777;margin-top:12px">No skins found.</div>`}
-    `;
-
+      <div class="skinList ${collapsed[hero.id]?"collapsed":""}">
+        ${skinsHtml||`<div style="color:#777;margin-top:12px">No skins found.</div>`}
+      </div>`;
     list.appendChild(card);
   });
-
-  document.getElementById("statHeroes").innerText = DATA.heroes.length;
-  document.getElementById("statSkins").innerText = totalSkins;
-  document.getElementById("statEnabled").innerText = totalEnabled;
+  document.getElementById("statHeroes").innerText=DATA.heroes.length;
+  document.getElementById("statSkins").innerText=totalSkins;
+  document.getElementById("statEnabled").innerText=totalEnabled;
 }
 </script>
 </body>
