@@ -123,6 +123,13 @@ button:active{transform:scale(.97)}
 .tagPicker{
   background:#07070f;border:1px solid rgba(255,255,255,.10);padding:10px;margin-top:8px;
 }
+.addTagBox{
+  background:#090911;border:1px solid rgba(0,245,255,.16);padding:10px;margin-top:8px;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+}
+.addTagPreview{display:flex;align-items:center;gap:8px;margin-top:6px;color:var(--muted);font-size:11px}
+.addTagPreview img{height:24px;max-width:96px;object-fit:contain;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.10);padding:2px}
+
 .selectedTags{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
 .tagDropdown{position:relative;margin-top:8px}
 .tagDropdownBtn{
@@ -293,6 +300,26 @@ button:active{transform:scale(.97)}
       <div class="title" style="font-size:14px;margin-bottom:6px">Official Skin Tags</div>
       <div id="selectedTags" class="selectedTags"></div>
 
+      <div class="addTagBox">
+        <div class="title" style="font-size:13px;margin-bottom:5px">+ Add New Skin Tag</div>
+        <input id="newTagName" placeholder="Tag name ex: Legend, Collector, Custom Tag" oninput="previewNewTag()">
+        <input id="newTagId" placeholder="Tag id optional, auto if blank ex: collector" oninput="previewNewTag()">
+        <input id="newTagIcon" placeholder="Tag icon/image link" oninput="previewNewTag()">
+        <select id="newTagType">
+          <option value="skin_tag">Skin Tag</option>
+          <option value="event">Event</option>
+          <option value="series">Series</option>
+          <option value="rarity">Rarity</option>
+          <option value="custom">Custom</option>
+        </select>
+        <div class="addTagPreview">
+          <img id="newTagPreviewImg" src="" onerror="this.style.display='none'">
+          <span id="newTagPreviewText">Fill name + icon, then submit.</span>
+        </div>
+        <button type="button" class="btnBlue" onclick="addNewTagFromPicker()">Submit New Tag</button>
+        <div class="small">Adds to tags.json locally, selects it, then Publish Changes saves it to GitHub.</div>
+      </div>
+
       <div class="tagDropdown">
         <button type="button" class="tagDropdownBtn" onclick="toggleTagDropdown()">
           <span id="tagDropdownLabel">Select Skin Tag</span>
@@ -372,6 +399,7 @@ const TAG_FILE = "tags.json";
 const BRANCH = "main";
 const CATEGORIES = ["assassin","fighter","mage","marksman","tank","support"];
 const API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
+const TAG_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${TAG_FILE}`;
 const TAG_URL = `https://raw.githubusercontent.com/${OWNER}/${REPO}/refs/heads/${BRANCH}/${TAG_FILE}`;
 
 let TOKEN = "";
@@ -379,6 +407,9 @@ let SHA = "";
 let DATA = { heroes: [] };
 let ORIGINAL = null;
 let TAG_DATABASE = [];
+let TAG_SHA = "";
+let TAG_ORIGINAL = [];
+let dirtyTags = false;
 let dirty = false;
 let currentHeroIndex = null;
 let currentSkinIndex = null;
@@ -425,6 +456,23 @@ function markSaved(){
     s.innerText = "Saved";
     s.className = "badge badgeGreen";
   }
+}
+
+function markTagsDirty(){
+  dirtyTags = true;
+  const s = document.getElementById("saveStatus");
+  if(s){
+    s.innerText = "Unsaved Changes";
+    s.className = "badge unsavedBadge";
+  }
+  const ts = document.getElementById("tagStatus");
+  if(ts) ts.innerText = "Tags: " + TAG_DATABASE.length + " *";
+}
+
+function markTagsSaved(){
+  dirtyTags = false;
+  const ts = document.getElementById("tagStatus");
+  if(ts) ts.innerText = "Tags: " + TAG_DATABASE.length;
 }
 
 function clone(obj){return JSON.parse(JSON.stringify(obj))}
@@ -556,15 +604,33 @@ async function loadTags(){
   try{
     log("Loading tags.json...");
 
-    const res = await fetch(TAG_URL + "?v=" + Date.now(), {
-      cache:"no-store"
-    });
+    let obj;
 
-    if(!res.ok){
-      throw new Error("HTTP " + res.status + " while loading tags.json");
+    if(TOKEN){
+      const res = await fetch(`${TAG_API}?ref=${BRANCH}&v=${Date.now()}`,{
+        headers:{
+          "Authorization":`Bearer ${TOKEN}`,
+          "Accept":"application/vnd.github+json"
+        },
+        cache:"no-store"
+      });
+
+      const file = await res.json();
+
+      if(!res.ok){
+        throw new Error(JSON.stringify(file));
+      }
+
+      TAG_SHA = file.sha || "";
+      const text = decodeURIComponent(escape(atob(file.content.replace(/\n/g,""))));
+      obj = JSON.parse(text);
+    }else{
+      const res = await fetch(TAG_URL + "?v=" + Date.now(), {cache:"no-store"});
+      if(!res.ok){
+        throw new Error("HTTP " + res.status + " while loading tags.json");
+      }
+      obj = await res.json();
     }
-
-    const obj = await res.json();
 
     TAG_DATABASE = Array.isArray(obj.tag_database) ? obj.tag_database : [];
     TAG_DATABASE = TAG_DATABASE.map(t=>({
@@ -575,8 +641,8 @@ async function loadTags(){
       type:t.type || "skin_tag"
     })).filter(t=>t.id && t.name);
 
-    const tagStatus = document.getElementById("tagStatus");
-    if(tagStatus) tagStatus.innerText = "Tags: " + TAG_DATABASE.length;
+    TAG_ORIGINAL = clone(TAG_DATABASE);
+    markTagsSaved();
 
     console.log("Tags Loaded:", TAG_DATABASE.length);
     log("Loaded tags: " + TAG_DATABASE.length);
@@ -587,6 +653,7 @@ async function loadTags(){
 
   }catch(e){
     TAG_DATABASE = [];
+    TAG_ORIGINAL = [];
     console.log("Tag Load Error:", e);
     log("tags.json load failed: " + e.toString());
 
@@ -637,62 +704,126 @@ async function loadData(){
 }
 
 async function publishChanges(){
-  if(!dirty){
+  if(!dirty && !dirtyTags){
     showToast("No changes to publish.");
     return;
   }
 
-  showConfirm("Publish Changes","This will commit all local edits to GitHub in one update. Continue?",async()=>{
+  showConfirm("Publish Changes","This will commit local edits to GitHub. It can update skins.json and tags.json. Continue?",async()=>{
     try{
       normalizeData();
       setBusy(true,"Publishing changes...");
       log("Publishing changes...");
 
-      const latest=await fetch(`${API}?ref=${BRANCH}`,{
-        headers:{
-          "Authorization":`Bearer ${TOKEN}`,
-          "Accept":"application/vnd.github+json"
+      if(dirty){
+        const latest=await fetch(`${API}?ref=${BRANCH}`,{
+          headers:{
+            "Authorization":`Bearer ${TOKEN}`,
+            "Accept":"application/vnd.github+json"
+          }
+        });
+
+        const latestFile=await latest.json();
+
+        if(!latest.ok){
+          log(JSON.stringify(latestFile,null,2));
+          showToast("Cannot get latest skins SHA");
+          return;
         }
-      });
 
-      const latestFile=await latest.json();
+        SHA=latestFile.sha;
 
-      if(!latest.ok){
-        log(JSON.stringify(latestFile,null,2));
-        showToast("Cannot get latest SHA");
-        return;
+        const content=btoa(unescape(encodeURIComponent(JSON.stringify(DATA,null,2))));
+
+        const res=await fetch(API,{
+          method:"PUT",
+          headers:{
+            "Authorization":`Bearer ${TOKEN}`,
+            "Accept":"application/vnd.github+json",
+            "Content-Type":"application/json"
+          },
+          body:JSON.stringify({
+            message:"Batch update skins.json from Warlito Admin Panel",
+            content,
+            sha:SHA,
+            branch:BRANCH
+          })
+        });
+
+        const result=await res.json();
+
+        if(!res.ok){
+          log(JSON.stringify(result,null,2));
+          showToast("skins.json publish failed. Reload then try again.");
+          return;
+        }
+
+        SHA=result.content.sha;
+        ORIGINAL=clone(DATA);
+        dirty=false;
+        log("skins.json published.");
       }
 
-      SHA=latestFile.sha;
+      if(dirtyTags){
+        const latestTags=await fetch(`${TAG_API}?ref=${BRANCH}`,{
+          headers:{
+            "Authorization":`Bearer ${TOKEN}`,
+            "Accept":"application/vnd.github+json"
+          }
+        });
 
-      const content=btoa(unescape(encodeURIComponent(JSON.stringify(DATA,null,2))));
+        const latestTagFile=await latestTags.json();
 
-      const res=await fetch(API,{
-        method:"PUT",
-        headers:{
-          "Authorization":`Bearer ${TOKEN}`,
-          "Accept":"application/vnd.github+json",
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-          message:"Batch update skins.json from Warlito Admin Panel",
-          content,
-          sha:SHA,
-          branch:BRANCH
-        })
-      });
+        if(!latestTags.ok){
+          log(JSON.stringify(latestTagFile,null,2));
+          showToast("Cannot get latest tags SHA");
+          return;
+        }
 
-      const result=await res.json();
+        TAG_SHA=latestTagFile.sha;
 
-      if(!res.ok){
-        log(JSON.stringify(result,null,2));
-        showToast("Publish failed. Reload then try again.");
-        return;
+        const cleanTags = TAG_DATABASE.map(t=>({
+          id:t.id || slugify(t.name),
+          name:t.name || t.id,
+          file:t.file || "",
+          icon:t.icon || "",
+          type:t.type || "skin_tag"
+        }));
+
+        const tagContent=btoa(unescape(encodeURIComponent(JSON.stringify({tag_database:cleanTags},null,2))));
+
+        const tagRes=await fetch(TAG_API,{
+          method:"PUT",
+          headers:{
+            "Authorization":`Bearer ${TOKEN}`,
+            "Accept":"application/vnd.github+json",
+            "Content-Type":"application/json"
+          },
+          body:JSON.stringify({
+            message:"Update tags.json from Warlito Admin Panel",
+            content:tagContent,
+            sha:TAG_SHA,
+            branch:BRANCH
+          })
+        });
+
+        const tagResult=await tagRes.json();
+
+        if(!tagRes.ok){
+          log(JSON.stringify(tagResult,null,2));
+          showToast("tags.json publish failed. Reload then try again.");
+          return;
+        }
+
+        TAG_SHA=tagResult.content.sha;
+        TAG_ORIGINAL=clone(cleanTags);
+        TAG_DATABASE=clone(cleanTags);
+        markTagsSaved();
+        log("tags.json published.");
       }
 
-      SHA=result.content.sha;
-      ORIGINAL=clone(DATA);
       markSaved();
+      markTagsSaved();
       render();
       log("Published.");
       showToast("Published to GitHub.");
@@ -706,27 +837,31 @@ async function publishChanges(){
 }
 
 function discardChanges(){
-  if(!dirty){
+  if(!dirty && !dirtyTags){
     loadData();
     return;
   }
 
-  showConfirm("Discard Changes","This will remove all local edits and reload the latest GitHub JSON.",()=>{
+  showConfirm("Discard Changes","This will remove all local edits and reload the latest GitHub JSON files.",()=>{
     if(ORIGINAL){
       DATA=clone(ORIGINAL);
       markSaved();
-      render();
-      showToast("Local changes discarded.");
-    }else{
-      loadData();
     }
+    if(TAG_ORIGINAL){
+      TAG_DATABASE=clone(TAG_ORIGINAL);
+      markTagsSaved();
+    }
+    render();
+    renderTagDropdown();
+    renderSelectedTags();
+    showToast("Local changes discarded.");
   });
 }
 
 function reloadAll(){
   if(!TOKEN){showToast("Login first");return}
 
-  if(dirty){
+  if(dirty || dirtyTags){
     showConfirm("Reload JSON","You have unsaved changes. Reloading will discard them.",()=>{
       loadData();
     });
@@ -998,6 +1133,86 @@ function autoSuggestTags(){
     renderSelectedTags();
     renderTagDropdown();
   }
+}
+
+function previewNewTag(){
+  const nameEl=document.getElementById("newTagName");
+  const idEl=document.getElementById("newTagId");
+  const iconEl=document.getElementById("newTagIcon");
+  const img=document.getElementById("newTagPreviewImg");
+  const txt=document.getElementById("newTagPreviewText");
+  if(!nameEl||!iconEl||!img||!txt)return;
+
+  const name=nameEl.value.trim();
+  const id=(idEl&&idEl.value.trim()) ? idEl.value.trim() : slugify(name);
+  const icon=iconEl.value.trim();
+
+  if(icon){
+    img.style.display="inline-block";
+    img.src=icon;
+  }else{
+    img.removeAttribute("src");
+    img.style.display="none";
+  }
+
+  txt.innerText = name ? `Preview: ${name} • id: ${id || "auto"}` : "Fill name + icon, then submit.";
+}
+
+function addNewTagFromPicker(){
+  const name=document.getElementById("newTagName").value.trim();
+  const customId=document.getElementById("newTagId").value.trim();
+  const icon=document.getElementById("newTagIcon").value.trim();
+  const type=document.getElementById("newTagType").value || "skin_tag";
+
+  if(!name){
+    showToast("Enter tag name");
+    return;
+  }
+
+  if(!icon){
+    showToast("Enter tag icon/image link");
+    return;
+  }
+
+  const id=slugify(customId || name);
+
+  if(!id){
+    showToast("Invalid tag id");
+    return;
+  }
+
+  const duplicate=TAG_DATABASE.find(t=>t.id.toLowerCase()===id.toLowerCase() || t.name.toLowerCase()===name.toLowerCase());
+  if(duplicate){
+    showToast("Tag already exists");
+    return;
+  }
+
+  const newTag={
+    id,
+    name,
+    file:"",
+    icon,
+    type
+  };
+
+  TAG_DATABASE.push(newTag);
+  TAG_DATABASE.sort((a,b)=>a.name.localeCompare(b.name));
+
+  if(!currentSelectedTags.some(t=>t.id===newTag.id)){
+    currentSelectedTags.push(clone(newTag));
+  }
+
+  document.getElementById("newTagName").value="";
+  document.getElementById("newTagId").value="";
+  document.getElementById("newTagIcon").value="";
+  document.getElementById("newTagType").value="skin_tag";
+  previewNewTag();
+
+  markTagsDirty();
+  renderSelectedTags();
+  renderTagDropdown();
+  render();
+  showToast("New tag added locally. Publish Changes to save tags.json.");
 }
 
 function renderSelectedTags(){
