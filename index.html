@@ -113,6 +113,48 @@ button:active{transform:scale(.97)}
 .small{display:block;width:100%;color:var(--muted);font-size:11px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .skin .actions{grid-template-columns:repeat(3,minmax(0,1fr))}
 .skin .actions button{font-size:11px;padding:9px 6px;min-height:35px}
+
+.officialTags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tagIconBadge{
+  height:24px;max-width:120px;object-fit:contain;background:rgba(0,0,0,.22);
+  border:1px solid rgba(255,255,255,.12);padding:2px 5px;
+  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))
+}
+.tagPicker{
+  background:#07070f;border:1px solid rgba(255,255,255,.10);padding:10px;margin-top:8px;
+}
+.selectedTags{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+.tagDropdown{position:relative;margin-top:8px}
+.tagDropdownBtn{
+  width:100%;justify-content:space-between;background:#080811;border:1px solid rgba(255,255,255,.10);
+  color:white;text-align:left;
+}
+.tagDropdownPanel{
+  display:none;margin-top:8px;background:#05050c;border:1px solid rgba(0,245,255,.20);
+  padding:8px;max-height:300px;overflow:auto;z-index:120;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));
+}
+.tagDropdownPanel.open{display:block}
+.tagOptions{display:grid;grid-template-columns:1fr;gap:7px;margin-top:8px}
+.tagOption{
+  display:grid;grid-template-columns:94px minmax(0,1fr);align-items:center;gap:9px;
+  background:#0b0b15;border:1px solid rgba(255,255,255,.10);padding:8px;cursor:pointer;
+  clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,9px 100%,0 calc(100% - 9px));
+}
+.tagOption:active{transform:scale(.98)}
+.tagOption img{height:24px;width:86px;object-fit:contain;background:rgba(0,0,0,.22)}
+.tagOptionName{font-size:13px;font-weight:900;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tagOptionId{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tagChip{
+  display:inline-flex;align-items:center;gap:6px;background:#11111d;border:1px solid rgba(0,245,255,.16);
+  color:white;padding:6px 8px;font-size:12px;font-weight:900;min-height:34px;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))
+}
+.tagChip img{height:20px;max-width:76px;object-fit:contain}
+.tagChip button{
+  min-height:22px;padding:2px 6px;font-size:11px;background:#ff174d;color:white;clip-path:none
+}
+
 .modal{
   position:fixed;inset:0;display:none;align-items:center;justify-content:center;
   background:rgba(0,0,0,.78);padding:10px;z-index:99
@@ -152,7 +194,7 @@ button:active{transform:scale(.97)}
   <div class="topbar">
     <div class="brand">
       <h1>Warlito Admin Panel</h1>
-      <p>Batch Save Mode • Opera GX Style</p>
+      <p>Batch Save Mode • Official MLBB Tags</p>
     </div>
     <button class="btnDark" onclick="reloadAll()">⟳ Reload</button>
   </div>
@@ -162,6 +204,7 @@ button:active{transform:scale(.97)}
     <input id="password" type="password" placeholder="Admin password">
     <input id="token" type="password" placeholder="GitHub token">
     <button class="btnBlue" onclick="login()">Enter Dashboard</button>
+    <button class="btnDark" onclick="resetLoginForm()">Reset Saved Login</button>
   </div>
 
   <div id="panel" class="hidden">
@@ -170,6 +213,7 @@ button:active{transform:scale(.97)}
       <div class="title">Publish Center</div>
       <div class="badges">
         <span id="saveStatus" class="badge badgeGreen">Saved</span>
+        <span id="tagStatus" class="badge badgePurple">Tags: 0</span>
       </div>
       <div class="actions" style="grid-template-columns:1fr 1fr">
         <button class="btnGreen" onclick="publishChanges()">Publish Changes</button>
@@ -242,9 +286,28 @@ button:active{transform:scale(.97)}
 <div class="modal" id="skinModal">
   <div class="modalBox cut">
     <div class="title" id="modalTitle">Add Skin</div>
-    <input id="skinImage" placeholder="Image URL" oninput="livePreview(); smartTag();">
-    <input id="skinScript" placeholder="Script ZIP URL" oninput="smartTag();">
-    <input id="skinTags" placeholder="Tags: legend, anime, starlight">
+    <input id="skinImage" placeholder="Image URL" oninput="livePreview(); autoSuggestTags();">
+    <input id="skinScript" placeholder="Script ZIP URL" oninput="autoSuggestTags();">
+
+    <div class="tagPicker cut">
+      <div class="title" style="font-size:14px;margin-bottom:6px">Official Skin Tags</div>
+      <div id="selectedTags" class="selectedTags"></div>
+
+      <div class="tagDropdown">
+        <button type="button" class="tagDropdownBtn" onclick="toggleTagDropdown()">
+          <span id="tagDropdownLabel">Select Skin Tag</span>
+          <span>▼</span>
+        </button>
+        <div id="tagDropdownPanel" class="tagDropdownPanel">
+          <input id="tagSearch" placeholder="Search tag: Legend, Collector, S.A.B.E.R..." oninput="renderTagDropdown()">
+          <div class="small">Preset list from tags.json. Tap one tag to add.</div>
+          <div id="tagOptions" class="tagOptions"></div>
+        </div>
+      </div>
+
+      <div class="small">Selected tags appear above. Multiple tags allowed.</div>
+    </div>
+
     <div class="row">
       <select id="skinFeatured"><option value="false">Normal</option><option value="true">Featured</option></select>
       <select id="skinEnabled"><option value="true">Enabled / Visible</option><option value="false">Disabled / Hidden</option></select>
@@ -305,26 +368,38 @@ const PASS = "123456";
 const OWNER = "kairimlbb17-tech";
 const REPO = "shesh";
 const FILE = "skins.json";
+const TAG_FILE = "tags.json";
 const BRANCH = "main";
 const CATEGORIES = ["assassin","fighter","mage","marksman","tank","support"];
 const API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
+const TAG_URL = `https://raw.githubusercontent.com/${OWNER}/${REPO}/refs/heads/${BRANCH}/${TAG_FILE}`;
 
 let TOKEN = "";
 let SHA = "";
 let DATA = { heroes: [] };
 let ORIGINAL = null;
+let TAG_DATABASE = [];
 let dirty = false;
 let currentHeroIndex = null;
 let currentSkinIndex = null;
 let currentEditHeroIndex = null;
+let currentSelectedTags = [];
 let collapsed = {};
 let isBusy = false;
 
 function setBusy(state,text){
   isBusy = state;
-  document.querySelectorAll("button,input,select").forEach(el=>el.disabled = state);
-  document.getElementById("loadingText").innerText = text || "Processing...";
-  document.getElementById("loading").style.display = state ? "flex" : "none";
+
+  // Huwag i-disable ang login form para hindi ma-lock ang admin sa login screen.
+  document.querySelectorAll("#panel button, #panel input, #panel select, .modal button, .modal input, .modal select").forEach(el=>{
+    el.disabled = state;
+  });
+
+  const loadingText = document.getElementById("loadingText");
+  const loading = document.getElementById("loading");
+
+  if(loadingText) loadingText.innerText = text || "Processing...";
+  if(loading) loading.style.display = state ? "flex" : "none";
 }
 
 function showToast(msg){
@@ -352,31 +427,27 @@ function markSaved(){
   }
 }
 
-function clone(obj){
-  return JSON.parse(JSON.stringify(obj));
-}
-
-function slugify(text){
-  return String(text||"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"");
-}
-
-function makeHeroId(name){
-  let base=slugify(name)||"hero",id=base,n=2;
-  while(DATA.heroes.some(h=>h.id===id)){id=`${base}_${n}`;n++}
-  return id;
-}
-
-function makeSkinId(hero){
-  let n=hero.skins.length+1,id=`${hero.id}_${String(n).padStart(3,"0")}`;
-  while(hero.skins.some(s=>s.id===id)){n++;id=`${hero.id}_${String(n).padStart(3,"0")}`}
-  return id;
-}
+function clone(obj){return JSON.parse(JSON.stringify(obj))}
+function slugify(text){return String(text||"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"")}
+function makeHeroId(name){let base=slugify(name)||"hero",id=base,n=2;while(DATA.heroes.some(h=>h.id===id)){id=`${base}_${n}`;n++}return id}
+function makeSkinId(hero){let n=hero.skins.length+1,id=`${hero.id}_${String(n).padStart(3,"0")}`;while(hero.skins.some(s=>s.id===id)){n++;id=`${hero.id}_${String(n).padStart(3,"0")}`}return id}
 
 function log(msg){
   const box=document.getElementById("log");
   if(!box)return;
   box.innerText+=`[${new Date().toLocaleTimeString()}] ${msg}\n`;
   box.scrollTop=box.scrollHeight;
+}
+
+function resetLoginForm(){
+  localStorage.removeItem("warlito_pass");
+  localStorage.removeItem("warlito_token");
+  TOKEN = "";
+  document.getElementById("password").value = "";
+  document.getElementById("token").value = "";
+  document.getElementById("panel").classList.add("hidden");
+  document.getElementById("loginCard").classList.remove("hidden");
+  showToast("Saved login reset.");
 }
 
 function saveLogin(){
@@ -399,12 +470,21 @@ function login(){
   const p=document.getElementById("password").value.trim();
   TOKEN=document.getElementById("token").value.trim();
 
-  if(p!==PASS){showToast("Wrong password");return}
-  if(!TOKEN){showToast("Enter GitHub token");return}
+  if(p!==PASS){
+    showToast("Wrong password");
+    return;
+  }
+
+  if(!TOKEN){
+    showToast("Enter GitHub token");
+    return;
+  }
 
   saveLogin();
+
   document.getElementById("loginCard").classList.add("hidden");
   document.getElementById("panel").classList.remove("hidden");
+
   loadData();
 }
 
@@ -421,6 +501,39 @@ window.addEventListener("load",()=>{
   }
 });
 
+function normalizeTagObject(tag){
+  if(!tag) return null;
+
+  if(typeof tag === "object"){
+    const id = tag.id || slugify(tag.name || "");
+    const found = TAG_DATABASE.find(t => t.id === id || slugify(t.name) === id);
+    if(found) return clone(found);
+    return {
+      id:id,
+      name:tag.name || id,
+      icon:tag.icon || "",
+      file:tag.file || ""
+    };
+  }
+
+  const raw = String(tag);
+  const id = slugify(raw);
+  const found = TAG_DATABASE.find(t => t.id === id || slugify(t.name) === id || t.name.toLowerCase() === raw.toLowerCase());
+  if(found) return clone(found);
+
+  return {
+    id:id,
+    name:raw,
+    icon:"",
+    file:""
+  };
+}
+
+function normalizeSkinTags(tags){
+  if(!Array.isArray(tags)) return [];
+  return tags.map(normalizeTagObject).filter(Boolean).filter((v,i,a)=>a.findIndex(x=>x.id===v.id)===i);
+}
+
 function normalizeData(){
   if(!DATA.heroes)DATA.heroes=[];
   DATA.heroes.forEach(hero=>{
@@ -434,14 +547,60 @@ function normalizeData(){
       if(!skin.id)skin.id=`${hero.id}_${String(index+1).padStart(3,"0")}`;
       if(typeof skin.featured==="undefined")skin.featured=false;
       if(typeof skin.enabled==="undefined")skin.enabled=true;
-      if(!skin.tags)skin.tags=smartTagsFromText(`${skin.image} ${skin.script} ${hero.name}`);
+      skin.tags = normalizeSkinTags(skin.tags || autoTagsFromText(`${skin.image} ${skin.script} ${hero.name}`));
     });
   });
+}
+
+async function loadTags(){
+  try{
+    log("Loading tags.json...");
+
+    const res = await fetch(TAG_URL + "?v=" + Date.now(), {
+      cache:"no-store"
+    });
+
+    if(!res.ok){
+      throw new Error("HTTP " + res.status + " while loading tags.json");
+    }
+
+    const obj = await res.json();
+
+    TAG_DATABASE = Array.isArray(obj.tag_database) ? obj.tag_database : [];
+    TAG_DATABASE = TAG_DATABASE.map(t=>({
+      id:t.id || slugify(t.name),
+      name:t.name || t.id,
+      file:t.file || "",
+      icon:t.icon || "",
+      type:t.type || "skin_tag"
+    })).filter(t=>t.id && t.name);
+
+    const tagStatus = document.getElementById("tagStatus");
+    if(tagStatus) tagStatus.innerText = "Tags: " + TAG_DATABASE.length;
+
+    console.log("Tags Loaded:", TAG_DATABASE.length);
+    log("Loaded tags: " + TAG_DATABASE.length);
+
+    if(document.getElementById("tagOptions")){
+      renderTagDropdown();
+    }
+
+  }catch(e){
+    TAG_DATABASE = [];
+    console.log("Tag Load Error:", e);
+    log("tags.json load failed: " + e.toString());
+
+    const tagStatus = document.getElementById("tagStatus");
+    if(tagStatus) tagStatus.innerText = "Tags: ERROR";
+
+    showToast("tags.json failed to load");
+  }
 }
 
 async function loadData(){
   try{
     setBusy(true,"Loading JSON...");
+    await loadTags();
     log("Loading skins.json...");
 
     const res=await fetch(`${API}?ref=${BRANCH}`,{
@@ -616,9 +775,7 @@ function saveHeroEdit(){
   showToast("Hero edited locally.");
 }
 
-function closeHeroEdit(){
-  document.getElementById("heroEditModal").style.display="none";
-}
+function closeHeroEdit(){document.getElementById("heroEditModal").style.display="none"}
 
 function toggleHero(index){
   DATA.heroes[index].enabled=!DATA.heroes[index].enabled;
@@ -640,16 +797,20 @@ function deleteHero(index){
 function openAddSkin(heroIndex){
   currentHeroIndex=heroIndex;
   currentSkinIndex=null;
+  currentSelectedTags = [];
 
   const hero=DATA.heroes[heroIndex];
 
   document.getElementById("modalTitle").innerText=`Add Skin to ${hero.name}`;
   document.getElementById("skinImage").value="";
   document.getElementById("skinScript").value="";
-  document.getElementById("skinTags").value="";
+  document.getElementById("tagSearch").value="";
   document.getElementById("skinFeatured").value="false";
   document.getElementById("skinEnabled").value="true";
   livePreview();
+  renderSelectedTags();
+  renderTagDropdown();
+  closeTagDropdown();
 
   document.getElementById("skinModal").style.display="flex";
 }
@@ -661,13 +822,18 @@ function openEditSkin(heroIndex,skinIndex){
   const hero=DATA.heroes[heroIndex];
   const skin=hero.skins[skinIndex];
 
+  currentSelectedTags = normalizeSkinTags(skin.tags || []);
+
   document.getElementById("modalTitle").innerText=`Edit Skin - ${hero.name}`;
   document.getElementById("skinImage").value=skin.image||"";
   document.getElementById("skinScript").value=skin.script||"";
-  document.getElementById("skinTags").value=(skin.tags||[]).join(", ");
+  document.getElementById("tagSearch").value="";
   document.getElementById("skinFeatured").value=skin.featured?"true":"false";
   document.getElementById("skinEnabled").value=skin.enabled?"true":"false";
   livePreview();
+  renderSelectedTags();
+  renderTagDropdown();
+  closeTagDropdown();
 
   document.getElementById("skinModal").style.display="flex";
 }
@@ -675,11 +841,6 @@ function openEditSkin(heroIndex,skinIndex){
 function saveSkinModal(){
   const image=document.getElementById("skinImage").value.trim();
   const script=document.getElementById("skinScript").value.trim();
-
-  let tags=document.getElementById("skinTags").value
-    .split(",")
-    .map(x=>x.trim().toLowerCase())
-    .filter(Boolean);
 
   const featured=document.getElementById("skinFeatured").value==="true";
   const enabled=document.getElementById("skinEnabled").value==="true";
@@ -701,8 +862,9 @@ function saveSkinModal(){
     return;
   }
 
+  let tags = normalizeSkinTags(currentSelectedTags);
   if(tags.length===0){
-    tags=smartTagsFromText(`${image} ${script} ${hero.name}`);
+    tags = autoTagsFromText(`${image} ${script} ${hero.name}`);
   }
 
   const old=currentSkinIndex!==null?hero.skins[currentSkinIndex]:null;
@@ -792,26 +954,144 @@ function livePreview(){
   txt.innerText=url;
 }
 
-function smartTagsFromText(text){
+function autoTagsFromText(text){
   const raw=String(text||"").toLowerCase();
-  const rules=["legend","starlight","collector","epic","elite","special","aspirant","lightborn","summer","christmas","valentine","anniversary","anime","aot","luckybox","backup","default","fanny","gusion","valentines"];
-  const tags=[];
+  const found = [];
 
-  rules.forEach(tag=>{
-    if(raw.includes(tag))tags.push(tag==="valentines"?"valentine":tag);
+  TAG_DATABASE.forEach(tag=>{
+    const tagName = tag.name.toLowerCase();
+    const tagId = tag.id.toLowerCase().replace(/_/g," ");
+    if(raw.includes(tagName) || raw.includes(tagId)){
+      found.push(clone(tag));
+    }
   });
 
-  return[...new Set(tags)];
+  const aliases = {
+    "aspirant":"the_aspirants",
+    "aspirants":"the_aspirants",
+    "aot":"attack_on_titan",
+    "venom":"v_e_n_o_m",
+    "saber":"s_a_b_e_r",
+    "stun":"s_t_u_n",
+    "starwars":"star_wars",
+    "lucky box":"luckybox",
+    "valentines":"valentine"
+  };
+
+  Object.keys(aliases).forEach(key=>{
+    if(raw.includes(key)){
+      const t = TAG_DATABASE.find(x=>x.id===aliases[key]);
+      if(t) found.push(clone(t));
+    }
+  });
+
+  return found.filter((v,i,a)=>a.findIndex(x=>x.id===v.id)===i);
 }
 
-function smartTag(){
-  const tags=smartTagsFromText(`${document.getElementById("skinImage").value} ${document.getElementById("skinScript").value}`);
-  if(tags.length)document.getElementById("skinTags").value=tags.join(", ");
+function autoSuggestTags(){
+  livePreview();
+  const image = document.getElementById("skinImage").value;
+  const script = document.getElementById("skinScript").value;
+  const suggested = autoTagsFromText(`${image} ${script}`);
+  if(currentSelectedTags.length === 0 && suggested.length > 0){
+    currentSelectedTags = suggested;
+    renderSelectedTags();
+    renderTagDropdown();
+  }
 }
 
-function closeModal(){
-  document.getElementById("skinModal").style.display="none";
+function renderSelectedTags(){
+  const box = document.getElementById("selectedTags");
+  if(!box) return;
+
+  if(currentSelectedTags.length === 0){
+    box.innerHTML = `<span class="small">No tags selected.</span>`;
+    return;
+  }
+
+  box.innerHTML = currentSelectedTags.map(t=>`
+    <div class="tagChip">
+      ${t.icon ? `<img src="${t.icon}" onerror="this.style.display='none'">` : ""}
+      <span>${t.name}</span>
+      <button onclick="removeSelectedTag('${t.id}')">X</button>
+    </div>
+  `).join("");
 }
+
+function toggleTagDropdown(){
+  const panel = document.getElementById("tagDropdownPanel");
+  if(!panel) return;
+  panel.classList.toggle("open");
+  renderTagDropdown();
+}
+
+function closeTagDropdown(){
+  const panel = document.getElementById("tagDropdownPanel");
+  if(panel) panel.classList.remove("open");
+}
+
+function renderTagDropdown(){
+  const box = document.getElementById("tagOptions");
+  const label = document.getElementById("tagDropdownLabel");
+  if(!box) return;
+
+  if(label){
+    label.innerText = currentSelectedTags.length > 0 ? "Add Another Skin Tag" : "Select Skin Tag";
+  }
+
+  const search = document.getElementById("tagSearch");
+  const q = (search ? search.value : "").toLowerCase();
+  const selectedIds = currentSelectedTags.map(t=>t.id);
+
+  const results = TAG_DATABASE.filter(t=>{
+    if(selectedIds.includes(t.id)) return false;
+    if(!q) return true;
+    return t.name.toLowerCase().includes(q) ||
+           t.id.toLowerCase().includes(q) ||
+           (t.file||"").toLowerCase().includes(q) ||
+           (t.type||"").toLowerCase().includes(q);
+  }).slice(0,60);
+
+  if(TAG_DATABASE.length === 0){
+    box.innerHTML = `<div class="small">Loading tags from tags.json...</div>`;
+    return;
+  }
+
+  if(results.length === 0){
+    box.innerHTML = `<div class="small">No skin tag found. Try another keyword.</div>`;
+    return;
+  }
+
+  box.innerHTML = results.map(t=>`
+    <div class="tagOption" onclick="addSelectedTag('${t.id}')">
+      ${t.icon ? `<img src="${t.icon}" onerror="this.style.display='none'">` : `<span class="badge badgePurple">TAG</span>`}
+      <div style="min-width:0">
+        <div class="tagOptionName">${t.name}</div>
+        <div class="tagOptionId">${t.id}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function addSelectedTag(id){
+  const tag = TAG_DATABASE.find(t=>t.id===id);
+  if(!tag) return;
+  if(currentSelectedTags.some(t=>t.id===id)) return;
+  currentSelectedTags.push(clone(tag));
+  const search = document.getElementById("tagSearch");
+  if(search) search.value = "";
+  renderSelectedTags();
+  renderTagDropdown();
+  closeTagDropdown();
+}
+
+function removeSelectedTag(id){
+  currentSelectedTags = currentSelectedTags.filter(t=>t.id!==id);
+  renderSelectedTags();
+  renderTagDropdown();
+}
+
+function closeModal(){document.getElementById("skinModal").style.display="none"}
 
 function showConfirm(title,desc,yesFn){
   document.getElementById("confirmTitle").innerText=title;
@@ -823,8 +1103,17 @@ function showConfirm(title,desc,yesFn){
   document.getElementById("confirmModal").style.display="flex";
 }
 
-function closeConfirm(){
-  document.getElementById("confirmModal").style.display="none";
+function closeConfirm(){document.getElementById("confirmModal").style.display="none"}
+
+function renderTagBadges(tags){
+  const clean = normalizeSkinTags(tags || []);
+  if(clean.length === 0) return "";
+  return `<div class="officialTags">` + clean.map(t=>{
+    if(t.icon){
+      return `<img class="tagIconBadge" src="${t.icon}" title="${t.name}" onerror="this.outerHTML='<span class=&quot;badge badgePurple&quot;>${t.name}</span>'">`;
+    }
+    return `<span class="badge badgePurple">${t.name}</span>`;
+  }).join("") + `</div>`;
 }
 
 function render(){
@@ -849,12 +1138,13 @@ function render(){
 
     let skins=hero.skins.map((skin,realIndex)=>({skin,realIndex})).filter(obj=>{
       const skin=obj.skin;
+      const tagText = normalizeSkinTags(skin.tags || []).map(t=>`${t.id} ${t.name}`).join(" ");
 
       if(status==="featured"&&!skin.featured)return false;
       if(status==="enabled"&&!skin.enabled)return false;
       if(status==="disabled"&&skin.enabled)return false;
 
-      const searchable=[hero.id,hero.name,hero.category,skin.id,skin.image,skin.script,...(skin.tags||[])].join(" ").toLowerCase();
+      const searchable=[hero.id,hero.name,hero.category,skin.id,skin.image,skin.script,tagText].join(" ").toLowerCase();
 
       return !q||heroMatches||searchable.includes(q);
     });
@@ -877,7 +1167,7 @@ function render(){
           <div class="small">ID: ${skin.id}</div>
           <div class="small">IMG: ${skin.image}</div>
           <div class="small">ZIP: ${skin.script}</div>
-          <div class="badges">${(skin.tags||[]).map(t=>`<span class="badge badgePurple">${t}</span>`).join("")}</div>
+          ${renderTagBadges(skin.tags)}
           <div class="actions">
             <button class="btnBlue" onclick="openEditSkin(${hi},${realIndex})">Edit</button>
             <button class="btnYellow" onclick="toggleFeatured(${hi},${realIndex})">★</button>
