@@ -595,7 +595,8 @@ function normalizeData(){
       if(!skin.id)skin.id=`${hero.id}_${String(index+1).padStart(3,"0")}`;
       if(typeof skin.featured==="undefined")skin.featured=false;
       if(typeof skin.enabled==="undefined")skin.enabled=true;
-      skin.tags = normalizeSkinTags(skin.tags || autoTagsFromText(`${skin.image} ${skin.script} ${hero.name}`));
+      // Manual tags only. If a skin has no tags, keep it blank.
+      skin.tags = normalizeSkinTags(skin.tags || []);
     });
   });
 }
@@ -997,10 +998,8 @@ function saveSkinModal(){
     return;
   }
 
+  // Manual tags only. Blank selected tags means this skin will have no skin tag.
   let tags = normalizeSkinTags(currentSelectedTags);
-  if(tags.length===0){
-    tags = autoTagsFromText(`${image} ${script} ${hero.name}`);
-  }
 
   const old=currentSkinIndex!==null?hero.skins[currentSkinIndex]:null;
 
@@ -1124,15 +1123,8 @@ function autoTagsFromText(text){
 }
 
 function autoSuggestTags(){
+  // Do not auto-apply tags. Some skins intentionally have no skin tag.
   livePreview();
-  const image = document.getElementById("skinImage").value;
-  const script = document.getElementById("skinScript").value;
-  const suggested = autoTagsFromText(`${image} ${script}`);
-  if(currentSelectedTags.length === 0 && suggested.length > 0){
-    currentSelectedTags = suggested;
-    renderSelectedTags();
-    renderTagDropdown();
-  }
 }
 
 function previewNewTag(){
