@@ -5,7 +5,7 @@
   },
 
   "update_enabled": true,
-  "latest_version": 6,
+  "latest_version": 8,
   "update_title": "Update Available",
   "update_message": "Please update the app.",
   "update_link": "https://..."
