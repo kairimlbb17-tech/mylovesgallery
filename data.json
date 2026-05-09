@@ -4,11 +4,9 @@
     "claim_link": ""
   },
 
-  "update": {
-    "enabled": true,
-    "version_code": 6,
-    "title": "New Update Available",
-    "message": "Please update to the latest version.",
-    "link": "https://your-update-link.com"
-  }
+  "update_enabled": true,
+  "latest_version": 6,
+  "update_title": "Update Available",
+  "update_message": "Please update the app.",
+  "update_link": "https://..."
 }
