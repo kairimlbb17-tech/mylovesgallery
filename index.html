@@ -241,6 +241,8 @@ button:active{transform:scale(.97)}
 
   <div id="panel" class="hidden">
 
+    <div id="dashboardPage">
+
     <div class="card cut cardGlow">
       <div class="title">Publish Center</div>
       <div class="badges">
@@ -250,6 +252,9 @@ button:active{transform:scale(.97)}
       <div class="actions" style="grid-template-columns:1fr 1fr">
         <button class="btnGreen" onclick="publishChanges()">Publish Changes</button>
         <button class="btnDark" onclick="discardChanges()">Discard / Reload</button>
+      </div>
+      <div class="actions" style="grid-template-columns:1fr">
+        <button class="btnBlue" onclick="showUpgradePage()">Go to Upgrade Skin Manager</button>
       </div>
       <div class="actions" style="grid-template-columns:1fr 1fr">
         <button class="btnDark" onclick="logout()">Logout</button>
@@ -308,6 +313,21 @@ button:active{transform:scale(.97)}
       <div id="heroesList" class="grid"></div>
     </div>
 
+    <div class="card cut">
+      <div class="title">Logs</div>
+      <div id="log" class="cut"></div>
+    </div>
+
+    </div>
+
+    <div id="upgradePage" class="hidden">
+      <div class="card cut cardGlow">
+        <div class="title">Upgrade Skin Manager</div>
+        <div class="actions" style="grid-template-columns:1fr 1fr">
+          <button class="btnDark" onclick="showDashboardPage()">← Back to Dashboard</button>
+          <button class="btnGreen" onclick="publishChanges()">Publish Changes</button>
+        </div>
+      </div>
     <div class="card cut cardGlow">
       <div class="title">Upgrade Skin Manager</div>
       <div class="badges">
@@ -322,10 +342,13 @@ button:active{transform:scale(.97)}
       <div id="upgradeList" class="upgradeList"></div>
     </div>
 
-    <div class="card cut">
-      <div class="title">Logs</div>
-      <div id="log" class="cut"></div>
+
+      <div class="card cut">
+        <div class="title">Upgrade Logs</div>
+        <div id="upgradeLog" class="cut" style="height:105px;overflow:auto;background:#050509;color:var(--green);border:1px solid rgba(0,255,156,.16);padding:10px;font-size:12px"></div>
+      </div>
     </div>
+
   </div>
 </div>
 
@@ -611,6 +634,27 @@ function log(msg){
   if(!box)return;
   box.innerText+=`[${new Date().toLocaleTimeString()}] ${msg}\n`;
   box.scrollTop=box.scrollHeight;
+}
+
+function upgradeLog(msg){
+  const box=document.getElementById("upgradeLog");
+  if(!box)return;
+  box.innerText+=`[${new Date().toLocaleTimeString()}] ${msg}\n`;
+  box.scrollTop=box.scrollHeight;
+}
+
+function showUpgradePage(){
+  document.getElementById("dashboardPage").classList.add("hidden");
+  document.getElementById("upgradePage").classList.remove("hidden");
+  renderUpgrades();
+  window.scrollTo(0,0);
+}
+
+function showDashboardPage(){
+  document.getElementById("upgradePage").classList.add("hidden");
+  document.getElementById("dashboardPage").classList.remove("hidden");
+  render();
+  window.scrollTo(0,0);
 }
 
 function resetLoginForm(){
