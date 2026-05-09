@@ -162,6 +162,31 @@ button:active{transform:scale(.97)}
   min-height:22px;padding:2px 6px;font-size:11px;background:#ff174d;color:white;clip-path:none
 }
 
+.upgradeList{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:820px){.upgradeList{grid-template-columns:repeat(2,1fr)}}
+.upgradeCard{
+  background:linear-gradient(160deg,#11111c,#07070d);
+  border:1px solid rgba(255,255,255,.08);
+  padding:12px;min-width:0;overflow:hidden
+}
+.upgradeHead{display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px;align-items:start}
+.upgradeHead img,.targetRow img{
+  width:72px;height:100px;object-fit:cover;background:#1f1f2a;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))
+}
+.upgradeName,.targetName{font-weight:900;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.upgradeTargets{margin-top:10px;border-top:1px solid rgba(255,255,255,.08);padding-top:8px}
+.upgradeTargets.collapsed{display:none}
+.targetRow{
+  display:grid;grid-template-columns:58px minmax(0,1fr);gap:9px;
+  background:#090911;border:1px solid rgba(255,255,255,.08);padding:8px;margin-top:8px
+}
+.targetRow img{width:58px;height:80px}
+.targetRow.disabled,.upgradeCard.disabled{opacity:.5;filter:grayscale(1)}
+.tagText{font-size:11px;color:var(--cyan);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
+.miniActions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px}
+.miniActions button{font-size:11px;min-height:34px;padding:7px 5px}
+
 .modal{
   position:fixed;inset:0;display:none;align-items:center;justify-content:center;
   background:rgba(0,0,0,.78);padding:10px;z-index:99
@@ -283,6 +308,20 @@ button:active{transform:scale(.97)}
       <div id="heroesList" class="grid"></div>
     </div>
 
+    <div class="card cut cardGlow">
+      <div class="title">Upgrade Skin Manager</div>
+      <div class="badges">
+        <span id="upgradeStatus" class="badge badgePurple">Upgrades: 0</span>
+        <span id="upgradeTargetStatus" class="badge badgeGreen">Targets: 0</span>
+      </div>
+      <div class="toolbar">
+        <input id="upgradeSearch" placeholder="Search hero, base, target, tag..." oninput="renderUpgrades()">
+        <button class="btnGreen" onclick="openUpgradeBaseModal()">+ Add Base</button>
+        <button class="btnDark" onclick="loadUpgradeData()">Reload Upgrades</button>
+      </div>
+      <div id="upgradeList" class="upgradeList"></div>
+    </div>
+
     <div class="card cut">
       <div class="title">Logs</div>
       <div id="log" class="cut"></div>
@@ -369,6 +408,58 @@ button:active{transform:scale(.97)}
   </div>
 </div>
 
+
+<div class="modal" id="upgradeBaseModal">
+  <div class="modalBox cut">
+    <div class="title" id="upgradeBaseModalTitle">Add Upgrade Base</div>
+    <div class="row">
+      <input id="upgradeHero" placeholder="Hero name ex: Fanny">
+      <input id="upgradeBaseName" placeholder="Base skin name ex: Campus Youth">
+    </div>
+    <input id="upgradeBaseImage" placeholder="Base image URL">
+    <input id="upgradeBackupScript" placeholder="Backup script URL optional">
+    <input id="upgradeBaseTags" placeholder="Skin tags ids comma separated ex: elite,starlight">
+    <div class="row">
+      <select id="upgradeBaseEnabled">
+        <option value="true">Enabled / Visible</option>
+        <option value="false">Disabled / Hidden</option>
+      </select>
+      <input id="upgradeBaseId" placeholder="Base id optional auto generated">
+    </div>
+    <div class="small">Tags must match tags.json id. Leave blank if unsure to avoid app errors.</div>
+    <div class="actions">
+      <button class="btnGreen" onclick="saveUpgradeBaseModal()">Save Base</button>
+      <button class="btnDark" onclick="closeUpgradeBaseModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="upgradeTargetModal">
+  <div class="modalBox cut">
+    <div class="title" id="upgradeTargetModalTitle">Add Upgrade Target</div>
+    <input id="upgradeTargetName" placeholder="Target skin name ex: Legend / Collector">
+    <input id="upgradeTargetImage" placeholder="Target image URL">
+    <input id="upgradeTargetScript" placeholder="Script ZIP URL">
+    <input id="upgradeTargetTags" placeholder="Skin tags ids comma separated ex: legend,collector">
+    <div class="row">
+      <select id="upgradeTargetType">
+        <option value="upgrade">Upgrade</option>
+        <option value="backup">Backup</option>
+      </select>
+      <select id="upgradeTargetEnabled">
+        <option value="true">Enabled / Visible</option>
+        <option value="false">Disabled / Hidden</option>
+      </select>
+    </div>
+    <input id="upgradeTargetId" placeholder="Target id optional auto generated">
+    <div class="small">Backup can have blank tags. Unknown tags should stay blank until added to tags.json.</div>
+    <div class="actions">
+      <button class="btnGreen" onclick="saveUpgradeTargetModal()">Save Target</button>
+      <button class="btnDark" onclick="closeUpgradeTargetModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="confirmModal">
   <div class="modalBox cut">
     <div class="title" id="confirmTitle">Confirm Action</div>
@@ -396,11 +487,14 @@ const OWNER = "kairimlbb17-tech";
 const REPO = "shesh";
 const FILE = "skins.json";
 const TAG_FILE = "tags.json";
+const UPGRADE_FILE = "skin_upgrades.json";
 const BRANCH = "main";
 const CATEGORIES = ["assassin","fighter","mage","marksman","tank","support"];
 const API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
 const TAG_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${TAG_FILE}`;
+const UPGRADE_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${UPGRADE_FILE}`;
 const TAG_URL = `https://raw.githubusercontent.com/${OWNER}/${REPO}/refs/heads/${BRANCH}/${TAG_FILE}`;
+const UPGRADE_URL = `https://raw.githubusercontent.com/${OWNER}/${REPO}/refs/heads/${BRANCH}/${UPGRADE_FILE}`;
 
 let TOKEN = "";
 let SHA = "";
@@ -410,6 +504,13 @@ let TAG_DATABASE = [];
 let TAG_SHA = "";
 let TAG_ORIGINAL = [];
 let dirtyTags = false;
+let dirtyUpgrade = false;
+let UPGRADE_SHA = "";
+let UPGRADE_DATA = { version:1, type:"skin_upgrades", skin_upgrades:[] };
+let UPGRADE_ORIGINAL = null;
+let collapsedUpgrades = {};
+let currentUpgradeBaseIndex = null;
+let currentUpgradeTargetIndex = null;
 let dirty = false;
 let currentHeroIndex = null;
 let currentSkinIndex = null;
@@ -475,7 +576,32 @@ function markTagsSaved(){
   if(ts) ts.innerText = "Tags: " + TAG_DATABASE.length;
 }
 
+function markUpgradeDirty(){
+  dirtyUpgrade = true;
+  const s = document.getElementById("saveStatus");
+  if(s){
+    s.innerText = "Unsaved Changes";
+    s.className = "badge unsavedBadge";
+  }
+  updateUpgradeBadges();
+}
+
+function markUpgradeSaved(){
+  dirtyUpgrade = false;
+  updateUpgradeBadges();
+}
+
 function clone(obj){return JSON.parse(JSON.stringify(obj))}
+function esc(text){
+  return String(text ?? "").replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+}
+function parseTagsInput(text){
+  return String(text||"").split(",").map(x=>slugify(x)).filter(Boolean).filter((v,i,a)=>a.indexOf(v)===i);
+}
+function tagsToInput(tags){
+  if(!Array.isArray(tags)) return "";
+  return tags.map(t=>typeof t==="string"?t:(t.id||slugify(t.name||""))).filter(Boolean).join(",");
+}
 function slugify(text){return String(text||"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"")}
 function makeHeroId(name){let base=slugify(name)||"hero",id=base,n=2;while(DATA.heroes.some(h=>h.id===id)){id=`${base}_${n}`;n++}return id}
 function makeSkinId(hero){let n=hero.skins.length+1,id=`${hero.id}_${String(n).padStart(3,"0")}`;while(hero.skins.some(s=>s.id===id)){n++;id=`${hero.id}_${String(n).padStart(3,"0")}`}return id}
@@ -694,6 +820,7 @@ async function loadData(){
     ORIGINAL=clone(DATA);
     markSaved();
     render();
+    await loadUpgradeData(false);
     log("Loaded.");
     showToast("Dashboard updated.");
   }catch(e){
@@ -705,12 +832,12 @@ async function loadData(){
 }
 
 async function publishChanges(){
-  if(!dirty && !dirtyTags){
+  if(!dirty && !dirtyTags && !dirtyUpgrade){
     showToast("No changes to publish.");
     return;
   }
 
-  showConfirm("Publish Changes","This will commit local edits to GitHub. It can update skins.json and tags.json. Continue?",async()=>{
+  showConfirm("Publish Changes","This will commit local edits to GitHub. It can update skins.json, tags.json, and skin_upgrades.json. Continue?",async()=>{
     try{
       normalizeData();
       setBusy(true,"Publishing changes...");
@@ -823,9 +950,63 @@ async function publishChanges(){
         log("tags.json published.");
       }
 
+
+      if(dirtyUpgrade){
+        normalizeUpgradeData();
+
+        const latestUpgrade=await fetch(`${UPGRADE_API}?ref=${BRANCH}`,{
+          headers:{
+            "Authorization":`Bearer ${TOKEN}`,
+            "Accept":"application/vnd.github+json"
+          }
+        });
+
+        const latestUpgradeFile=await latestUpgrade.json();
+
+        if(!latestUpgrade.ok){
+          log(JSON.stringify(latestUpgradeFile,null,2));
+          showToast("Cannot get latest skin_upgrades SHA");
+          return;
+        }
+
+        UPGRADE_SHA=latestUpgradeFile.sha;
+
+        const upgradeContent=btoa(unescape(encodeURIComponent(JSON.stringify(UPGRADE_DATA,null,2))));
+
+        const upgradeRes=await fetch(UPGRADE_API,{
+          method:"PUT",
+          headers:{
+            "Authorization":`Bearer ${TOKEN}`,
+            "Accept":"application/vnd.github+json",
+            "Content-Type":"application/json"
+          },
+          body:JSON.stringify({
+            message:"Update skin_upgrades.json from Warlito Admin Panel",
+            content:upgradeContent,
+            sha:UPGRADE_SHA,
+            branch:BRANCH
+          })
+        });
+
+        const upgradeResult=await upgradeRes.json();
+
+        if(!upgradeRes.ok){
+          log(JSON.stringify(upgradeResult,null,2));
+          showToast("skin_upgrades.json publish failed. Reload then try again.");
+          return;
+        }
+
+        UPGRADE_SHA=upgradeResult.content.sha;
+        UPGRADE_ORIGINAL=clone(UPGRADE_DATA);
+        markUpgradeSaved();
+        log("skin_upgrades.json published.");
+      }
+
       markSaved();
       markTagsSaved();
+      markUpgradeSaved();
       render();
+      renderUpgrades();
       log("Published.");
       showToast("Published to GitHub.");
     }catch(e){
@@ -838,7 +1019,7 @@ async function publishChanges(){
 }
 
 function discardChanges(){
-  if(!dirty && !dirtyTags){
+  if(!dirty && !dirtyTags && !dirtyUpgrade){
     loadData();
     return;
   }
@@ -852,7 +1033,12 @@ function discardChanges(){
       TAG_DATABASE=clone(TAG_ORIGINAL);
       markTagsSaved();
     }
+    if(UPGRADE_ORIGINAL){
+      UPGRADE_DATA=clone(UPGRADE_ORIGINAL);
+      markUpgradeSaved();
+    }
     render();
+    renderUpgrades();
     renderTagDropdown();
     renderSelectedTags();
     showToast("Local changes discarded.");
@@ -862,7 +1048,7 @@ function discardChanges(){
 function reloadAll(){
   if(!TOKEN){showToast("Login first");return}
 
-  if(dirty || dirtyTags){
+  if(dirty || dirtyTags || dirtyUpgrade){
     showConfirm("Reload JSON","You have unsaved changes. Reloading will discard them.",()=>{
       loadData();
     });
@@ -1322,6 +1508,395 @@ function renderTagBadges(tags){
     return `<span class="badge badgePurple">${t.name}</span>`;
   }).join("") + `</div>`;
 }
+
+
+function normalizeUpgradeData(){
+  if(!UPGRADE_DATA || typeof UPGRADE_DATA !== "object") UPGRADE_DATA = {};
+  if(!UPGRADE_DATA.version) UPGRADE_DATA.version = 1;
+  UPGRADE_DATA.type = "skin_upgrades";
+  if(!Array.isArray(UPGRADE_DATA.skin_upgrades)) UPGRADE_DATA.skin_upgrades = [];
+
+  UPGRADE_DATA.skin_upgrades.forEach(base=>{
+    base.hero = base.hero || "";
+    base.base_name = base.base_name || "";
+    if(!base.id) base.id = makeUpgradeBaseId(base.hero, base.base_name);
+    base.base_image = base.base_image || "";
+    base.backup_script = base.backup_script || "";
+    if(typeof base.enabled === "undefined") base.enabled = true;
+    base.skin_tags = parseTagsInput(tagsToInput(base.skin_tags || []));
+    if(!Array.isArray(base.targets)) base.targets = [];
+
+    base.targets.forEach(target=>{
+      target.name = target.name || "";
+      if(!target.id) target.id = makeUpgradeTargetId(base, target.name);
+      target.image = target.image || "";
+      target.script = target.script || "";
+      target.type = target.type || "upgrade";
+      if(typeof target.enabled === "undefined") target.enabled = true;
+      target.skin_tags = parseTagsInput(tagsToInput(target.skin_tags || []));
+    });
+  });
+}
+
+function makeUpgradeBaseId(hero, baseName){
+  let base = slugify((hero || "hero") + "_" + (baseName || "base")) || "upgrade_base";
+  let id = base, n = 2;
+  while(UPGRADE_DATA.skin_upgrades.some(x=>x.id===id)){
+    id = `${base}_${n}`;
+    n++;
+  }
+  return id;
+}
+
+function makeUpgradeTargetId(base, targetName){
+  let prefix = base.id || makeUpgradeBaseId(base.hero, base.base_name);
+  let raw = `${prefix}_to_${targetName || "target"}`;
+  let id = slugify(raw) || `${prefix}_to_target`;
+  let n = 2;
+  while((base.targets||[]).some(x=>x.id===id)){
+    id = `${slugify(raw)}_${n}`;
+    n++;
+  }
+  return id;
+}
+
+async function loadUpgradeData(showMessage=true){
+  try{
+    log("Loading skin_upgrades.json...");
+
+    let obj;
+
+    if(TOKEN){
+      const res = await fetch(`${UPGRADE_API}?ref=${BRANCH}&v=${Date.now()}`,{
+        headers:{
+          "Authorization":`Bearer ${TOKEN}`,
+          "Accept":"application/vnd.github+json"
+        },
+        cache:"no-store"
+      });
+
+      const file = await res.json();
+
+      if(!res.ok){
+        throw new Error(JSON.stringify(file));
+      }
+
+      UPGRADE_SHA = file.sha || "";
+      const text = decodeURIComponent(escape(atob(file.content.replace(/\n/g,""))));
+      obj = JSON.parse(text);
+    }else{
+      const res = await fetch(UPGRADE_URL + "?v=" + Date.now(), {cache:"no-store"});
+      if(!res.ok) throw new Error("HTTP " + res.status + " while loading skin_upgrades.json");
+      obj = await res.json();
+    }
+
+    UPGRADE_DATA = obj;
+    normalizeUpgradeData();
+    UPGRADE_ORIGINAL = clone(UPGRADE_DATA);
+    markUpgradeSaved();
+    renderUpgrades();
+
+    log("Loaded upgrades: " + UPGRADE_DATA.skin_upgrades.length);
+    if(showMessage) showToast("Upgrade manager updated.");
+  }catch(e){
+    log("skin_upgrades.json load failed: " + e.toString());
+    updateUpgradeBadges();
+    renderUpgrades();
+    if(showMessage) showToast("skin_upgrades.json failed to load");
+  }
+}
+
+function updateUpgradeBadges(){
+  const bases = (UPGRADE_DATA.skin_upgrades || []).length;
+  let targets = 0;
+  (UPGRADE_DATA.skin_upgrades || []).forEach(b=>targets += (b.targets || []).length);
+
+  const us = document.getElementById("upgradeStatus");
+  const ts = document.getElementById("upgradeTargetStatus");
+
+  if(us) us.innerText = "Upgrades: " + bases + (dirtyUpgrade ? " *" : "");
+  if(ts) ts.innerText = "Targets: " + targets;
+}
+
+function renderUpgradeTagBadges(tagIds){
+  const ids = parseTagsInput(tagsToInput(tagIds || []));
+  if(ids.length === 0) return "";
+
+  return `<div class="officialTags">` + ids.map(id=>{
+    const t = TAG_DATABASE.find(x=>x.id===id || slugify(x.name)===id);
+    if(t && t.icon){
+      return `<img class="tagIconBadge" src="${esc(t.icon)}" title="${esc(t.name)}" onerror="this.outerHTML='<span class=&quot;badge badgePurple&quot;>${esc(t.name)}</span>'">`;
+    }
+    return `<span class="badge badgePurple">${esc(id)}</span>`;
+  }).join("") + `</div>`;
+}
+
+function upgradeSearchMatch(base, q){
+  if(!q) return true;
+  const targetText = (base.targets || []).map(t=>[
+    t.id,t.name,t.image,t.script,t.type,t.enabled,
+    ...(parseTagsInput(tagsToInput(t.skin_tags || [])))
+  ].join(" ")).join(" ");
+  const baseText = [
+    base.id,base.hero,base.base_name,base.base_image,base.backup_script,base.enabled,
+    ...(parseTagsInput(tagsToInput(base.skin_tags || []))),
+    targetText
+  ].join(" ").toLowerCase();
+  return baseText.includes(q);
+}
+
+function renderUpgrades(){
+  normalizeUpgradeData();
+  updateUpgradeBadges();
+
+  const list = document.getElementById("upgradeList");
+  if(!list) return;
+
+  const search = document.getElementById("upgradeSearch");
+  const q = (search ? search.value : "").toLowerCase().trim();
+
+  const items = UPGRADE_DATA.skin_upgrades
+    .map((base,index)=>({base,index}))
+    .filter(({base})=>upgradeSearchMatch(base,q));
+
+  if(items.length === 0){
+    list.innerHTML = `<div class="small">No upgrade skins found.</div>`;
+    return;
+  }
+
+  list.innerHTML = items.map(({base,index})=>{
+    if(typeof collapsedUpgrades[base.id] === "undefined") collapsedUpgrades[base.id] = true;
+    const collapsed = collapsedUpgrades[base.id];
+
+    const targetsHtml = (base.targets || []).map((target,ti)=>`
+      <div class="targetRow cut ${target.enabled ? "" : "disabled"}">
+        <img src="${esc(target.image)}" onerror="this.style.opacity=.25">
+        <div style="min-width:0">
+          <div class="targetName">${esc(target.name || "Untitled Target")}</div>
+          <div class="small">${esc(target.type || "upgrade")} • ${target.enabled ? "Visible" : "Hidden"}</div>
+          <div class="small">ZIP: ${esc(target.script || "")}</div>
+          <div class="tagText">${parseTagsInput(tagsToInput(target.skin_tags || [])).join(", ") || "No tags"}</div>
+          ${renderUpgradeTagBadges(target.skin_tags)}
+          <div class="miniActions">
+            <button class="btnBlue" onclick="openUpgradeTargetModal(${index},${ti})">Edit</button>
+            <button class="btnDark" onclick="toggleUpgradeTarget(${index},${ti})">${target.enabled ? "Hide" : "Show"}</button>
+            <button class="btnRed" onclick="deleteUpgradeTarget(${index},${ti})">Delete</button>
+          </div>
+        </div>
+      </div>
+    `).join("");
+
+    return `
+      <div class="upgradeCard cut ${base.enabled ? "" : "disabled"}">
+        <div class="upgradeHead">
+          <img src="${esc(base.base_image)}" onerror="this.style.opacity=.25">
+          <div style="min-width:0">
+            <div class="upgradeName">${esc(base.base_name || "Untitled Base")}</div>
+            <div class="small">Hero: ${esc(base.hero || "")}</div>
+            <div class="small">ID: ${esc(base.id || "")}</div>
+            <div class="tagText">${parseTagsInput(tagsToInput(base.skin_tags || [])).join(", ") || "No tags"}</div>
+            ${renderUpgradeTagBadges(base.skin_tags)}
+          </div>
+        </div>
+
+        <div class="miniActions">
+          <button class="btnDark" onclick="toggleUpgradeCollapse('${esc(base.id)}')">${collapsed ? "Expand" : "Minimize"}</button>
+          <button class="btnGreen" onclick="openUpgradeTargetModal(${index},null)">+ Target</button>
+          <button class="btnBlue" onclick="openUpgradeBaseModal(${index})">Edit</button>
+          <button class="btnDark" onclick="toggleUpgradeBase(${index})">${base.enabled ? "Hide" : "Show"}</button>
+          <button class="btnRed" onclick="deleteUpgradeBase(${index})">Delete</button>
+        </div>
+
+        <div class="upgradeTargets ${collapsed ? "collapsed" : ""}">
+          <div class="small">${(base.targets||[]).length} target(s)</div>
+          ${targetsHtml || `<div class="small">No targets yet.</div>`}
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function toggleUpgradeCollapse(id){
+  collapsedUpgrades[id] = !collapsedUpgrades[id];
+  renderUpgrades();
+}
+
+function openUpgradeBaseModal(index=null){
+  currentUpgradeBaseIndex = index;
+
+  const title = document.getElementById("upgradeBaseModalTitle");
+  const base = index === null ? null : UPGRADE_DATA.skin_upgrades[index];
+
+  title.innerText = index === null ? "Add Upgrade Base" : "Edit Upgrade Base";
+
+  document.getElementById("upgradeHero").value = base ? base.hero || "" : "";
+  document.getElementById("upgradeBaseName").value = base ? base.base_name || "" : "";
+  document.getElementById("upgradeBaseImage").value = base ? base.base_image || "" : "";
+  document.getElementById("upgradeBackupScript").value = base ? base.backup_script || "" : "";
+  document.getElementById("upgradeBaseTags").value = base ? tagsToInput(base.skin_tags || []) : "";
+  document.getElementById("upgradeBaseEnabled").value = base ? String(base.enabled !== false) : "true";
+  document.getElementById("upgradeBaseId").value = base ? base.id || "" : "";
+
+  document.getElementById("upgradeBaseModal").style.display = "flex";
+}
+
+function closeUpgradeBaseModal(){
+  document.getElementById("upgradeBaseModal").style.display = "none";
+}
+
+function saveUpgradeBaseModal(){
+  const hero = document.getElementById("upgradeHero").value.trim();
+  const baseName = document.getElementById("upgradeBaseName").value.trim();
+  const baseImage = document.getElementById("upgradeBaseImage").value.trim();
+  const backupScript = document.getElementById("upgradeBackupScript").value.trim();
+  const skinTags = parseTagsInput(document.getElementById("upgradeBaseTags").value);
+  const enabled = document.getElementById("upgradeBaseEnabled").value === "true";
+  const customId = slugify(document.getElementById("upgradeBaseId").value.trim());
+
+  if(!hero || !baseName || !baseImage){
+    showToast("Fill hero, base name, and image.");
+    return;
+  }
+
+  if(currentUpgradeBaseIndex === null){
+    const newBase = {
+      id: customId || makeUpgradeBaseId(hero,baseName),
+      hero,
+      base_name: baseName,
+      base_image: baseImage,
+      backup_script: backupScript,
+      enabled,
+      skin_tags: skinTags,
+      targets:[]
+    };
+    UPGRADE_DATA.skin_upgrades.push(newBase);
+    collapsedUpgrades[newBase.id] = false;
+  }else{
+    const base = UPGRADE_DATA.skin_upgrades[currentUpgradeBaseIndex];
+    base.id = customId || base.id || makeUpgradeBaseId(hero,baseName);
+    base.hero = hero;
+    base.base_name = baseName;
+    base.base_image = baseImage;
+    base.backup_script = backupScript;
+    base.enabled = enabled;
+    base.skin_tags = skinTags;
+  }
+
+  closeUpgradeBaseModal();
+  markUpgradeDirty();
+  renderUpgrades();
+  showToast("Upgrade base saved locally.");
+}
+
+function toggleUpgradeBase(index){
+  UPGRADE_DATA.skin_upgrades[index].enabled = !UPGRADE_DATA.skin_upgrades[index].enabled;
+  markUpgradeDirty();
+  renderUpgrades();
+}
+
+function deleteUpgradeBase(index){
+  const base = UPGRADE_DATA.skin_upgrades[index];
+  showConfirm("Delete Upgrade Base",`Delete "${base.base_name}" and all ${base.targets.length} target(s)?`,()=>{
+    UPGRADE_DATA.skin_upgrades.splice(index,1);
+    markUpgradeDirty();
+    renderUpgrades();
+    showToast("Upgrade base deleted locally.");
+  });
+}
+
+function openUpgradeTargetModal(baseIndex,targetIndex=null){
+  currentUpgradeBaseIndex = baseIndex;
+  currentUpgradeTargetIndex = targetIndex;
+
+  const base = UPGRADE_DATA.skin_upgrades[baseIndex];
+  const target = targetIndex === null ? null : base.targets[targetIndex];
+
+  document.getElementById("upgradeTargetModalTitle").innerText =
+    targetIndex === null ? `Add Target - ${base.base_name}` : `Edit Target - ${base.base_name}`;
+
+  document.getElementById("upgradeTargetName").value = target ? target.name || "" : "";
+  document.getElementById("upgradeTargetImage").value = target ? target.image || "" : "";
+  document.getElementById("upgradeTargetScript").value = target ? target.script || "" : "";
+  document.getElementById("upgradeTargetTags").value = target ? tagsToInput(target.skin_tags || []) : "";
+  document.getElementById("upgradeTargetType").value = target ? target.type || "upgrade" : "upgrade";
+  document.getElementById("upgradeTargetEnabled").value = target ? String(target.enabled !== false) : "true";
+  document.getElementById("upgradeTargetId").value = target ? target.id || "" : "";
+
+  document.getElementById("upgradeTargetModal").style.display = "flex";
+}
+
+function closeUpgradeTargetModal(){
+  document.getElementById("upgradeTargetModal").style.display = "none";
+}
+
+function saveUpgradeTargetModal(){
+  const base = UPGRADE_DATA.skin_upgrades[currentUpgradeBaseIndex];
+
+  const name = document.getElementById("upgradeTargetName").value.trim();
+  const image = document.getElementById("upgradeTargetImage").value.trim();
+  const script = document.getElementById("upgradeTargetScript").value.trim();
+  const skinTags = parseTagsInput(document.getElementById("upgradeTargetTags").value);
+  const type = document.getElementById("upgradeTargetType").value || "upgrade";
+  const enabled = document.getElementById("upgradeTargetEnabled").value === "true";
+  const customId = slugify(document.getElementById("upgradeTargetId").value.trim());
+
+  if(!name || !image){
+    showToast("Fill target name and image.");
+    return;
+  }
+
+  if(type !== "backup" && !script){
+    showToast("Upgrade targets need script URL.");
+    return;
+  }
+
+  if(currentUpgradeTargetIndex === null){
+    const newTarget = {
+      id: customId || makeUpgradeTargetId(base,name),
+      name,
+      image,
+      script,
+      type,
+      enabled,
+      skin_tags: skinTags
+    };
+    base.targets.push(newTarget);
+    collapsedUpgrades[base.id] = false;
+  }else{
+    const target = base.targets[currentUpgradeTargetIndex];
+    target.id = customId || target.id || makeUpgradeTargetId(base,name);
+    target.name = name;
+    target.image = image;
+    target.script = script;
+    target.type = type;
+    target.enabled = enabled;
+    target.skin_tags = skinTags;
+  }
+
+  closeUpgradeTargetModal();
+  markUpgradeDirty();
+  renderUpgrades();
+  showToast("Target saved locally.");
+}
+
+function toggleUpgradeTarget(baseIndex,targetIndex){
+  const target = UPGRADE_DATA.skin_upgrades[baseIndex].targets[targetIndex];
+  target.enabled = !target.enabled;
+  markUpgradeDirty();
+  renderUpgrades();
+}
+
+function deleteUpgradeTarget(baseIndex,targetIndex){
+  const base = UPGRADE_DATA.skin_upgrades[baseIndex];
+  const target = base.targets[targetIndex];
+  showConfirm("Delete Target",`Delete "${target.name}" from ${base.base_name}?`,()=>{
+    base.targets.splice(targetIndex,1);
+    markUpgradeDirty();
+    renderUpgrades();
+    showToast("Target deleted locally.");
+  });
+}
+
 
 function render(){
   normalizeData();
