@@ -6,7 +6,7 @@
 
   "update": {
     "enabled": true,
-    "version_code": 2,
+    "version_code": 6,
     "title": "New Update Available",
     "message": "Please update to the latest version.",
     "link": "https://your-update-link.com"
