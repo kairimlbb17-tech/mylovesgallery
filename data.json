@@ -1,6 +1,14 @@
 {
   "sponsor": {
     "enabled": false,
-    "claim_link": "https://temu.com/s/v7njBWxvfa1YW"
+    "claim_link": ""
+  },
+
+  "update": {
+    "enabled": true,
+    "version_code": 2,
+    "title": "New Update Available",
+    "message": "Please update to the latest version.",
+    "link": "https://your-update-link.com"
   }
 }
