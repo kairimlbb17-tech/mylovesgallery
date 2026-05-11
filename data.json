@@ -1,7 +1,17 @@
 {
   "sponsor": {
     "enabled": true,
-    "claim_link": "https://temu.com/s/laICGsJ2vR5h3mq"
+    "app_open_enabled": false,
+    "button_enabled": true,
+    "rotation_enabled": true,
+    "rotation_minutes": 30,
+    "claim_links": [
+      "https://temu.com/s/d9NI5YmPr71jA8R",
+      "https://temu.com/s/d9NI5YmPr71jA8R",
+      "https://temu.com/s/d9NI5YmPr71jA8R",
+      "https://temu.com/s/d9NI5YmPr71jA8R"
+    ],
+    "claim_link": "https://temu.com/s/d9NI5YmPr71jA8R"
   },
 
   "update_enabled": true,
