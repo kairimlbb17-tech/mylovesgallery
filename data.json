@@ -1,7 +1,7 @@
 {
   "sponsor": {
     "enabled": true,
-    "app_open_enabled": false,
+    "app_open_enabled": true,
     "button_enabled": true,
     "rotation_enabled": true,
     "rotation_minutes": 30,
