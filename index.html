@@ -187,6 +187,17 @@ button:active{transform:scale(.97)}
 .miniActions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px}
 .miniActions button{font-size:11px;min-height:34px;padding:7px 5px}
 
+
+.modskinList{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:820px){.modskinList{grid-template-columns:repeat(2,1fr)}}
+.modskinCard{background:linear-gradient(160deg,#11111c,#07070d);border:1px solid rgba(255,255,255,.08);padding:12px;min-width:0;overflow:hidden}
+.modskinCard.disabled{opacity:.5;filter:grayscale(1)}
+.modskinHead{display:grid;grid-template-columns:86px minmax(0,1fr);gap:10px;align-items:start}
+.modskinHead img{width:86px;height:120px;object-fit:cover;background:#1f1f2a;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.modskinName{font-weight:900;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.modskinPreview{display:grid;grid-template-columns:86px minmax(0,1fr);gap:10px;background:#090911;border:1px solid rgba(255,255,255,.08);padding:9px;margin-top:9px;align-items:center}
+.modskinPreview img{width:86px;height:120px;object-fit:cover;background:#222;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+
 .modal{
   position:fixed;inset:0;display:none;align-items:center;justify-content:center;
   background:rgba(0,0,0,.78);padding:10px;z-index:99
@@ -255,6 +266,7 @@ button:active{transform:scale(.97)}
       </div>
       <div class="actions" style="grid-template-columns:1fr">
         <button class="btnBlue" onclick="showUpgradePage()">Go to Upgrade Skin Manager</button>
+        <button class="btnGreen" onclick="showModskinPage()">Go to ModSkin Manager</button>
       </div>
       <div class="actions" style="grid-template-columns:1fr 1fr">
         <button class="btnDark" onclick="logout()">Logout</button>
@@ -346,6 +358,36 @@ button:active{transform:scale(.97)}
       <div class="card cut">
         <div class="title">Upgrade Logs</div>
         <div id="upgradeLog" class="cut" style="height:105px;overflow:auto;background:#050509;color:var(--green);border:1px solid rgba(0,255,156,.16);padding:10px;font-size:12px"></div>
+      </div>
+    </div>
+
+
+    <div id="modskinPage" class="hidden">
+      <div class="card cut cardGlow">
+        <div class="title">ModSkin Manager</div>
+        <div class="badges">
+          <span id="modskinStatus" class="badge badgePurple">ModSkins: 0</span>
+          <span id="modskinEnabledStatus" class="badge badgeGreen">Enabled: 0</span>
+        </div>
+        <div class="actions" style="grid-template-columns:1fr 1fr">
+          <button class="btnDark" onclick="showDashboardPage()">← Back to Dashboard</button>
+          <button class="btnGreen" onclick="publishChanges()">Publish Changes</button>
+        </div>
+      </div>
+
+      <div class="card cut cardGlow">
+        <div class="title">Add / Manage ModSkins</div>
+        <div class="toolbar">
+          <input id="modskinSearch" placeholder="Search modskin, category, series, tag..." oninput="renderModskins()">
+          <button class="btnGreen" onclick="openModskinModal()">+ Add ModSkin</button>
+          <button class="btnDark" onclick="loadModskinData()">Reload ModSkins</button>
+        </div>
+        <div id="modskinList" class="modskinList"></div>
+      </div>
+
+      <div class="card cut">
+        <div class="title">ModSkin Logs</div>
+        <div id="modskinLog" class="cut" style="height:105px;overflow:auto;background:#050509;color:var(--green);border:1px solid rgba(0,255,156,.16);padding:10px;font-size:12px"></div>
       </div>
     </div>
 
@@ -483,6 +525,34 @@ button:active{transform:scale(.97)}
   </div>
 </div>
 
+
+<div class="modal" id="modskinModal">
+  <div class="modalBox cut">
+    <div class="title" id="modskinModalTitle">Add ModSkin</div>
+    <input id="modskinName" placeholder="ModSkin name ex: Kaido">
+    <div class="row">
+      <input id="modskinCategory" placeholder="Category ex: Anime">
+      <input id="modskinSeries" placeholder="Series ex: One Piece">
+    </div>
+    <input id="modskinImage" placeholder="Image URL" oninput="previewModskin()">
+    <input id="modskinScript" placeholder="Script ZIP URL">
+    <input id="modskinTags" placeholder="Tags comma separated ex: Anime, One Piece">
+    <div class="row">
+      <select id="modskinFeatured"><option value="false">Normal</option><option value="true">Featured</option></select>
+      <select id="modskinEnabled"><option value="true">Enabled / Visible</option><option value="false">Disabled / Hidden</option></select>
+    </div>
+    <input id="modskinId" placeholder="ID optional, auto generated">
+    <div class="modskinPreview cut">
+      <img id="modskinPreviewImg" src="">
+      <div><b>Live Preview</b><div class="small" id="modskinPreviewText">Paste image URL...</div></div>
+    </div>
+    <div class="actions">
+      <button class="btnGreen" onclick="saveModskinModal()">Save Local</button>
+      <button class="btnDark" onclick="closeModskinModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="confirmModal">
   <div class="modalBox cut">
     <div class="title" id="confirmTitle">Confirm Action</div>
@@ -511,13 +581,16 @@ const REPO = "shesh";
 const FILE = "skins.json";
 const TAG_FILE = "tags.json";
 const UPGRADE_FILE = "skin_upgrades.json";
+const MODSKIN_FILE = "modskins.json";
 const BRANCH = "main";
 const CATEGORIES = ["assassin","fighter","mage","marksman","tank","support"];
 const API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
 const TAG_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${TAG_FILE}`;
 const UPGRADE_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${UPGRADE_FILE}`;
+const MODSKIN_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${MODSKIN_FILE}`;
 const TAG_URL = `https://raw.githubusercontent.com/${OWNER}/${REPO}/refs/heads/${BRANCH}/${TAG_FILE}`;
 const UPGRADE_URL = `https://raw.githubusercontent.com/${OWNER}/${REPO}/refs/heads/${BRANCH}/${UPGRADE_FILE}`;
+const MODSKIN_URL = `https://raw.githubusercontent.com/${OWNER}/${REPO}/refs/heads/${BRANCH}/${MODSKIN_FILE}`;
 
 let TOKEN = "";
 let SHA = "";
@@ -531,6 +604,11 @@ let dirtyUpgrade = false;
 let UPGRADE_SHA = "";
 let UPGRADE_DATA = { version:1, type:"skin_upgrades", skin_upgrades:[] };
 let UPGRADE_ORIGINAL = null;
+let dirtyModskin = false;
+let MODSKIN_SHA = "";
+let MODSKIN_DATA = { version:1, type:"modskins", modskins:[] };
+let MODSKIN_ORIGINAL = null;
+let currentModskinIndex = null;
 let collapsedUpgrades = {};
 let currentUpgradeBaseIndex = null;
 let currentUpgradeTargetIndex = null;
@@ -646,12 +724,22 @@ function upgradeLog(msg){
 function showUpgradePage(){
   document.getElementById("dashboardPage").classList.add("hidden");
   document.getElementById("upgradePage").classList.remove("hidden");
+  document.getElementById("modskinPage").classList.add("hidden");
   renderUpgrades();
+  window.scrollTo(0,0);
+}
+
+function showModskinPage(){
+  document.getElementById("dashboardPage").classList.add("hidden");
+  document.getElementById("upgradePage").classList.add("hidden");
+  document.getElementById("modskinPage").classList.remove("hidden");
+  renderModskins();
   window.scrollTo(0,0);
 }
 
 function showDashboardPage(){
   document.getElementById("upgradePage").classList.add("hidden");
+  document.getElementById("modskinPage").classList.add("hidden");
   document.getElementById("dashboardPage").classList.remove("hidden");
   render();
   window.scrollTo(0,0);
@@ -865,6 +953,7 @@ async function loadData(){
     markSaved();
     render();
     await loadUpgradeData(false);
+    await loadModskinData(false);
     log("Loaded.");
     showToast("Dashboard updated.");
   }catch(e){
@@ -876,12 +965,12 @@ async function loadData(){
 }
 
 async function publishChanges(){
-  if(!dirty && !dirtyTags && !dirtyUpgrade){
+  if(!dirty && !dirtyTags && !dirtyUpgrade && !dirtyModskin){
     showToast("No changes to publish.");
     return;
   }
 
-  showConfirm("Publish Changes","This will commit local edits to GitHub. It can update skins.json, tags.json, and skin_upgrades.json. Continue?",async()=>{
+  showConfirm("Publish Changes","This will commit local edits to GitHub. It can update skins.json, tags.json, skin_upgrades.json, and modskins.json. Continue?",async()=>{
     try{
       normalizeData();
       setBusy(true,"Publishing changes...");
@@ -1046,11 +1135,65 @@ async function publishChanges(){
         log("skin_upgrades.json published.");
       }
 
+
+      if(dirtyModskin){
+        normalizeModskinData();
+
+        const latestModskin=await fetch(`${MODSKIN_API}?ref=${BRANCH}`,{
+          headers:{
+            "Authorization":`Bearer ${TOKEN}`,
+            "Accept":"application/vnd.github+json"
+          }
+        });
+
+        const latestModskinFile=await latestModskin.json();
+
+        if(!latestModskin.ok){
+          log(JSON.stringify(latestModskinFile,null,2));
+          showToast("Cannot get latest modskins SHA");
+          return;
+        }
+
+        MODSKIN_SHA=latestModskinFile.sha;
+
+        const modskinContent=btoa(unescape(encodeURIComponent(JSON.stringify(MODSKIN_DATA,null,2))));
+
+        const modskinRes=await fetch(MODSKIN_API,{
+          method:"PUT",
+          headers:{
+            "Authorization":`Bearer ${TOKEN}`,
+            "Accept":"application/vnd.github+json",
+            "Content-Type":"application/json"
+          },
+          body:JSON.stringify({
+            message:"Update modskins.json from Warlito Admin Panel",
+            content:modskinContent,
+            sha:MODSKIN_SHA,
+            branch:BRANCH
+          })
+        });
+
+        const modskinResult=await modskinRes.json();
+
+        if(!modskinRes.ok){
+          log(JSON.stringify(modskinResult,null,2));
+          showToast("modskins.json publish failed. Reload then try again.");
+          return;
+        }
+
+        MODSKIN_SHA=modskinResult.content.sha;
+        MODSKIN_ORIGINAL=clone(MODSKIN_DATA);
+        markModskinSaved();
+        log("modskins.json published.");
+      }
+
       markSaved();
       markTagsSaved();
       markUpgradeSaved();
+      markModskinSaved();
       render();
       renderUpgrades();
+      renderModskins();
       log("Published.");
       showToast("Published to GitHub.");
     }catch(e){
@@ -1063,7 +1206,7 @@ async function publishChanges(){
 }
 
 function discardChanges(){
-  if(!dirty && !dirtyTags && !dirtyUpgrade){
+  if(!dirty && !dirtyTags && !dirtyUpgrade && !dirtyModskin){
     loadData();
     return;
   }
@@ -1081,8 +1224,13 @@ function discardChanges(){
       UPGRADE_DATA=clone(UPGRADE_ORIGINAL);
       markUpgradeSaved();
     }
+    if(MODSKIN_ORIGINAL){
+      MODSKIN_DATA=clone(MODSKIN_ORIGINAL);
+      markModskinSaved();
+    }
     render();
     renderUpgrades();
+    renderModskins();
     renderTagDropdown();
     renderSelectedTags();
     showToast("Local changes discarded.");
@@ -1092,7 +1240,7 @@ function discardChanges(){
 function reloadAll(){
   if(!TOKEN){showToast("Login first");return}
 
-  if(dirty || dirtyTags || dirtyUpgrade){
+  if(dirty || dirtyTags || dirtyUpgrade || dirtyModskin){
     showConfirm("Reload JSON","You have unsaved changes. Reloading will discard them.",()=>{
       loadData();
     });
@@ -1940,6 +2088,27 @@ function deleteUpgradeTarget(baseIndex,targetIndex){
     showToast("Target deleted locally.");
   });
 }
+
+
+
+function modskinLog(msg){const box=document.getElementById("modskinLog");if(!box)return;box.innerText+=`[${new Date().toLocaleTimeString()}] ${msg}\n`;box.scrollTop=box.scrollHeight;}
+function markModskinDirty(){dirtyModskin=true;const s=document.getElementById("saveStatus");if(s){s.innerText="Unsaved Changes";s.className="badge unsavedBadge";}updateModskinBadges();}
+function markModskinSaved(){dirtyModskin=false;updateModskinBadges();}
+function parseTextTags(text){return String(text||"").split(",").map(x=>x.trim()).filter(Boolean).filter((v,i,a)=>a.findIndex(x=>x.toLowerCase()===v.toLowerCase())===i);}
+function tagsArrayToText(tags){if(!Array.isArray(tags))return "";return tags.map(t=>typeof t==="string"?t:(t.name||t.id||"")).filter(Boolean).join(", ");}
+function makeModskinId(name){let base=slugify(name||"modskin")||"modskin";let id=base,n=2;while((MODSKIN_DATA.modskins||[]).some(x=>x.id===id)){id=`${base}_${n}`;n++;}return id;}
+function normalizeModskinData(){if(!MODSKIN_DATA||typeof MODSKIN_DATA!=="object")MODSKIN_DATA={};if(!MODSKIN_DATA.version)MODSKIN_DATA.version=1;MODSKIN_DATA.type="modskins";if(!Array.isArray(MODSKIN_DATA.modskins))MODSKIN_DATA.modskins=[];MODSKIN_DATA.modskins.forEach(item=>{item.name=item.name||"";if(!item.id)item.id=makeModskinId(item.name);item.category=item.category||"";item.series=item.series||"";item.image=item.image||"";item.script=item.script||"";if(typeof item.enabled==="undefined")item.enabled=true;if(typeof item.featured==="undefined")item.featured=false;if(!Array.isArray(item.tags))item.tags=[];item.tags=item.tags.map(t=>typeof t==="string"?t:(t.name||t.id||"")).filter(Boolean);});}
+async function loadModskinData(showMessage=true){try{log("Loading modskins.json...");let obj;if(TOKEN){const res=await fetch(`${MODSKIN_API}?ref=${BRANCH}&v=${Date.now()}`,{headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json"},cache:"no-store"});const file=await res.json();if(!res.ok)throw new Error(JSON.stringify(file));MODSKIN_SHA=file.sha||"";const text=decodeURIComponent(escape(atob(file.content.replace(/\n/g,""))));obj=JSON.parse(text);}else{const res=await fetch(MODSKIN_URL+"?v="+Date.now(),{cache:"no-store"});if(!res.ok)throw new Error("HTTP "+res.status+" while loading modskins.json");obj=await res.json();}MODSKIN_DATA=obj;normalizeModskinData();MODSKIN_ORIGINAL=clone(MODSKIN_DATA);markModskinSaved();renderModskins();log("Loaded modskins: "+MODSKIN_DATA.modskins.length);if(showMessage)showToast("ModSkin manager updated.");}catch(e){log("modskins.json load failed: "+e.toString());updateModskinBadges();renderModskins();if(showMessage)showToast("modskins.json failed to load");}}
+function updateModskinBadges(){const all=(MODSKIN_DATA.modskins||[]).length;let enabled=0;(MODSKIN_DATA.modskins||[]).forEach(x=>{if(x.enabled!==false)enabled++;});const ms=document.getElementById("modskinStatus"),es=document.getElementById("modskinEnabledStatus");if(ms)ms.innerText="ModSkins: "+all+(dirtyModskin?" *":"");if(es)es.innerText="Enabled: "+enabled;}
+function modskinSearchMatch(item,q){if(!q)return true;const text=[item.id,item.name,item.category,item.series,item.image,item.script,item.enabled,item.featured,...(Array.isArray(item.tags)?item.tags:[])].join(" ").toLowerCase();return text.includes(q);}
+function renderModskins(){normalizeModskinData();updateModskinBadges();const list=document.getElementById("modskinList");if(!list)return;const search=document.getElementById("modskinSearch");const q=(search?search.value:"").toLowerCase().trim();const items=MODSKIN_DATA.modskins.map((item,index)=>({item,index})).filter(({item})=>modskinSearchMatch(item,q));if(items.length===0){list.innerHTML=`<div class="small">No modskins found.</div>`;return;}list.innerHTML=items.map(({item,index})=>`<div class="modskinCard cut ${item.enabled!==false?"":"disabled"}"><div class="modskinHead"><img src="${esc(item.image)}" onerror="this.style.opacity=.25"><div style="min-width:0"><div class="modskinName">${esc(item.name||"Untitled ModSkin")}</div><div class="small">ID: ${esc(item.id||"")}</div><div class="small">${esc(item.category||"No Category")} • ${esc(item.series||"No Series")}</div><div class="small">ZIP: ${esc(item.script||"")}</div><div class="tagText">${esc(tagsArrayToText(item.tags)||"No tags")}</div><div class="badges"><span class="badge ${item.enabled!==false?"badgeGreen":"badgeOff"}">${item.enabled!==false?"visible":"hidden"}</span><span class="badge ${item.featured?"badgeYellow":"badgePurple"}">${item.featured?"featured":"normal"}</span></div></div></div><div class="miniActions"><button class="btnBlue" onclick="openModskinModal(${index})">Edit</button><button class="btnYellow" onclick="toggleModskinFeatured(${index})">★</button><button class="btnDark" onclick="toggleModskinEnabled(${index})">${item.enabled!==false?"Hide":"Show"}</button><button class="btnRed" onclick="deleteModskin(${index})">Delete</button></div></div>`).join("");}
+function openModskinModal(index=null){currentModskinIndex=index;const item=index===null?null:MODSKIN_DATA.modskins[index];document.getElementById("modskinModalTitle").innerText=index===null?"Add ModSkin":"Edit ModSkin";document.getElementById("modskinName").value=item?item.name||"":"";document.getElementById("modskinCategory").value=item?item.category||"":"";document.getElementById("modskinSeries").value=item?item.series||"":"";document.getElementById("modskinImage").value=item?item.image||"":"";document.getElementById("modskinScript").value=item?item.script||"":"";document.getElementById("modskinTags").value=item?tagsArrayToText(item.tags||[]):"";document.getElementById("modskinFeatured").value=item?String(item.featured===true):"false";document.getElementById("modskinEnabled").value=item?String(item.enabled!==false):"true";document.getElementById("modskinId").value=item?item.id||"":"";previewModskin();document.getElementById("modskinModal").style.display="flex";}
+function closeModskinModal(){document.getElementById("modskinModal").style.display="none";}
+function previewModskin(){const img=document.getElementById("modskinPreviewImg"),txt=document.getElementById("modskinPreviewText");const url=document.getElementById("modskinImage").value.trim();const name=document.getElementById("modskinName").value.trim();if(!url){img.removeAttribute("src");txt.innerText="Paste image URL...";return;}img.src=url;txt.innerText=name?name:url;}
+function saveModskinModal(){const name=document.getElementById("modskinName").value.trim();const category=document.getElementById("modskinCategory").value.trim();const series=document.getElementById("modskinSeries").value.trim();const image=document.getElementById("modskinImage").value.trim();const script=document.getElementById("modskinScript").value.trim();const tags=parseTextTags(document.getElementById("modskinTags").value);const featured=document.getElementById("modskinFeatured").value==="true";const enabled=document.getElementById("modskinEnabled").value==="true";const customId=slugify(document.getElementById("modskinId").value.trim());if(!name||!image||!script){showToast("Fill name, image, and script URL.");return;}if(currentModskinIndex===null){MODSKIN_DATA.modskins.push({id:customId||makeModskinId(name),name,category,series,image,script,enabled,featured,tags});}else{const item=MODSKIN_DATA.modskins[currentModskinIndex];item.id=customId||item.id||makeModskinId(name);item.name=name;item.category=category;item.series=series;item.image=image;item.script=script;item.enabled=enabled;item.featured=featured;item.tags=tags;}closeModskinModal();markModskinDirty();renderModskins();showToast("ModSkin saved locally.");}
+function toggleModskinEnabled(index){MODSKIN_DATA.modskins[index].enabled=!(MODSKIN_DATA.modskins[index].enabled!==false);markModskinDirty();renderModskins();}
+function toggleModskinFeatured(index){MODSKIN_DATA.modskins[index].featured=!MODSKIN_DATA.modskins[index].featured;markModskinDirty();renderModskins();}
+function deleteModskin(index){const item=MODSKIN_DATA.modskins[index];showConfirm("Delete ModSkin",`Delete "${item.name}" from modskins.json? This cannot be undone after publish.`,()=>{MODSKIN_DATA.modskins.splice(index,1);markModskinDirty();renderModskins();showToast("ModSkin deleted locally.");});}
 
 
 function render(){
