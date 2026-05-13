@@ -382,6 +382,7 @@ button:active{transform:scale(.97)}
           <button class="btnGreen" onclick="openModskinModal()">+ Add ModSkin</button>
           <button class="btnDark" onclick="loadModskinData()">Reload ModSkins</button>
         </div>
+        <div class="small">Order is based sa list order. Use ↑ / ↓ para piliin kung anong skin mauuna sa app.</div>
         <div id="modskinList" class="modskinList"></div>
       </div>
 
@@ -397,6 +398,8 @@ button:active{transform:scale(.97)}
 <div class="modal" id="skinModal">
   <div class="modalBox cut">
     <div class="title" id="modalTitle">Add Skin</div>
+    <div class="small">Skin name / display name</div>
+    <input id="skinName" placeholder="Skin name ex: Blade Dancer, Saber Backup">
     <input id="skinImage" placeholder="Image URL" oninput="livePreview(); autoSuggestTags();">
     <input id="skinScript" placeholder="Script ZIP URL" oninput="autoSuggestTags();">
 
@@ -529,7 +532,9 @@ button:active{transform:scale(.97)}
 <div class="modal" id="modskinModal">
   <div class="modalBox cut">
     <div class="title" id="modskinModalTitle">Add ModSkin</div>
+    <div class="small">Skin name / display name</div>
     <input id="modskinName" placeholder="ModSkin name ex: Kaido">
+    <div class="small">Category and series</div>
     <div class="row">
       <input id="modskinCategory" placeholder="Category ex: Anime">
       <input id="modskinSeries" placeholder="Series ex: One Piece">
@@ -851,6 +856,7 @@ function normalizeData(){
     if(!hero.skins)hero.skins=[];
     hero.skins.forEach((skin,index)=>{
       if(!skin.id)skin.id=`${hero.id}_${String(index+1).padStart(3,"0")}`;
+      if(typeof skin.name==="undefined")skin.name="";
       if(typeof skin.featured==="undefined")skin.featured=false;
       if(typeof skin.enabled==="undefined")skin.enabled=true;
       // Manual tags only. If a skin has no tags, keep it blank.
@@ -1316,6 +1322,7 @@ function openAddSkin(heroIndex){
   const hero=DATA.heroes[heroIndex];
 
   document.getElementById("modalTitle").innerText=`Add Skin to ${hero.name}`;
+  document.getElementById("skinName").value="";
   document.getElementById("skinImage").value="";
   document.getElementById("skinScript").value="";
   document.getElementById("tagSearch").value="";
@@ -1339,6 +1346,7 @@ function openEditSkin(heroIndex,skinIndex){
   currentSelectedTags = normalizeSkinTags(skin.tags || []);
 
   document.getElementById("modalTitle").innerText=`Edit Skin - ${hero.name}`;
+  document.getElementById("skinName").value=skin.name||"";
   document.getElementById("skinImage").value=skin.image||"";
   document.getElementById("skinScript").value=skin.script||"";
   document.getElementById("tagSearch").value="";
@@ -1353,6 +1361,7 @@ function openEditSkin(heroIndex,skinIndex){
 }
 
 function saveSkinModal(){
+  const skinName=document.getElementById("skinName").value.trim();
   const image=document.getElementById("skinImage").value.trim();
   const script=document.getElementById("skinScript").value.trim();
 
@@ -1383,6 +1392,7 @@ function saveSkinModal(){
 
   const skinData={
     id:old?old.id:makeSkinId(hero),
+    name:skinName,
     image,
     script,
     featured,
@@ -1463,7 +1473,8 @@ function livePreview(){
   }
 
   img.src=url;
-  txt.innerText=url;
+  const n = document.getElementById("skinName") ? document.getElementById("skinName").value.trim() : "";
+  txt.innerText = n ? n + " • " + url : url;
 }
 
 function autoTagsFromText(text){
@@ -2101,13 +2112,34 @@ function normalizeModskinData(){if(!MODSKIN_DATA||typeof MODSKIN_DATA!=="object"
 async function loadModskinData(showMessage=true){try{log("Loading modskins.json...");let obj;if(TOKEN){const res=await fetch(`${MODSKIN_API}?ref=${BRANCH}&v=${Date.now()}`,{headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json"},cache:"no-store"});const file=await res.json();if(!res.ok)throw new Error(JSON.stringify(file));MODSKIN_SHA=file.sha||"";const text=decodeURIComponent(escape(atob(file.content.replace(/\n/g,""))));obj=JSON.parse(text);}else{const res=await fetch(MODSKIN_URL+"?v="+Date.now(),{cache:"no-store"});if(!res.ok)throw new Error("HTTP "+res.status+" while loading modskins.json");obj=await res.json();}MODSKIN_DATA=obj;normalizeModskinData();MODSKIN_ORIGINAL=clone(MODSKIN_DATA);markModskinSaved();renderModskins();log("Loaded modskins: "+MODSKIN_DATA.modskins.length);if(showMessage)showToast("ModSkin manager updated.");}catch(e){log("modskins.json load failed: "+e.toString());updateModskinBadges();renderModskins();if(showMessage)showToast("modskins.json failed to load");}}
 function updateModskinBadges(){const all=(MODSKIN_DATA.modskins||[]).length;let enabled=0;(MODSKIN_DATA.modskins||[]).forEach(x=>{if(x.enabled!==false)enabled++;});const ms=document.getElementById("modskinStatus"),es=document.getElementById("modskinEnabledStatus");if(ms)ms.innerText="ModSkins: "+all+(dirtyModskin?" *":"");if(es)es.innerText="Enabled: "+enabled;}
 function modskinSearchMatch(item,q){if(!q)return true;const text=[item.id,item.name,item.category,item.series,item.image,item.script,item.enabled,item.featured,...(Array.isArray(item.tags)?item.tags:[])].join(" ").toLowerCase();return text.includes(q);}
-function renderModskins(){normalizeModskinData();updateModskinBadges();const list=document.getElementById("modskinList");if(!list)return;const search=document.getElementById("modskinSearch");const q=(search?search.value:"").toLowerCase().trim();const items=MODSKIN_DATA.modskins.map((item,index)=>({item,index})).filter(({item})=>modskinSearchMatch(item,q));if(items.length===0){list.innerHTML=`<div class="small">No modskins found.</div>`;return;}list.innerHTML=items.map(({item,index})=>`<div class="modskinCard cut ${item.enabled!==false?"":"disabled"}"><div class="modskinHead"><img src="${esc(item.image)}" onerror="this.style.opacity=.25"><div style="min-width:0"><div class="modskinName">${esc(item.name||"Untitled ModSkin")}</div><div class="small">ID: ${esc(item.id||"")}</div><div class="small">${esc(item.category||"No Category")} • ${esc(item.series||"No Series")}</div><div class="small">ZIP: ${esc(item.script||"")}</div><div class="tagText">${esc(tagsArrayToText(item.tags)||"No tags")}</div><div class="badges"><span class="badge ${item.enabled!==false?"badgeGreen":"badgeOff"}">${item.enabled!==false?"visible":"hidden"}</span><span class="badge ${item.featured?"badgeYellow":"badgePurple"}">${item.featured?"featured":"normal"}</span></div></div></div><div class="miniActions"><button class="btnBlue" onclick="openModskinModal(${index})">Edit</button><button class="btnYellow" onclick="toggleModskinFeatured(${index})">★</button><button class="btnDark" onclick="toggleModskinEnabled(${index})">${item.enabled!==false?"Hide":"Show"}</button><button class="btnRed" onclick="deleteModskin(${index})">Delete</button></div></div>`).join("");}
+function renderModskins(){normalizeModskinData();updateModskinBadges();const list=document.getElementById("modskinList");if(!list)return;const search=document.getElementById("modskinSearch");const q=(search?search.value:"").toLowerCase().trim();const items=MODSKIN_DATA.modskins.map((item,index)=>({item,index})).filter(({item})=>modskinSearchMatch(item,q));if(items.length===0){list.innerHTML=`<div class="small">No modskins found.</div>`;return;}list.innerHTML=items.map(({item,index})=>`<div class="modskinCard cut ${item.enabled!==false?"":"disabled"}"><div class="modskinHead"><img src="${esc(item.image)}" onerror="this.style.opacity=.25"><div style="min-width:0"><div class="modskinName">${esc(item.name||"Untitled ModSkin")}</div><div class="small">ID: ${esc(item.id||"")}</div><div class="small">${esc(item.category||"No Category")} • ${esc(item.series||"No Series")}</div><div class="small">ZIP: ${esc(item.script||"")}</div><div class="tagText">${esc(tagsArrayToText(item.tags)||"No tags")}</div><div class="badges"><span class="badge ${item.enabled!==false?"badgeGreen":"badgeOff"}">${item.enabled!==false?"visible":"hidden"}</span><span class="badge ${item.featured?"badgeYellow":"badgePurple"}">${item.featured?"featured":"normal"}</span></div></div></div><div class="miniActions">
+<button class="btnBlue" onclick="openModskinModal(${index})">Edit Name</button>
+<button class="btnDark" onclick="moveModskin(${index},-1)">↑</button>
+<button class="btnDark" onclick="moveModskin(${index},1)">↓</button>
+<button class="btnYellow" onclick="toggleModskinFeatured(${index})">★</button>
+<button class="btnDark" onclick="toggleModskinEnabled(${index})">${item.enabled!==false?"Hide":"Show"}</button>
+<button class="btnRed" onclick="deleteModskin(${index})">Delete</button>
+</div></div>`).join("");}
 function openModskinModal(index=null){currentModskinIndex=index;const item=index===null?null:MODSKIN_DATA.modskins[index];document.getElementById("modskinModalTitle").innerText=index===null?"Add ModSkin":"Edit ModSkin";document.getElementById("modskinName").value=item?item.name||"":"";document.getElementById("modskinCategory").value=item?item.category||"":"";document.getElementById("modskinSeries").value=item?item.series||"":"";document.getElementById("modskinImage").value=item?item.image||"":"";document.getElementById("modskinScript").value=item?item.script||"":"";document.getElementById("modskinTags").value=item?tagsArrayToText(item.tags||[]):"";document.getElementById("modskinFeatured").value=item?String(item.featured===true):"false";document.getElementById("modskinEnabled").value=item?String(item.enabled!==false):"true";document.getElementById("modskinId").value=item?item.id||"":"";previewModskin();document.getElementById("modskinModal").style.display="flex";}
 function closeModskinModal(){document.getElementById("modskinModal").style.display="none";}
 function previewModskin(){const img=document.getElementById("modskinPreviewImg"),txt=document.getElementById("modskinPreviewText");const url=document.getElementById("modskinImage").value.trim();const name=document.getElementById("modskinName").value.trim();if(!url){img.removeAttribute("src");txt.innerText="Paste image URL...";return;}img.src=url;txt.innerText=name?name:url;}
 function saveModskinModal(){const name=document.getElementById("modskinName").value.trim();const category=document.getElementById("modskinCategory").value.trim();const series=document.getElementById("modskinSeries").value.trim();const image=document.getElementById("modskinImage").value.trim();const script=document.getElementById("modskinScript").value.trim();const tags=parseTextTags(document.getElementById("modskinTags").value);const featured=document.getElementById("modskinFeatured").value==="true";const enabled=document.getElementById("modskinEnabled").value==="true";const customId=slugify(document.getElementById("modskinId").value.trim());if(!name||!image||!script){showToast("Fill name, image, and script URL.");return;}if(currentModskinIndex===null){MODSKIN_DATA.modskins.push({id:customId||makeModskinId(name),name,category,series,image,script,enabled,featured,tags});}else{const item=MODSKIN_DATA.modskins[currentModskinIndex];item.id=customId||item.id||makeModskinId(name);item.name=name;item.category=category;item.series=series;item.image=image;item.script=script;item.enabled=enabled;item.featured=featured;item.tags=tags;}closeModskinModal();markModskinDirty();renderModskins();showToast("ModSkin saved locally.");}
 function toggleModskinEnabled(index){MODSKIN_DATA.modskins[index].enabled=!(MODSKIN_DATA.modskins[index].enabled!==false);markModskinDirty();renderModskins();}
 function toggleModskinFeatured(index){MODSKIN_DATA.modskins[index].featured=!MODSKIN_DATA.modskins[index].featured;markModskinDirty();renderModskins();}
+function moveModskin(index,dir){
+  const arr = MODSKIN_DATA.modskins || [];
+  const newIndex = index + dir;
+  if(newIndex < 0 || newIndex >= arr.length){
+    showToast(dir < 0 ? "Already first." : "Already last.");
+    return;
+  }
+  const temp = arr[index];
+  arr[index] = arr[newIndex];
+  arr[newIndex] = temp;
+  markModskinDirty();
+  renderModskins();
+  showToast("ModSkin order changed locally.");
+}
 function deleteModskin(index){const item=MODSKIN_DATA.modskins[index];showConfirm("Delete ModSkin",`Delete "${item.name}" from modskins.json? This cannot be undone after publish.`,()=>{MODSKIN_DATA.modskins.splice(index,1);markModskinDirty();renderModskins();showToast("ModSkin deleted locally.");});}
 
 
@@ -2139,7 +2171,7 @@ function render(){
       if(status==="enabled"&&!skin.enabled)return false;
       if(status==="disabled"&&skin.enabled)return false;
 
-      const searchable=[hero.id,hero.name,hero.category,skin.id,skin.image,skin.script,tagText].join(" ").toLowerCase();
+      const searchable=[hero.id,hero.name,hero.category,skin.id,skin.name,skin.image,skin.script,tagText].join(" ").toLowerCase();
 
       return !q||heroMatches||searchable.includes(q);
     });
@@ -2158,7 +2190,7 @@ function render(){
       <div class="skin cut ${skin.featured?"featured":""} ${skin.enabled?"":"disabled"}">
         <img src="${skin.image}" onerror="this.style.opacity=.25">
         <div class="skinBody">
-          <div class="skinTitle">${skin.featured?"Featured Skin":"Skin"} • ${skin.enabled?"Visible":"Hidden"}</div>
+          <div class="skinTitle">${skin.featured?"Featured Skin":"Skin"} • ${skin.name ? esc(skin.name) : "No Name"} • ${skin.enabled?"Visible":"Hidden"}</div>
           <div class="small">ID: ${skin.id}</div>
           <div class="small">IMG: ${skin.image}</div>
           <div class="small">ZIP: ${skin.script}</div>
