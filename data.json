@@ -2,7 +2,7 @@
   "sponsor": {
     "enabled": true,
     "app_open_enabled": false,
-    "button_enabled": true,
+    "button_enabled": false,
     "rotation_enabled": true,
     "rotation_minutes": 30,
     "claim_links": [
@@ -15,8 +15,8 @@
   },
 
   "update_enabled": true,
-  "latest_version": 7,
+  "latest_version": 10,
   "update_title": "Update Available",
   "update_message": "Please update the app.",
-  "update_link": "https://..."
+  "update_link": "https://play.google.com/store/apps/details?id=com.warlito.toolkit"
 }
