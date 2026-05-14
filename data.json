@@ -15,7 +15,7 @@
   },
 
   "update_enabled": true,
-  "latest_version": 10,
+  "latest_version": 11,
   "update_title": "✨ New Update Available ✨",
   "update_message": "Fixed bugs in the Shizuku dialog, Fixed skin issues, Join our official Telegram group for updates & support, ❌ Can’t install Watashi Toolkit? ✅ Quick Fix:Uninstall the old version Reinstall the latest version from the Play Store",
   "update_link": "https://play.google.com/store/apps/details?id=com.warlito.toolkit"
