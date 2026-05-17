@@ -7,227 +7,666 @@
 
 <style>
 :root{
-  --bg:#050509;
-  --card:#11111b;
-  --card2:#080811;
-  --line:rgba(255,255,255,.10);
-  --text:#f7f7ff;
-  --muted:#8f91a5;
-  --red:#ff174d;
-  --purple:#8b5cf6;
-  --cyan:#00f5ff;
-  --green:#00ff9c;
-  --yellow:#ffd166;
+  --bg:#0f172a;
+  --bg-soft:#111827;
+  --surface:#ffffff;
+  --surface-2:#f8fafc;
+  --surface-3:#eef2f7;
+  --card:#ffffff;
+  --card2:#f8fafc;
+  --line:#e2e8f0;
+  --line-strong:#cbd5e1;
+  --text:#0f172a;
+  --muted:#64748b;
+  --muted-2:#94a3b8;
+  --red:#ef4444;
+  --purple:#7c3aed;
+  --cyan:#0ea5e9;
+  --green:#10b981;
+  --yellow:#f59e0b;
+  --blue:#2563eb;
+  --shadow:0 18px 45px rgba(15,23,42,.08);
+  --shadow-soft:0 8px 24px rgba(15,23,42,.06);
+  --radius:18px;
+  --radius-sm:12px;
 }
-*{box-sizing:border-box;max-width:100%;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;width:100%;min-height:100%;overflow-x:hidden}
+*{
+  box-sizing:border-box;
+  max-width:100%;
+  -webkit-tap-highlight-color:transparent;
+}
+html,body{
+  margin:0;
+  width:100%;
+  min-height:100%;
+  overflow-x:hidden;
+}
 body{
   color:var(--text);
-  font-family:"Segoe UI",Arial,sans-serif;
+  font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif;
   background:
-    radial-gradient(circle at 0 0,rgba(255,23,77,.22),transparent 32%),
-    radial-gradient(circle at 100% 0,rgba(0,245,255,.14),transparent 30%),
-    linear-gradient(145deg,#050508,#090915 55%,#050508);
+    radial-gradient(circle at top left,rgba(37,99,235,.12),transparent 34%),
+    radial-gradient(circle at top right,rgba(16,185,129,.10),transparent 30%),
+    linear-gradient(180deg,#f8fafc 0%,#eef2f7 48%,#f8fafc 100%);
 }
 body:before{
   content:"";
-  position:fixed;inset:0;
-  background:
-    linear-gradient(rgba(255,255,255,.026) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.026) 1px,transparent 1px);
-  background-size:34px 34px;
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(15,23,42,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(15,23,42,.035) 1px,transparent 1px);
+  background-size:42px 42px;
   pointer-events:none;
+  mask-image:linear-gradient(to bottom,black,transparent 75%);
 }
-.app{width:100%;max-width:1000px;margin:auto;padding:12px;position:relative;z-index:1}
-.cut{clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px))}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0 14px}
+.app{
+  width:100%;
+  max-width:1180px;
+  margin:auto;
+  padding:22px;
+  position:relative;
+  z-index:1;
+}
+.cut{clip-path:none;border-radius:var(--radius)}
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin:6px 0 20px;
+  padding:16px 18px;
+  background:rgba(255,255,255,.78);
+  border:1px solid rgba(226,232,240,.9);
+  border-radius:24px;
+  box-shadow:var(--shadow-soft);
+  backdrop-filter:blur(14px);
+}
 .brand{min-width:0}
 .brand h1{
-  margin:0;font-size:24px;font-weight:900;letter-spacing:.3px;
-  background:linear-gradient(90deg,#fff,var(--cyan),var(--red));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+  margin:0;
+  font-size:clamp(22px,3vw,32px);
+  font-weight:850;
+  letter-spacing:-.04em;
+  color:var(--text);
+  background:none;
+  -webkit-background-clip:initial;
+  -webkit-text-fill-color:initial;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
-.brand p{margin:3px 0 0;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand p{
+  margin:5px 0 0;
+  font-size:13px;
+  color:var(--muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
 .card{
-  background:linear-gradient(145deg,rgba(20,20,32,.95),rgba(8,8,15,.97));
-  border:1px solid var(--line);
-  padding:14px;margin-bottom:13px;
-  box-shadow:0 16px 40px rgba(0,0,0,.38)
+  background:rgba(255,255,255,.9);
+  border:1px solid rgba(226,232,240,.95);
+  border-radius:var(--radius);
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:var(--shadow-soft);
+  backdrop-filter:blur(14px);
 }
-.cardGlow{border-color:rgba(255,23,77,.32);box-shadow:0 0 24px rgba(255,23,77,.12),0 16px 40px rgba(0,0,0,.38)}
-.title{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:900;margin-bottom:10px}
+.cardGlow{
+  border-color:rgba(37,99,235,.18);
+  box-shadow:var(--shadow),0 0 0 1px rgba(37,99,235,.04);
+}
+.title{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-size:16px;
+  font-weight:800;
+  letter-spacing:-.02em;
+  margin-bottom:12px;
+  color:var(--text);
+}
 input,select{
-  width:100%;min-width:0;color:white;background:#080811;border:1px solid rgba(255,255,255,.10);
-  outline:none;padding:12px;margin:5px 0;font-size:14px;
-  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))
+  width:100%;
+  min-width:0;
+  color:var(--text);
+  background:var(--surface);
+  border:1px solid var(--line);
+  outline:none;
+  padding:12px 13px;
+  margin:5px 0;
+  font-size:14px;
+  border-radius:12px;
+  clip-path:none;
+  transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;
 }
-input:focus,select:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(255,23,77,.08)}
+input::placeholder{color:var(--muted-2)}
+select{appearance:auto}
+input:focus,select:focus{
+  border-color:rgba(37,99,235,.55);
+  box-shadow:0 0 0 4px rgba(37,99,235,.10);
+  background:#fff;
+}
 button{
-  border:0;color:white;background:linear-gradient(135deg,var(--red),var(--purple));
-  padding:11px 12px;min-height:40px;font-size:13px;font-weight:900;cursor:pointer;
-  display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))
+  border:0;
+  color:white;
+  background:linear-gradient(135deg,#2563eb,#1d4ed8);
+  padding:11px 14px;
+  min-height:42px;
+  font-size:13px;
+  font-weight:750;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  border-radius:12px;
+  clip-path:none;
+  box-shadow:0 8px 16px rgba(37,99,235,.16);
+  transition:transform .15s ease,filter .15s ease,box-shadow .15s ease;
 }
-button:disabled{opacity:.45;filter:grayscale(1);pointer-events:none}
-button:active{transform:scale(.97)}
-.btnDark{background:#232333}
-.btnGreen{background:linear-gradient(135deg,#00b86b,var(--green));color:#06110c}
-.btnBlue{background:linear-gradient(135deg,#2563eb,var(--cyan));color:#031018}
-.btnRed{background:linear-gradient(135deg,#ff174d,#ff3b3b)}
-.btnYellow{background:linear-gradient(135deg,#ffd166,#ff8c00);color:#1b1100}
+button:hover{filter:brightness(1.03);box-shadow:0 10px 20px rgba(37,99,235,.20)}
+button:disabled{opacity:.52;filter:grayscale(1);pointer-events:none}
+button:active{transform:translateY(1px) scale(.99)}
+.btnDark{
+  background:#f1f5f9;
+  color:#334155;
+  border:1px solid var(--line);
+  box-shadow:none;
+}
+.btnGreen{background:linear-gradient(135deg,#10b981,#059669);color:white;box-shadow:0 8px 16px rgba(16,185,129,.18)}
+.btnBlue{background:linear-gradient(135deg,#2563eb,#0ea5e9);color:white}
+.btnRed{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;box-shadow:0 8px 16px rgba(239,68,68,.18)}
+.btnYellow{background:linear-gradient(135deg,#f59e0b,#f97316);color:white;box-shadow:0 8px 16px rgba(245,158,11,.18)}
 .hidden{display:none!important}
-.login{max-width:430px;margin:8vh auto 0}
-.row,.toolbar,.stats{display:grid;grid-template-columns:1fr;gap:8px}
-@media(min-width:760px){.row{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1.3fr 1fr 1fr}.stats{grid-template-columns:repeat(3,1fr)}}
-.stat{background:#080811;border:1px solid rgba(255,255,255,.08);padding:13px}
-.stat span{color:var(--muted);font-size:12px}.stat b{display:block;margin-top:4px;font-size:23px;color:var(--green)}
-.grid{display:grid;grid-template-columns:1fr;gap:12px}
-@media(min-width:820px){.grid{grid-template-columns:repeat(2,1fr)}}
-.hero{background:linear-gradient(160deg,#11111c,#07070d);border:1px solid rgba(255,255,255,.08);padding:13px;min-width:0;overflow:hidden}
-.heroHead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.heroTop{min-width:0;flex:1}
-.heroName{font-size:24px;line-height:1;font-weight:900;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.heroId{margin-top:4px;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.badge{
-  max-width:100%;font-size:10px;font-weight:900;color:#050508;background:var(--cyan);
-  padding:5px 7px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))
+.login{
+  max-width:440px;
+  margin:8vh auto 0;
+  padding:24px;
 }
-.badgeRed{background:var(--red);color:white}.badgeGreen{background:var(--green)}.badgeYellow{background:var(--yellow)}
-.badgePurple{background:var(--purple);color:white}.badgeOff{background:#555;color:#eee}
-.unsavedBadge{background:var(--yellow);color:#151000}
-.actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:10px}
+.row,.toolbar,.stats{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+}
+@media(min-width:760px){
+  .row{grid-template-columns:1fr 1fr}
+  .toolbar{grid-template-columns:1.4fr 1fr 1fr}
+  .stats{grid-template-columns:repeat(3,1fr)}
+}
+.stat{
+  background:linear-gradient(180deg,#fff,#f8fafc);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:16px;
+}
+.stat span{
+  color:var(--muted);
+  font-size:12px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+.stat b{
+  display:block;
+  margin-top:6px;
+  font-size:30px;
+  line-height:1;
+  color:var(--text);
+  letter-spacing:-.04em;
+}
+.grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+@media(min-width:820px){.grid{grid-template-columns:repeat(2,1fr)}}
+.hero,.upgradeCard,.modskinCard{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:16px;
+  min-width:0;
+  overflow:hidden;
+  box-shadow:0 10px 28px rgba(15,23,42,.06);
+}
+.heroHead{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+}
+.heroTop{min-width:0;flex:1}
+.heroName{
+  font-size:23px;
+  line-height:1.05;
+  font-weight:850;
+  text-transform:none;
+  letter-spacing:-.04em;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.heroId{
+  margin-top:6px;
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.badges{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:10px;
+}
+.badge{
+  max-width:100%;
+  font-size:11px;
+  font-weight:800;
+  color:#075985;
+  background:#e0f2fe;
+  border:1px solid rgba(14,165,233,.18);
+  padding:5px 8px;
+  text-transform:capitalize;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  border-radius:999px;
+  clip-path:none;
+}
+.badgeRed{background:#fee2e2;border-color:#fecaca;color:#991b1b}
+.badgeGreen{background:#dcfce7;border-color:#bbf7d0;color:#065f46}
+.badgeYellow{background:#fef3c7;border-color:#fde68a;color:#92400e}
+.badgePurple{background:#ede9fe;border-color:#ddd6fe;color:#5b21b6}
+.badgeOff{background:#e5e7eb;border-color:#d1d5db;color:#475569}
+.unsavedBadge{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
+.actions{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin-top:12px;
+}
 .actions button{width:100%;margin:0;min-width:0}
 @media(min-width:520px){.actions{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .skinList.collapsed{display:none}
 .skin{
-  display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px;background:#090911;
-  border:1px solid rgba(255,255,255,.08);padding:8px;margin-top:10px;min-width:0;overflow:hidden
+  display:grid;
+  grid-template-columns:76px minmax(0,1fr);
+  gap:12px;
+  background:#f8fafc;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:10px;
+  margin-top:12px;
+  min-width:0;
+  overflow:hidden;
 }
-.skin.featured{border-color:rgba(255,209,102,.75);box-shadow:0 0 16px rgba(255,209,102,.10)}
-.skin.disabled{opacity:.45;filter:grayscale(1)}
-.skin img{width:72px;height:100px;object-fit:cover;background:#1f1f2a;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
-.skinBody{min-width:0;overflow:hidden}.skinTitle{font-weight:900;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.small{display:block;width:100%;color:var(--muted);font-size:11px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.skin.featured{
+  border-color:rgba(245,158,11,.45);
+  box-shadow:0 0 0 3px rgba(245,158,11,.08);
+}
+.skin.disabled,.targetRow.disabled,.upgradeCard.disabled,.modskinCard.disabled{
+  opacity:.58;
+  filter:grayscale(.25);
+}
+.skin img,.upgradeHead img,.targetRow img,.modskinHead img,.modskinPreview img,.preview img{
+  object-fit:cover;
+  background:#e2e8f0;
+  border-radius:14px;
+  clip-path:none;
+  border:1px solid var(--line);
+}
+.skin img{width:76px;height:104px}
+.skinBody{min-width:0;overflow:hidden}
+.skinTitle{
+  font-weight:800;
+  font-size:14px;
+  color:var(--text);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.small{
+  display:block;
+  width:100%;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.45;
+  margin-top:4px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
 .skin .actions{grid-template-columns:repeat(3,minmax(0,1fr))}
-.skin .actions button{font-size:11px;padding:9px 6px;min-height:35px}
-
-.officialTags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.skin .actions button{font-size:11px;padding:8px 7px;min-height:34px}
+.officialTags,.selectedTags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:9px;
+}
 .tagIconBadge{
-  height:24px;max-width:120px;object-fit:contain;background:rgba(0,0,0,.22);
-  border:1px solid rgba(255,255,255,.12);padding:2px 5px;
-  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))
+  height:25px;
+  max-width:124px;
+  object-fit:contain;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:3px 7px;
+  clip-path:none;
 }
-.tagPicker{
-  background:#07070f;border:1px solid rgba(255,255,255,.10);padding:10px;margin-top:8px;
+.tagPicker,.addTagBox{
+  background:#f8fafc;
+  border:1px solid var(--line);
+  padding:12px;
+  margin-top:10px;
+  border-radius:16px;
+  clip-path:none;
 }
-.addTagBox{
-  background:#090911;border:1px solid rgba(0,245,255,.16);padding:10px;margin-top:8px;
-  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+.addTagBox{border-color:rgba(14,165,233,.24)}
+.addTagPreview{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:7px;
+  color:var(--muted);
+  font-size:12px;
 }
-.addTagPreview{display:flex;align-items:center;gap:8px;margin-top:6px;color:var(--muted);font-size:11px}
-.addTagPreview img{height:24px;max-width:96px;object-fit:contain;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.10);padding:2px}
-
-.selectedTags{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
-.tagDropdown{position:relative;margin-top:8px}
+.addTagPreview img{
+  height:25px;
+  max-width:100px;
+  object-fit:contain;
+  background:white;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:2px;
+}
+.tagDropdown{position:relative;margin-top:10px}
 .tagDropdownBtn{
-  width:100%;justify-content:space-between;background:#080811;border:1px solid rgba(255,255,255,.10);
-  color:white;text-align:left;
+  width:100%;
+  justify-content:space-between;
+  background:white;
+  border:1px solid var(--line);
+  color:var(--text);
+  text-align:left;
+  box-shadow:none;
 }
 .tagDropdownPanel{
-  display:none;margin-top:8px;background:#05050c;border:1px solid rgba(0,245,255,.20);
-  padding:8px;max-height:300px;overflow:auto;z-index:120;
-  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));
+  display:none;
+  margin-top:8px;
+  background:white;
+  border:1px solid rgba(37,99,235,.18);
+  padding:10px;
+  max-height:320px;
+  overflow:auto;
+  z-index:120;
+  border-radius:16px;
+  clip-path:none;
+  box-shadow:var(--shadow-soft);
 }
 .tagDropdownPanel.open{display:block}
-.tagOptions{display:grid;grid-template-columns:1fr;gap:7px;margin-top:8px}
-.tagOption{
-  display:grid;grid-template-columns:94px minmax(0,1fr);align-items:center;gap:9px;
-  background:#0b0b15;border:1px solid rgba(255,255,255,.10);padding:8px;cursor:pointer;
-  clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,9px 100%,0 calc(100% - 9px));
+.tagOptions{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+  margin-top:9px;
 }
-.tagOption:active{transform:scale(.98)}
-.tagOption img{height:24px;width:86px;object-fit:contain;background:rgba(0,0,0,.22)}
-.tagOptionName{font-size:13px;font-weight:900;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tagOptionId{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tagOption{
+  display:grid;
+  grid-template-columns:96px minmax(0,1fr);
+  align-items:center;
+  gap:10px;
+  background:#f8fafc;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:9px;
+  cursor:pointer;
+  clip-path:none;
+}
+.tagOption:hover{border-color:rgba(37,99,235,.35);background:#f1f5f9}
+.tagOption:active{transform:scale(.99)}
+.tagOption img{
+  height:25px;
+  width:88px;
+  object-fit:contain;
+  background:white;
+  border-radius:10px;
+}
+.tagOptionName{
+  font-size:13px;
+  font-weight:800;
+  color:var(--text);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.tagOptionId{
+  font-size:11px;
+  color:var(--muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
 .tagChip{
-  display:inline-flex;align-items:center;gap:6px;background:#11111d;border:1px solid rgba(0,245,255,.16);
-  color:white;padding:6px 8px;font-size:12px;font-weight:900;min-height:34px;
-  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  background:white;
+  border:1px solid var(--line);
+  color:var(--text);
+  padding:6px 8px;
+  font-size:12px;
+  font-weight:800;
+  min-height:34px;
+  border-radius:999px;
+  clip-path:none;
 }
 .tagChip img{height:20px;max-width:76px;object-fit:contain}
 .tagChip button{
-  min-height:22px;padding:2px 6px;font-size:11px;background:#ff174d;color:white;clip-path:none
+  min-height:22px;
+  padding:2px 7px;
+  font-size:11px;
+  background:#ef4444;
+  color:white;
+  border-radius:999px;
+  clip-path:none;
 }
-
-.upgradeList{display:grid;grid-template-columns:1fr;gap:12px}
-@media(min-width:820px){.upgradeList{grid-template-columns:repeat(2,1fr)}}
-.upgradeCard{
-  background:linear-gradient(160deg,#11111c,#07070d);
-  border:1px solid rgba(255,255,255,.08);
-  padding:12px;min-width:0;overflow:hidden
+.upgradeList,.modskinList{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
 }
-.upgradeHead{display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px;align-items:start}
-.upgradeHead img,.targetRow img{
-  width:72px;height:100px;object-fit:cover;background:#1f1f2a;
-  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))
+@media(min-width:820px){.upgradeList,.modskinList{grid-template-columns:repeat(2,1fr)}}
+.upgradeHead{
+  display:grid;
+  grid-template-columns:76px minmax(0,1fr);
+  gap:12px;
+  align-items:start;
 }
-.upgradeName,.targetName{font-weight:900;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.upgradeTargets{margin-top:10px;border-top:1px solid rgba(255,255,255,.08);padding-top:8px}
+.upgradeHead img,.targetRow img{width:76px;height:104px}
+.upgradeName,.targetName,.modskinName{
+  font-weight:850;
+  font-size:16px;
+  color:var(--text);
+  letter-spacing:-.02em;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.upgradeTargets{
+  margin-top:12px;
+  border-top:1px solid var(--line);
+  padding-top:10px;
+}
 .upgradeTargets.collapsed{display:none}
 .targetRow{
-  display:grid;grid-template-columns:58px minmax(0,1fr);gap:9px;
-  background:#090911;border:1px solid rgba(255,255,255,.08);padding:8px;margin-top:8px
+  display:grid;
+  grid-template-columns:62px minmax(0,1fr);
+  gap:10px;
+  background:#f8fafc;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:10px;
+  margin-top:9px;
 }
-.targetRow img{width:58px;height:80px}
-.targetRow.disabled,.upgradeCard.disabled{opacity:.5;filter:grayscale(1)}
-.tagText{font-size:11px;color:var(--cyan);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
-.miniActions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px}
-.miniActions button{font-size:11px;min-height:34px;padding:7px 5px}
-
-
-.modskinList{display:grid;grid-template-columns:1fr;gap:12px}
-@media(min-width:820px){.modskinList{grid-template-columns:repeat(2,1fr)}}
-.modskinCard{background:linear-gradient(160deg,#11111c,#07070d);border:1px solid rgba(255,255,255,.08);padding:12px;min-width:0;overflow:hidden}
-.modskinCard.disabled{opacity:.5;filter:grayscale(1)}
-.modskinHead{display:grid;grid-template-columns:86px minmax(0,1fr);gap:10px;align-items:start}
-.modskinHead img{width:86px;height:120px;object-fit:cover;background:#1f1f2a;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
-.modskinName{font-weight:900;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.modskinPreview{display:grid;grid-template-columns:86px minmax(0,1fr);gap:10px;background:#090911;border:1px solid rgba(255,255,255,.08);padding:9px;margin-top:9px;align-items:center}
-.modskinPreview img{width:86px;height:120px;object-fit:cover;background:#222;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
-
+.targetRow img{width:62px;height:84px}
+.tagText{
+  font-size:12px;
+  color:#0369a1;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  margin-top:4px;
+}
+.miniActions{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  margin-top:10px;
+}
+.miniActions button{font-size:11px;min-height:34px;padding:7px 6px}
+.modskinHead{
+  display:grid;
+  grid-template-columns:88px minmax(0,1fr);
+  gap:12px;
+  align-items:start;
+}
+.modskinHead img{width:88px;height:122px}
+.modskinPreview,.preview{
+  display:grid;
+  grid-template-columns:82px minmax(0,1fr);
+  gap:12px;
+  background:#f8fafc;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:10px;
+  margin-top:10px;
+  align-items:center;
+}
+.modskinPreview img{width:88px;height:122px}
+.preview img{width:82px;height:112px}
 .modal{
-  position:fixed;inset:0;display:none;align-items:center;justify-content:center;
-  background:rgba(0,0,0,.78);padding:10px;z-index:99
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(15,23,42,.58);
+  padding:12px;
+  z-index:99;
+  backdrop-filter:blur(8px);
 }
 .modalBox{
-  width:100%;max-width:520px;max-height:90vh;overflow:auto;
-  background:linear-gradient(145deg,#141420,#080811);
-  border:1px solid rgba(255,23,77,.32);padding:14px;
-  box-shadow:0 0 45px rgba(255,23,77,.15)
+  width:100%;
+  max-width:560px;
+  max-height:90vh;
+  overflow:auto;
+  background:white;
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:18px;
+  box-shadow:0 25px 80px rgba(15,23,42,.24);
 }
-.preview{display:grid;grid-template-columns:78px minmax(0,1fr);gap:10px;background:#090911;border:1px solid rgba(255,255,255,.08);padding:9px;margin-top:9px;align-items:center}
-.preview img{width:78px;height:108px;object-fit:cover;background:#222}
-#log{height:105px;overflow:auto;background:#050509;color:var(--green);border:1px solid rgba(0,255,156,.16);padding:10px;font-size:12px}
+#log,#upgradeLog,#modskinLog{
+  height:112px!important;
+  overflow:auto!important;
+  background:#0f172a!important;
+  color:#bbf7d0!important;
+  border:1px solid rgba(148,163,184,.18)!important;
+  border-radius:14px!important;
+  padding:12px!important;
+  font-size:12px!important;
+  font-family:"SFMono-Regular",Consolas,monospace!important;
+}
 .loading{
-  position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:150;display:none;
-  align-items:center;justify-content:center;padding:20px
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.62);
+  z-index:150;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  backdrop-filter:blur(8px);
 }
 .loadingBox{
-  width:100%;max-width:330px;background:linear-gradient(145deg,#151522,#07070d);
-  border:1px solid rgba(0,245,255,.25);padding:18px;text-align:center
+  width:100%;
+  max-width:340px;
+  background:white;
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:22px;
+  text-align:center;
+  box-shadow:0 25px 80px rgba(15,23,42,.24);
 }
 .loader{
-  width:42px;height:42px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--cyan);
-  margin:0 auto 12px;border-radius:50%;animation:spin .8s linear infinite
+  width:44px;
+  height:44px;
+  border:3px solid #e2e8f0;
+  border-top-color:#2563eb;
+  margin:0 auto 14px;
+  border-radius:50%;
+  animation:spin .8s linear infinite;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 .toast{
-  position:fixed;left:12px;right:12px;bottom:18px;background:#101018;border:1px solid rgba(0,245,255,.22);
-  color:white;padding:12px;z-index:160;display:none
+  position:fixed;
+  left:18px;
+  right:18px;
+  bottom:20px;
+  max-width:640px;
+  margin:auto;
+  background:#0f172a;
+  border:1px solid rgba(148,163,184,.18);
+  color:white;
+  padding:13px 15px;
+  z-index:160;
+  display:none;
+  border-radius:16px;
+  box-shadow:0 18px 45px rgba(15,23,42,.22);
 }
+@media(max-width:620px){
+  .app{padding:12px}
+  .topbar{align-items:flex-start;flex-direction:column;border-radius:18px}
+  .topbar button{width:100%}
+  .card{padding:14px;border-radius:16px}
+  .hero,.upgradeCard,.modskinCard{padding:13px;border-radius:16px}
+  .skin{grid-template-columns:68px minmax(0,1fr)}
+  .skin img{width:68px;height:94px}
+  .actions,.miniActions{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .brand h1{white-space:normal}
+  .modalBox{padding:14px;border-radius:18px}
+}
+
+
+/* Added admin safety/productivity tools */
+.requiredHint{color:#ef4444;font-size:11px;margin:3px 0 8px;display:none}
+.requiredError{border-color:#ef4444!important;box-shadow:0 0 0 3px rgba(239,68,68,.10)!important}
+.toolStrip{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.toolStrip button{flex:1;min-width:130px}
+.bulkBar{position:sticky;top:8px;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border:1px solid rgba(148,163,184,.35);padding:10px;border-radius:14px;margin-bottom:12px;display:none;box-shadow:0 12px 30px rgba(15,23,42,.10)}
+.bulkBar.show{display:block}.bulkBar .actions{margin-top:8px}.selectSkinBox{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;color:var(--muted);margin-bottom:6px}.selectSkinBox input{width:auto;margin:0;padding:0;min-height:auto}
+.activityList{max-height:220px;overflow:auto;border:1px solid rgba(148,163,184,.20);border-radius:14px;background:#fff;padding:8px}.activityItem{padding:8px;border-bottom:1px solid rgba(148,163,184,.16);font-size:12px;color:var(--muted)}.activityItem:last-child{border-bottom:0}.activityItem b{color:var(--text)}
+.previewList{max-height:55vh;overflow:auto}.previewGroup{margin-top:10px;padding:10px;border:1px solid rgba(148,163,184,.22);border-radius:14px;background:#fff}.previewGroup b{display:block;margin-bottom:6px}.previewGroup li{font-size:12px;margin:5px 0;color:var(--muted)}
+.urlStatus{font-size:11px;margin-top:4px;color:var(--muted)}.urlStatus.ok{color:#059669}.urlStatus.bad{color:#dc2626}.urlStatus.checking{color:#2563eb}
+.stickyPublish{position:fixed;left:10px;right:10px;bottom:10px;z-index:140;background:rgba(15,23,42,.94);color:white;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:10px;display:none;box-shadow:0 18px 45px rgba(15,23,42,.28)}
+.stickyPublish .stickyInner{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center}.stickyPublish b{font-size:13px}.stickyPublish span{font-size:11px;color:#cbd5e1}.stickyPublish button{border-radius:12px;min-height:36px;padding:8px 10px}
+@media(max-width:760px){.stickyPublish{display:block}.app{padding-bottom:86px}.stickyPublish .stickyInner{grid-template-columns:1fr}.stickyPublish button{width:100%}}
+
+/* Broken image scanner */
+.brokenPanelSummary{margin-top:8px;font-size:12px;color:var(--muted)}
+.brokenList{max-height:58vh;overflow:auto;display:grid;gap:10px;margin-top:12px}
+.brokenItem{background:#fff;border:1px solid rgba(239,68,68,.24);border-radius:14px;padding:10px;box-shadow:0 8px 22px rgba(15,23,42,.06)}
+.brokenItemHead{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.brokenItemTitle{font-weight:900;color:var(--text);font-size:13px}
+.brokenUrl{font-size:11px;color:#dc2626;word-break:break-all;margin-top:5px;background:rgba(239,68,68,.08);padding:7px;border-radius:10px}
+.brokenMeta{font-size:11px;color:var(--muted);margin-top:4px}
+.brokenActions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:9px}
+.brokenActions button{font-size:11px;min-height:32px;padding:7px 6px}
+@media(max-width:620px){.brokenActions{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 </style>
 </head>
 
@@ -262,11 +701,13 @@ button:active{transform:scale(.97)}
       </div>
       <div class="actions" style="grid-template-columns:1fr 1fr">
         <button class="btnGreen" onclick="publishChanges()">Publish Changes</button>
+        <button class="btnBlue" onclick="openPreviewChanges()">Preview Changes</button>
         <button class="btnDark" onclick="discardChanges()">Discard / Reload</button>
       </div>
       <div class="actions" style="grid-template-columns:1fr">
         <button class="btnBlue" onclick="showUpgradePage()">Go to Upgrade Skin Manager</button>
         <button class="btnGreen" onclick="showModskinPage()">Go to ModSkin Manager</button>
+        <button class="btnYellow" onclick="showSkinTagPage()">Go to Skin Tag Manager</button>
       </div>
       <div class="actions" style="grid-template-columns:1fr 1fr">
         <button class="btnDark" onclick="logout()">Logout</button>
@@ -320,6 +761,32 @@ button:active{transform:scale(.97)}
       </div>
     </div>
 
+
+
+    <div class="card cut">
+      <div class="title">Tools</div>
+      <div class="toolStrip">
+        <button class="btnBlue" onclick="openPreviewChanges()">Preview Changes</button>
+        <button class="btnDark" onclick="sortHeroesByName()">Sort Heroes A-Z</button>
+        <button class="btnDark" onclick="sortAllSkinsByName()">Sort All Skins A-Z</button>
+        <button class="btnDark" onclick="downloadBackupNow()">Download Backup</button>
+        <button class="btnYellow" onclick="checkAllVisibleImages()">Test Visible Images</button>
+        <button class="btnDark" onclick="cleanUnusedSkinTags()">Clean Unused Skin Tags</button>
+        <button class="btnRed" onclick="openBrokenImageScanner()">Broken Images Scanner</button>
+      </div>
+      <div id="imageCheckSummary" class="small" style="margin-top:8px">Image tester ready.</div>
+    </div>
+
+    <div id="bulkBar" class="bulkBar">
+      <b id="bulkCount">0 selected</b>
+      <div class="small">Bulk actions apply only to selected normal skins.</div>
+      <div class="actions" style="grid-template-columns:repeat(4,1fr)">
+        <button class="btnGreen" onclick="bulkSetSkinEnabled(true)">Show</button>
+        <button class="btnDark" onclick="bulkSetSkinEnabled(false)">Hide</button>
+        <button class="btnYellow" onclick="bulkSetFeatured(true)">Featured</button>
+        <button class="btnRed" onclick="bulkDeleteSkins()">Delete</button>
+      </div>
+    </div>
     <div class="card cut">
       <div class="title">Heroes</div>
       <div id="heroesList" class="grid"></div>
@@ -328,6 +795,12 @@ button:active{transform:scale(.97)}
     <div class="card cut">
       <div class="title">Logs</div>
       <div id="log" class="cut"></div>
+    </div>
+
+    <div class="card cut">
+      <div class="title">Activity History</div>
+      <div id="activityList" class="activityList"><div class="activityItem">No local activity yet.</div></div>
+      <div class="toolStrip"><button class="btnDark" onclick="clearActivityHistory()">Clear Activity</button></div>
     </div>
 
     </div>
@@ -361,6 +834,57 @@ button:active{transform:scale(.97)}
       </div>
     </div>
 
+
+    <div id="skinTagPage" class="hidden">
+      <div class="card cut cardGlow">
+        <div class="title">Skin Tag Manager</div>
+        <div class="badges">
+          <span id="skinTagManagerStatus" class="badge badgePurple">Tags: 0</span>
+          <span class="badge badgeGreen">tags.json</span>
+        </div>
+        <div class="actions" style="grid-template-columns:1fr 1fr">
+          <button class="btnDark" onclick="showDashboardPage()">← Back to Dashboard</button>
+          <button class="btnGreen" onclick="publishChanges()">Publish Changes</button>
+        </div>
+        <div class="small">Dito na mag-aadd ng bagong official skin tags. Pagkatapos mag-add, Publish Changes para ma-save sa GitHub.</div>
+      </div>
+
+      <div class="card cut cardGlow">
+        <div class="title">+ Add New Skin Tag</div>
+        <div class="addTagBox">
+        <div class="title" style="font-size:13px;margin-bottom:5px">+ Add New Skin Tag</div>
+        <input id="newTagName" placeholder="Tag name ex: Legend, Collector, Custom Tag" oninput="previewNewTag()">
+        <input id="newTagId" placeholder="Tag id optional, auto if blank ex: collector" oninput="previewNewTag()">
+        <input id="newTagIcon" placeholder="Tag icon/image link" oninput="previewNewTag()">
+        <select id="newTagType">
+          <option value="skin_tag">Skin Tag</option>
+          <option value="event">Event</option>
+          <option value="series">Series</option>
+          <option value="rarity">Rarity</option>
+          <option value="custom">Custom</option>
+        </select>
+        <div class="addTagPreview">
+          <img id="newTagPreviewImg" src="" onerror="this.style.display='none'">
+          <span id="newTagPreviewText">Fill name + icon, then submit.</span>
+        </div>
+        <button type="button" class="btnBlue" onclick="addNewTagFromPicker()">Submit New Tag</button>
+        <div class="small">Adds to tags.json locally, selects it, then Publish Changes saves it to GitHub.</div>
+        </div>
+
+        <div class="toolbar" style="margin-top:12px">
+          <input id="skinTagManagerSearch" placeholder="Search tag name, id, type..." oninput="renderSkinTagManager()">
+          <button class="btnDark" onclick="loadTags();renderSkinTagManager()">Reload Tags</button>
+          <button class="btnBlue" onclick="renderSkinTagManager()">Refresh List</button>
+          <button class="btnDark" onclick="sortTagsByUsage()">Sort by Usage</button>
+        </div>
+        <div id="tagManagerList" class="tagManagerList"></div>
+      </div>
+
+      <div class="card cut">
+        <div class="title">Tag Notes</div>
+        <div class="small">Sa Add/Edit Skin modal, tag selection na lang ang makikita. Ang creation ng new tags ay nasa manager page na ito para mas malinis.</div>
+      </div>
+    </div>
 
     <div id="modskinPage" class="hidden">
       <div class="card cut cardGlow">
@@ -400,32 +924,13 @@ button:active{transform:scale(.97)}
     <div class="title" id="modalTitle">Add Skin</div>
     <div class="small">Skin name / display name</div>
     <input id="skinName" placeholder="Skin name ex: Blade Dancer, Saber Backup">
-    <input id="skinImage" placeholder="Image URL" oninput="livePreview(); autoSuggestTags();">
-    <input id="skinScript" placeholder="Script ZIP URL" oninput="autoSuggestTags();">
+    <input id="skinImage" data-required="Image URL" placeholder="Image URL" oninput="livePreview(); autoSuggestTags(); validateRequiredInput(this); debounceImageTest('skinImage','skinImageStatus')">
+    <div id="skinImageStatus" class="urlStatus">Image tester ready.</div>
+    <input id="skinScript" data-required="Script ZIP URL" placeholder="Script ZIP URL" oninput="autoSuggestTags(); validateRequiredInput(this);">
 
     <div class="tagPicker cut">
       <div class="title" style="font-size:14px;margin-bottom:6px">Official Skin Tags</div>
       <div id="selectedTags" class="selectedTags"></div>
-
-      <div class="addTagBox">
-        <div class="title" style="font-size:13px;margin-bottom:5px">+ Add New Skin Tag</div>
-        <input id="newTagName" placeholder="Tag name ex: Legend, Collector, Custom Tag" oninput="previewNewTag()">
-        <input id="newTagId" placeholder="Tag id optional, auto if blank ex: collector" oninput="previewNewTag()">
-        <input id="newTagIcon" placeholder="Tag icon/image link" oninput="previewNewTag()">
-        <select id="newTagType">
-          <option value="skin_tag">Skin Tag</option>
-          <option value="event">Event</option>
-          <option value="series">Series</option>
-          <option value="rarity">Rarity</option>
-          <option value="custom">Custom</option>
-        </select>
-        <div class="addTagPreview">
-          <img id="newTagPreviewImg" src="" onerror="this.style.display='none'">
-          <span id="newTagPreviewText">Fill name + icon, then submit.</span>
-        </div>
-        <button type="button" class="btnBlue" onclick="addNewTagFromPicker()">Submit New Tag</button>
-        <div class="small">Adds to tags.json locally, selects it, then Publish Changes saves it to GitHub.</div>
-      </div>
 
       <div class="tagDropdown">
         <button type="button" class="tagDropdownBtn" onclick="toggleTagDropdown()">
@@ -533,14 +1038,15 @@ button:active{transform:scale(.97)}
   <div class="modalBox cut">
     <div class="title" id="modskinModalTitle">Add ModSkin</div>
     <div class="small">Skin name / display name</div>
-    <input id="modskinName" placeholder="ModSkin name ex: Kaido">
+    <input id="modskinName" data-required="ModSkin name" placeholder="ModSkin name ex: Kaido" oninput="validateRequiredInput(this)">
     <div class="small">Category and series</div>
     <div class="row">
       <input id="modskinCategory" placeholder="Category ex: Anime">
       <input id="modskinSeries" placeholder="Series ex: One Piece">
     </div>
-    <input id="modskinImage" placeholder="Image URL" oninput="previewModskin()">
-    <input id="modskinScript" placeholder="Script ZIP URL">
+    <input id="modskinImage" data-required="Image URL" placeholder="Image URL" oninput="previewModskin(); validateRequiredInput(this); debounceImageTest('modskinImage','modskinImageStatus')">
+    <div id="modskinImageStatus" class="urlStatus">Image tester ready.</div>
+    <input id="modskinScript" data-required="Script ZIP URL" placeholder="Script ZIP URL" oninput="validateRequiredInput(this)">
     <input id="modskinTags" placeholder="Tags comma separated ex: Anime, One Piece">
     <div class="row">
       <select id="modskinFeatured"><option value="false">Normal</option><option value="true">Featured</option></select>
@@ -554,6 +1060,44 @@ button:active{transform:scale(.97)}
     <div class="actions">
       <button class="btnGreen" onclick="saveModskinModal()">Save Local</button>
       <button class="btnDark" onclick="closeModskinModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="modal" id="previewChangesModal">
+  <div class="modalBox cut">
+    <div class="title">Preview Changes</div>
+    <div class="badges">
+      <span id="previewSummaryBadge" class="badge badgePurple">Checking...</span>
+      <span class="badge badgeGreen">Safe Review</span>
+    </div>
+    <div id="previewChangesBody" class="previewList"></div>
+    <div class="actions">
+      <button class="btnGreen" onclick="closePreviewChanges(); publishChanges()">Publish Now</button>
+      <button class="btnDark" onclick="closePreviewChanges()">Close</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal" id="brokenImageModal">
+  <div class="modalBox cut">
+    <div class="title">Broken Image Scanner</div>
+    <div class="badges">
+      <span id="brokenScanBadge" class="badge badgePurple">Ready</span>
+      <span id="brokenScanCount" class="badge badgeGreen">0 broken</span>
+    </div>
+    <div class="brokenPanelSummary" id="brokenScanSummary">Scan all image URLs from heroes, skins, upgrade skins, modskins, and skin tag icons.</div>
+    <div class="toolStrip">
+      <button id="brokenScanBtn" class="btnRed" onclick="scanBrokenImages(true)">Scan Broken Images</button>
+      <button id="brokenShowBtn" class="btnDark" onclick="showOnlyBrokenImages()">Show Broken Only</button>
+      <button id="brokenExportBtn" class="btnDark" onclick="exportBrokenImagesList()">Export List</button>
+    </div>
+    <div id="brokenImageList" class="brokenList"></div>
+    <div class="actions">
+      <button class="btnDark" onclick="closeBrokenImageScanner()">Close</button>
     </div>
   </div>
 </div>
@@ -574,6 +1118,16 @@ button:active{transform:scale(.97)}
     <div class="loader"></div>
     <b id="loadingText">Processing...</b>
     <div style="color:var(--muted);font-size:12px;margin-top:6px">Please wait, do not tap buttons.</div>
+  </div>
+</div>
+
+
+
+<div class="stickyPublish" id="stickyPublish">
+  <div class="stickyInner">
+    <div><b id="stickyStatusText">Saved</b><br><span id="stickySubText">Ready</span></div>
+    <button class="btnBlue" onclick="openPreviewChanges()">Preview</button>
+    <button class="btnGreen" onclick="publishChanges()">Publish</button>
   </div>
 </div>
 
@@ -674,12 +1228,16 @@ function markTagsDirty(){
   }
   const ts = document.getElementById("tagStatus");
   if(ts) ts.innerText = "Tags: " + TAG_DATABASE.length + " *";
+  const ms = document.getElementById("skinTagManagerStatus");
+  if(ms) ms.innerText = "Tags: " + TAG_DATABASE.length + " *";
 }
 
 function markTagsSaved(){
   dirtyTags = false;
   const ts = document.getElementById("tagStatus");
   if(ts) ts.innerText = "Tags: " + TAG_DATABASE.length;
+  const ms = document.getElementById("skinTagManagerStatus");
+  if(ms) ms.innerText = "Tags: " + TAG_DATABASE.length;
 }
 
 function markUpgradeDirty(){
@@ -730,6 +1288,7 @@ function showUpgradePage(){
   document.getElementById("dashboardPage").classList.add("hidden");
   document.getElementById("upgradePage").classList.remove("hidden");
   document.getElementById("modskinPage").classList.add("hidden");
+  const tagPage=document.getElementById("skinTagPage"); if(tagPage) tagPage.classList.add("hidden");
   renderUpgrades();
   window.scrollTo(0,0);
 }
@@ -738,13 +1297,24 @@ function showModskinPage(){
   document.getElementById("dashboardPage").classList.add("hidden");
   document.getElementById("upgradePage").classList.add("hidden");
   document.getElementById("modskinPage").classList.remove("hidden");
+  const tagPage=document.getElementById("skinTagPage"); if(tagPage) tagPage.classList.add("hidden");
   renderModskins();
+  window.scrollTo(0,0);
+}
+
+function showSkinTagPage(){
+  document.getElementById("dashboardPage").classList.add("hidden");
+  document.getElementById("upgradePage").classList.add("hidden");
+  document.getElementById("modskinPage").classList.add("hidden");
+  const tagPage=document.getElementById("skinTagPage"); if(tagPage) tagPage.classList.remove("hidden");
+  renderSkinTagManager();
   window.scrollTo(0,0);
 }
 
 function showDashboardPage(){
   document.getElementById("upgradePage").classList.add("hidden");
   document.getElementById("modskinPage").classList.add("hidden");
+  const tagPage=document.getElementById("skinTagPage"); if(tagPage) tagPage.classList.add("hidden");
   document.getElementById("dashboardPage").classList.remove("hidden");
   render();
   window.scrollTo(0,0);
@@ -845,6 +1415,74 @@ function normalizeSkinTags(tags){
   return tags.map(normalizeTagObject).filter(Boolean).filter((v,i,a)=>a.findIndex(x=>x.id===v.id)===i);
 }
 
+function cleanUnusedSkinTags(){
+  const validTagIds = new Set((TAG_DATABASE || []).map(t => String(t.id || slugify(t.name || "")).toLowerCase()).filter(Boolean));
+
+  if(validTagIds.size === 0){
+    showToast("tags.json not loaded yet.");
+    return;
+  }
+
+  let removedCount = 0;
+  let affectedSkins = 0;
+  const removedMap = {};
+
+  (DATA.heroes || []).forEach(hero => {
+    (hero.skins || []).forEach(skin => {
+      const before = Array.isArray(skin.tags) ? skin.tags : [];
+      const cleaned = [];
+      const seen = new Set();
+      let changed = false;
+
+      before.forEach(tag => {
+        const id = typeof tag === "string" ? slugify(tag) : String(tag && (tag.id || slugify(tag.name || "")) || "").toLowerCase();
+
+        if(!id || !validTagIds.has(id)){
+          removedCount++;
+          changed = true;
+          const label = typeof tag === "string" ? tag : (tag && (tag.name || tag.id)) || "blank";
+          removedMap[label] = (removedMap[label] || 0) + 1;
+          return;
+        }
+
+        if(seen.has(id)){
+          removedCount++;
+          changed = true;
+          removedMap[id + " duplicate"] = (removedMap[id + " duplicate"] || 0) + 1;
+          return;
+        }
+
+        seen.add(id);
+        cleaned.push(normalizeTagObject(tag));
+      });
+
+      if(changed){
+        skin.tags = cleaned;
+        affectedSkins++;
+      }
+    });
+  });
+
+  if(removedCount === 0){
+    showToast("No unused skin tags found.");
+    return;
+  }
+
+  const preview = Object.keys(removedMap).slice(0,10).map(k => `${k} (${removedMap[k]})`).join(", ");
+  showConfirm(
+    "Clean Unused Skin Tags",
+    `Remove ${removedCount} unused/invalid/duplicate tag(s) from ${affectedSkins} skin(s)? ${preview ? "Found: " + preview : ""}`,
+    () => {
+      markDirty();
+      render();
+      if(typeof renderSkinTagManager === "function") renderSkinTagManager();
+      if(typeof addActivity === "function") addActivity(`Cleaned ${removedCount} unused skin tag(s) from ${affectedSkins} skin(s).`);
+      log(`Cleaned unused skin tags: ${removedCount} removed from ${affectedSkins} skin(s).`);
+      showToast("Unused skin tags cleaned locally. Publish Changes to save.");
+    }
+  );
+}
+
 function normalizeData(){
   if(!DATA.heroes)DATA.heroes=[];
   DATA.heroes.forEach(hero=>{
@@ -915,6 +1553,7 @@ async function loadTags(){
     if(document.getElementById("tagOptions")){
       renderTagDropdown();
     }
+    renderSkinTagManager();
 
   }catch(e){
     TAG_DATABASE = [];
@@ -979,6 +1618,7 @@ async function publishChanges(){
   showConfirm("Publish Changes","This will commit local edits to GitHub. It can update skins.json, tags.json, skin_upgrades.json, and modskins.json. Continue?",async()=>{
     try{
       normalizeData();
+      createBackupDownload("before_publish");
       setBusy(true,"Publishing changes...");
       log("Publishing changes...");
 
@@ -1200,6 +1840,7 @@ async function publishChanges(){
       render();
       renderUpgrades();
       renderModskins();
+      renderSkinTagManager();
       log("Published.");
       showToast("Published to GitHub.");
     }catch(e){
@@ -1238,6 +1879,7 @@ function discardChanges(){
     renderUpgrades();
     renderModskins();
     renderTagDropdown();
+    renderSkinTagManager();
     renderSelectedTags();
     showToast("Local changes discarded.");
   });
@@ -1375,14 +2017,22 @@ function saveSkinModal(){
 
   const hero=DATA.heroes[currentHeroIndex];
 
-  const duplicate=hero.skins.find((s,i)=>{
+  const duplicateImage=hero.skins.find((s,i)=>{
     if(currentSkinIndex!==null&&i===currentSkinIndex)return false;
-    return s.image===image||s.script===script;
+    return s.image===image;
   });
 
-  if(duplicate){
-    showToast("Duplicate image/script exists.");
+  if(duplicateImage){
+    showToast("Duplicate image URL exists. Script duplicates are allowed.");
     return;
+  }
+
+  const duplicateScript=hero.skins.find((s,i)=>{
+    if(currentSkinIndex!==null&&i===currentSkinIndex)return false;
+    return s.script===script;
+  });
+  if(duplicateScript){
+    addActivity("Duplicate script allowed", "Same ZIP/script URL used by another skin.");
   }
 
   // Manual tags only. Blank selected tags means this skin will have no skin tag.
@@ -1539,6 +2189,38 @@ function previewNewTag(){
   txt.innerText = name ? `Preview: ${name} • id: ${id || "auto"}` : "Fill name + icon, then submit.";
 }
 
+
+function renderSkinTagManager(){
+  const list = document.getElementById("tagManagerList");
+  const status = document.getElementById("skinTagManagerStatus");
+  if(status) status.innerText = "Tags: " + TAG_DATABASE.length + (dirtyTags ? " *" : "");
+  if(!list) return;
+
+  const search = document.getElementById("skinTagManagerSearch");
+  const q = (search ? search.value : "").toLowerCase().trim();
+
+  const items = TAG_DATABASE.filter(t=>{
+    if(!q) return true;
+    return [t.id,t.name,t.type,t.file,t.icon].join(" ").toLowerCase().includes(q);
+  });
+
+  if(items.length === 0){
+    list.innerHTML = `<div class="small">No tags found.</div>`;
+    return;
+  }
+
+  list.innerHTML = items.map(t=>`
+    <div class="tagManagerCard cut">
+      ${t.icon ? `<img src="${esc(t.icon)}" onerror="this.style.opacity=.25">` : `<span class="badge badgePurple">TAG</span>`}
+      <div style="min-width:0">
+        <div class="tagManagerName">${esc(t.name)}</div>
+        <div class="small">ID: ${esc(t.id)}</div>
+        <div class="small">Type: ${esc(t.type || "skin_tag")}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
 function addNewTagFromPicker(){
   const name=document.getElementById("newTagName").value.trim();
   const customId=document.getElementById("newTagId").value.trim();
@@ -1592,6 +2274,7 @@ function addNewTagFromPicker(){
   markTagsDirty();
   renderSelectedTags();
   renderTagDropdown();
+  renderSkinTagManager();
   render();
   showToast("New tag added locally. Publish Changes to save tags.json.");
 }
@@ -2190,6 +2873,7 @@ function render(){
       <div class="skin cut ${skin.featured?"featured":""} ${skin.enabled?"":"disabled"}">
         <img src="${skin.image}" onerror="this.style.opacity=.25">
         <div class="skinBody">
+          <label class="selectSkinBox"><input type="checkbox" onchange="toggleSkinSelection(${hi},${realIndex},this.checked)" ${selectedSkinKeys[skinKey(hi,realIndex)]?"checked":""}> Select</label>
           <div class="skinTitle">${skin.featured?"Featured Skin":"Skin"} • ${skin.name ? esc(skin.name) : "No Name"} • ${skin.enabled?"Visible":"Hidden"}</div>
           <div class="small">ID: ${skin.id}</div>
           <div class="small">IMG: ${skin.image}</div>
@@ -2224,6 +2908,7 @@ function render(){
         <button class="btnDark" onclick="toggleCollapse('${hero.id}')">${collapsed[hero.id]?"Expand":"Minimize"}</button>
         <button class="btnGreen" onclick="openAddSkin(${hi})">+ Skin</button>
         <button class="btnBlue" onclick="editHero(${hi})">Edit</button>
+        <button class="btnDark" onclick="sortHeroSkins(${hi})">Sort Skins</button>
         <button class="btnDark" onclick="toggleHero(${hi})">${hero.enabled?"Hide":"Show"}</button>
         <button class="btnRed" onclick="deleteHero(${hi})">Delete</button>
       </div>
@@ -2239,6 +2924,707 @@ function render(){
   document.getElementById("statSkins").innerText=totalSkins;
   document.getElementById("statEnabled").innerText=totalEnabled;
 }
+
+
+/* ===== Added professional admin features ===== */
+let ACTIVITY_HISTORY = [];
+let selectedSkinKeys = {};
+let imageDebounceTimer = null;
+
+function hasUnsavedChanges(){return !!(dirty || dirtyTags || dirtyUpgrade || dirtyModskin)}
+function refreshStickyPublish(){
+  const status=document.getElementById('stickyStatusText');
+  const sub=document.getElementById('stickySubText');
+  if(!status||!sub)return;
+  if(hasUnsavedChanges()){
+    status.innerText='Unsaved Changes';
+    sub.innerText=[dirty?'skins.json':'',dirtyTags?'tags.json':'',dirtyUpgrade?'skin_upgrades.json':'',dirtyModskin?'modskins.json':''].filter(Boolean).join(' • ') || 'Local edits pending';
+  }else{status.innerText='Saved';sub.innerText='No pending local edits';}
+}
+
+const _oldMarkDirty=markDirty; markDirty=function(){_oldMarkDirty();refreshStickyPublish();};
+const _oldMarkSaved=markSaved; markSaved=function(){_oldMarkSaved();refreshStickyPublish();};
+const _oldMarkTagsDirty=markTagsDirty; markTagsDirty=function(){_oldMarkTagsDirty();refreshStickyPublish();};
+const _oldMarkTagsSaved=markTagsSaved; markTagsSaved=function(){_oldMarkTagsSaved();refreshStickyPublish();};
+const _oldMarkUpgradeDirty=markUpgradeDirty; markUpgradeDirty=function(){_oldMarkUpgradeDirty();refreshStickyPublish();};
+const _oldMarkUpgradeSaved=markUpgradeSaved; markUpgradeSaved=function(){_oldMarkUpgradeSaved();refreshStickyPublish();};
+const _oldMarkModskinDirty=markModskinDirty; markModskinDirty=function(){_oldMarkModskinDirty();refreshStickyPublish();};
+const _oldMarkModskinSaved=markModskinSaved; markModskinSaved=function(){_oldMarkModskinSaved();refreshStickyPublish();};
+
+function addActivity(action, detail){
+  ACTIVITY_HISTORY.unshift({time:new Date().toLocaleTimeString(), action, detail: detail||''});
+  ACTIVITY_HISTORY = ACTIVITY_HISTORY.slice(0,80);
+  renderActivityHistory();
+}
+function renderActivityHistory(){
+  const box=document.getElementById('activityList'); if(!box)return;
+  if(ACTIVITY_HISTORY.length===0){box.innerHTML='<div class="activityItem">No local activity yet.</div>';return;}
+  box.innerHTML=ACTIVITY_HISTORY.map(x=>`<div class="activityItem"><b>${esc(x.time)} • ${esc(x.action)}</b><br>${esc(x.detail)}</div>`).join('');
+}
+function clearActivityHistory(){ACTIVITY_HISTORY=[];renderActivityHistory();showToast('Activity cleared.');}
+
+function validateRequiredInput(el){
+  if(!el)return true;
+  const required=el.getAttribute('data-required');
+  if(!required)return true;
+  const ok=String(el.value||'').trim().length>0;
+  el.classList.toggle('requiredError',!ok);
+  return ok;
+}
+function validateRequiredFields(ids){
+  let ok=true;
+  ids.forEach(id=>{const el=document.getElementById(id); if(el && !validateRequiredInput(el)) ok=false;});
+  if(!ok) showToast('Fill all required fields.');
+  return ok;
+}
+
+const _oldSaveSkinModal=saveSkinModal;
+saveSkinModal=function(){
+  if(!validateRequiredFields(['skinImage','skinScript'])) return;
+  _oldSaveSkinModal();
+}
+const _oldSaveModskinModal=saveModskinModal;
+saveModskinModal=function(){
+  if(!validateRequiredFields(['modskinName','modskinImage','modskinScript'])) return;
+  _oldSaveModskinModal();
+}
+
+function testImageUrl(url, cb){
+  if(!url){cb(false,'No image URL');return;}
+  const img=new Image();
+  let done=false;
+  const finish=(ok,msg)=>{if(done)return;done=true;cb(ok,msg)};
+  img.onload=()=>finish(true,'Image OK');
+  img.onerror=()=>finish(false,'Broken image or blocked by source');
+  setTimeout(()=>finish(false,'Image test timeout'),7000);
+  img.src=url + (url.includes('?')?'&':'?') + 'imgtest=' + Date.now();
+}
+function debounceImageTest(inputId,statusId){
+  clearTimeout(imageDebounceTimer);
+  imageDebounceTimer=setTimeout(()=>testSingleImage(inputId,statusId),600);
+}
+function testSingleImage(inputId,statusId){
+  const input=document.getElementById(inputId), status=document.getElementById(statusId);
+  if(!input||!status)return;
+  const url=input.value.trim();
+  if(!url){status.className='urlStatus';status.innerText='Image tester ready.';return;}
+  status.className='urlStatus checking';status.innerText='Checking image...';
+  testImageUrl(url,(ok,msg)=>{status.className='urlStatus '+(ok?'ok':'bad');status.innerText=msg;});
+}
+function checkAllVisibleImages(){
+  const imgs=[...document.querySelectorAll('#heroesList img,#upgradeList img,#modskinList img')].map(img=>img.getAttribute('src')).filter(Boolean);
+  const unique=[...new Set(imgs)];
+  const box=document.getElementById('imageCheckSummary');
+  if(box) box.innerText='Testing '+unique.length+' visible images...';
+  if(unique.length===0){showToast('No visible images to test.');return;}
+  let done=0,bad=0;
+  unique.forEach(url=>testImageUrl(url,(ok)=>{done++; if(!ok) bad++; if(box) box.innerText=`Image test: ${done}/${unique.length} checked • ${bad} broken`; if(done===unique.length) showToast(bad?`${bad} broken image(s) found.`:'All visible images OK.');}));
+}
+
+function createBackupDownload(label){
+  try{
+    const backup={created_at:new Date().toISOString(), label:label||'manual_backup', skins:DATA, tags:{tag_database:TAG_DATABASE}, skin_upgrades:UPGRADE_DATA, modskins:MODSKIN_DATA};
+    const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=`warlito_backup_${label||'manual'}_${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
+    document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    addActivity('Backup created', a.download);
+  }catch(e){console.log(e);showToast('Backup failed.');}
+}
+function downloadBackupNow(){createBackupDownload('manual');showToast('Backup downloaded.');}
+
+function diffArrayById(oldArr,newArr,label){
+  oldArr=oldArr||[]; newArr=newArr||[];
+  const oldMap=new Map(oldArr.map(x=>[x.id,x])); const newMap=new Map(newArr.map(x=>[x.id,x]));
+  const added=[],deleted=[],edited=[];
+  newMap.forEach((v,id)=>{if(!oldMap.has(id)) added.push(v); else if(JSON.stringify(oldMap.get(id))!==JSON.stringify(v)) edited.push(v);});
+  oldMap.forEach((v,id)=>{if(!newMap.has(id)) deleted.push(v);});
+  return {label,added,deleted,edited};
+}
+function collectChangePreview(){
+  const groups=[];
+  groups.push(diffArrayById((ORIGINAL&&ORIGINAL.heroes)||[], DATA.heroes||[], 'Heroes'));
+  let oldSkins=[],newSkins=[];
+  ((ORIGINAL&&ORIGINAL.heroes)||[]).forEach(h=>(h.skins||[]).forEach(s=>oldSkins.push({...s,_hero:h.name})));
+  (DATA.heroes||[]).forEach(h=>(h.skins||[]).forEach(s=>newSkins.push({...s,_hero:h.name})));
+  groups.push(diffArrayById(oldSkins,newSkins,'Normal Skins'));
+  groups.push(diffArrayById(TAG_ORIGINAL||[], TAG_DATABASE||[], 'Skin Tags'));
+  groups.push(diffArrayById((UPGRADE_ORIGINAL&&UPGRADE_ORIGINAL.skin_upgrades)||[], (UPGRADE_DATA&&UPGRADE_DATA.skin_upgrades)||[], 'Upgrade Bases'));
+  groups.push(diffArrayById((MODSKIN_ORIGINAL&&MODSKIN_ORIGINAL.modskins)||[], (MODSKIN_DATA&&MODSKIN_DATA.modskins)||[], 'ModSkins'));
+  return groups;
+}
+function openPreviewChanges(){
+  const modal=document.getElementById('previewChangesModal'), body=document.getElementById('previewChangesBody'), badge=document.getElementById('previewSummaryBadge');
+  if(!modal||!body)return;
+  const groups=collectChangePreview();
+  let total=0;
+  body.innerHTML=groups.map(g=>{
+    const count=g.added.length+g.edited.length+g.deleted.length; total+=count;
+    if(count===0) return '';
+    const rows=[];
+    g.added.forEach(x=>rows.push(`<li>Added: ${esc(x.name||x.base_name||x.id||'Untitled')}</li>`));
+    g.edited.forEach(x=>rows.push(`<li>Edited: ${esc(x.name||x.base_name||x.id||'Untitled')}</li>`));
+    g.deleted.forEach(x=>rows.push(`<li>Deleted: ${esc(x.name||x.base_name||x.id||'Untitled')}</li>`));
+    return `<div class="previewGroup"><b>${esc(g.label)} • ${count}</b><ul>${rows.join('')}</ul></div>`;
+  }).join('') || '<div class="previewGroup"><b>No local changes.</b><div class="small">Everything is saved or no edits detected.</div></div>';
+  if(badge) badge.innerText=total+' change(s)';
+  modal.style.display='flex';
+}
+function closePreviewChanges(){const m=document.getElementById('previewChangesModal'); if(m)m.style.display='none';}
+
+function skinKey(heroIndex,skinIndex){return heroIndex+'_'+skinIndex}
+function toggleSkinSelection(heroIndex,skinIndex,checked){
+  const key=skinKey(heroIndex,skinIndex);
+  if(checked) selectedSkinKeys[key]={heroIndex,skinIndex}; else delete selectedSkinKeys[key];
+  updateBulkBar();
+}
+function clearInvalidSelections(){
+  Object.keys(selectedSkinKeys).forEach(k=>{const x=selectedSkinKeys[k]; if(!DATA.heroes[x.heroIndex]||!DATA.heroes[x.heroIndex].skins[x.skinIndex]) delete selectedSkinKeys[k];});
+}
+function selectedSkinList(){clearInvalidSelections();return Object.values(selectedSkinKeys);}
+function updateBulkBar(){
+  const arr=selectedSkinList(), bar=document.getElementById('bulkBar'), count=document.getElementById('bulkCount');
+  if(count)count.innerText=arr.length+' selected'; if(bar)bar.classList.toggle('show',arr.length>0);
+}
+function bulkSetSkinEnabled(value){selectedSkinList().forEach(x=>DATA.heroes[x.heroIndex].skins[x.skinIndex].enabled=value); addActivity('Bulk visibility', selectedSkinList().length+' skin(s) updated'); selectedSkinKeys={}; markDirty(); render(); updateBulkBar();}
+function bulkSetFeatured(value){selectedSkinList().forEach(x=>DATA.heroes[x.heroIndex].skins[x.skinIndex].featured=value); addActivity('Bulk featured', selectedSkinList().length+' skin(s) updated'); selectedSkinKeys={}; markDirty(); render(); updateBulkBar();}
+function bulkDeleteSkins(){
+  const arr=selectedSkinList(); if(arr.length===0)return;
+  showConfirm('Bulk Delete Skins',`Delete ${arr.length} selected skin(s)?`,()=>{
+    arr.sort((a,b)=>b.heroIndex-a.heroIndex || b.skinIndex-a.skinIndex).forEach(x=>{if(DATA.heroes[x.heroIndex]&&DATA.heroes[x.heroIndex].skins[x.skinIndex]) DATA.heroes[x.heroIndex].skins.splice(x.skinIndex,1);});
+    addActivity('Bulk delete', arr.length+' skin(s) deleted locally'); selectedSkinKeys={}; markDirty(); render(); updateBulkBar();
+  });
+}
+
+function sortHeroesByName(){DATA.heroes.sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''))); addActivity('Sorted heroes','Heroes sorted A-Z'); markDirty(); render();}
+function sortAllSkinsByName(){(DATA.heroes||[]).forEach(h=>(h.skins||[]).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')))); addActivity('Sorted skins','All hero skins sorted A-Z'); markDirty(); render();}
+function sortHeroSkins(heroIndex){const h=DATA.heroes[heroIndex]; if(!h)return; h.skins.sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''))); addActivity('Sorted hero skins', h.name); markDirty(); render();}
+
+function getTagUsageCount(id){
+  id=String(id||'').toLowerCase(); let count=0;
+  (DATA.heroes||[]).forEach(h=>(h.skins||[]).forEach(s=>{if(normalizeSkinTags(s.tags||[]).some(t=>String(t.id).toLowerCase()===id)) count++;}));
+  ((UPGRADE_DATA&&UPGRADE_DATA.skin_upgrades)||[]).forEach(b=>{if(parseTagsInput(tagsToInput(b.skin_tags||[])).includes(id)) count++; (b.targets||[]).forEach(t=>{if(parseTagsInput(tagsToInput(t.skin_tags||[])).includes(id)) count++;});});
+  return count;
+}
+let tagSortUsage=false;
+function sortTagsByUsage(){tagSortUsage=!tagSortUsage;renderSkinTagManager();showToast(tagSortUsage?'Sorted by usage.':'Sorted default.');}
+const _oldRenderSkinTagManager=renderSkinTagManager;
+renderSkinTagManager=function(){
+  const list = document.getElementById("tagManagerList");
+  const status = document.getElementById("skinTagManagerStatus");
+  if(status) status.innerText = "Tags: " + TAG_DATABASE.length + (dirtyTags ? " *" : "");
+  if(!list) return;
+  const search = document.getElementById("skinTagManagerSearch");
+  const q = (search ? search.value : "").toLowerCase().trim();
+  let items = TAG_DATABASE.filter(t=>!q || [t.id,t.name,t.type,t.file,t.icon].join(" ").toLowerCase().includes(q));
+  if(tagSortUsage) items = items.slice().sort((a,b)=>getTagUsageCount(b.id)-getTagUsageCount(a.id));
+  if(items.length === 0){list.innerHTML = `<div class="small">No tags found.</div>`;return;}
+  list.innerHTML = items.map(t=>{
+    const usage=getTagUsageCount(t.id);
+    return `<div class="tagManagerCard cut">
+      ${t.icon ? `<img src="${esc(t.icon)}" onerror="this.style.opacity=.25">` : `<span class="badge badgePurple">TAG</span>`}
+      <div style="min-width:0">
+        <div class="tagManagerName">${esc(t.name)}</div>
+        <div class="small">ID: ${esc(t.id)}</div>
+        <div class="small">Type: ${esc(t.type || "skin_tag")}</div>
+        <div class="badges"><span class="badge badgeGreen">Used: ${usage}</span></div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// activity hooks for common actions
+['addHero','saveHeroEdit','toggleHero','deleteHero','saveUpgradeBaseModal','saveUpgradeTargetModal','saveModskinModal','addNewTagFromPicker'].forEach(fn=>{
+  if(typeof window[fn]==='function'){
+    const old=window[fn]; window[fn]=function(){const before=JSON.stringify({d:dirty,t:dirtyTags,u:dirtyUpgrade,m:dirtyModskin}); const r=old.apply(this,arguments); addActivity(fn.replace(/([A-Z])/g,' $1').trim(), 'Local action completed'); return r;}
+  }
+});
+refreshStickyPublish();
+
+
+/* Broken Image Scanner / Bulk Fix Tools - WORKING ENGINE */
+let BROKEN_IMAGE_RESULTS = [];
+let BROKEN_SHOW_ONLY = true;
+let BROKEN_SCAN_RUNNING = false;
+let BROKEN_SCAN_TOKEN = 0;
+
+function setBrokenScannerButtons(disabled){
+  ['brokenScanBtn','brokenShowBtn','brokenExportBtn'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.disabled=!!disabled;
+  });
+}
+
+function collectImageTargets(){
+  const targets=[];
+  try{
+    (DATA.heroes||[]).forEach((hero,heroIndex)=>{
+      (hero.skins||[]).forEach((skin,skinIndex)=>{
+        targets.push({type:'skin',group:'Hero Skin',title:(hero.name||hero.id||'Hero')+' • '+(skin.name||skin.id||'Skin'),meta:'skins.json / '+(hero.category||'')+' / '+(skin.enabled?'visible':'hidden'),url:String(skin.image||'').trim(),heroIndex,skinIndex});
+      });
+    });
+  }catch(e){console.warn('collect skins failed',e)}
+
+  try{
+    ((UPGRADE_DATA&&UPGRADE_DATA.skin_upgrades)||[]).forEach((base,baseIndex)=>{
+      targets.push({type:'upgradeBase',group:'Upgrade Base',title:(base.hero||'Hero')+' • '+(base.base_name||base.id||'Base'),meta:'skin_upgrades.json / base image',url:String(base.base_image||'').trim(),baseIndex});
+      (base.targets||[]).forEach((target,targetIndex)=>{
+        targets.push({type:'upgradeTarget',group:'Upgrade Target',title:(base.base_name||base.id||'Base')+' → '+(target.name||target.id||'Target'),meta:'skin_upgrades.json / target image / '+(target.type||'upgrade'),url:String(target.image||'').trim(),baseIndex,targetIndex});
+      });
+    });
+  }catch(e){console.warn('collect upgrades failed',e)}
+
+  try{
+    ((MODSKIN_DATA&&MODSKIN_DATA.modskins)||[]).forEach((item,modskinIndex)=>{
+      targets.push({type:'modskin',group:'ModSkin',title:item.name||item.id||'ModSkin',meta:'modskins.json / '+(item.category||'No Category')+' / '+(item.series||'No Series'),url:String(item.image||'').trim(),modskinIndex});
+    });
+  }catch(e){console.warn('collect modskins failed',e)}
+
+  try{
+    (TAG_DATABASE||[]).forEach((tag,tagIndex)=>{
+      targets.push({type:'tagIcon',group:'Skin Tag Icon',title:tag.name||tag.id||'Tag',meta:'tags.json / icon / '+(tag.type||'skin_tag'),url:String(tag.icon||'').trim(),tagIndex});
+    });
+  }catch(e){console.warn('collect tags failed',e)}
+
+  return targets.filter(x=>x.url && /^https?:\/\//i.test(x.url));
+}
+
+function normalizeImageScanUrl(url){
+  url = String(url || '').trim();
+  if(!url) return url;
+  try{
+    const u = new URL(url);
+    const host = u.hostname.toLowerCase();
+
+    // GitHub page/raw URLs can open in a browser but fail inside Image() checks.
+    // Convert them to the direct raw.githubusercontent.com file URL before scanning.
+    if(host === 'github.com'){
+      const parts = u.pathname.split('/').filter(Boolean);
+      if(parts.length >= 5){
+        const user = parts[0];
+        const repo = parts[1];
+        const mode = parts[2];
+        if(mode === 'raw' || mode === 'blob'){
+          let branch = '';
+          let fileParts = [];
+          if(parts[3] === 'refs' && parts[4] === 'heads' && parts.length >= 7){
+            branch = 'refs/heads/' + parts[5];
+            fileParts = parts.slice(6);
+          }else{
+            branch = parts[3];
+            fileParts = parts.slice(4);
+          }
+          if(branch && fileParts.length){
+            return 'https://raw.githubusercontent.com/' + user + '/' + repo + '/' + branch + '/' + fileParts.join('/');
+          }
+        }
+      }
+    }
+
+    // Some copied raw URLs contain spaces or unsafe characters. URL() normalizes them.
+    return u.href;
+  }catch(e){
+    return url;
+  }
+}
+
+function testImageUrlWorking(url, timeoutMs=9000){
+  return new Promise(resolve=>{
+    const originalUrl = String(url || '').trim();
+    const normalizedUrl = normalizeImageScanUrl(originalUrl);
+    const urlsToTry = normalizedUrl && normalizedUrl !== originalUrl ? [normalizedUrl, originalUrl] : [originalUrl];
+    let index = 0;
+    let timer = null;
+
+    const tryNext = (lastReason)=>{
+      if(index >= urlsToTry.length){
+        resolve({ok:false, reason:lastReason || 'load_failed', checkedUrl:normalizedUrl || originalUrl});
+        return;
+      }
+
+      const checkUrl = urlsToTry[index++];
+      let settled=false;
+      const finish=(ok,reason)=>{
+        if(settled) return;
+        settled=true;
+        clearTimeout(timer);
+        if(ok){
+          resolve({ok:true, reason:reason || 'loaded', checkedUrl:checkUrl});
+        }else{
+          tryNext(reason);
+        }
+      };
+
+      timer=setTimeout(()=>finish(false,'timeout'),timeoutMs);
+      const img=new Image();
+      img.onload=()=>finish(true, checkUrl !== originalUrl ? 'loaded_after_github_raw_normalize' : 'loaded');
+      img.onerror=()=>finish(false,'load_failed');
+      try{ img.referrerPolicy='no-referrer'; }catch(e){}
+      img.src=checkUrl;
+    };
+
+    if(!originalUrl){
+      resolve({ok:false, reason:'empty_url', checkedUrl:''});
+      return;
+    }
+    tryNext('load_failed');
+  });
+}
+
+function openBrokenImageScanner(){
+  const modal=document.getElementById('brokenImageModal');
+  if(modal) modal.style.display='flex';
+  const summary=document.getElementById('brokenScanSummary');
+  const targets=collectImageTargets();
+  if(summary && BROKEN_IMAGE_RESULTS.length===0) summary.innerText='Ready. Found '+targets.length+' image URL(s) to check from heroes, upgrades, modskins, and tag icons.';
+  renderBrokenImageResults();
+}
+
+function closeBrokenImageScanner(){
+  const modal=document.getElementById('brokenImageModal');
+  if(modal) modal.style.display='none';
+}
+
+async function scanBrokenImages(showToastMsg=true){
+  if(BROKEN_SCAN_RUNNING){ showToast('Scanner is already running.'); return; }
+  const token=++BROKEN_SCAN_TOKEN;
+  const targets=collectImageTargets();
+  const badge=document.getElementById('brokenScanBadge');
+  const count=document.getElementById('brokenScanCount');
+  const summary=document.getElementById('brokenScanSummary');
+  const box=document.getElementById('brokenImageList');
+
+  BROKEN_SCAN_RUNNING=true;
+  BROKEN_IMAGE_RESULTS=[];
+  BROKEN_SHOW_ONLY=true;
+  setBrokenScannerButtons(true);
+  const scanBtn=document.getElementById('brokenScanBtn');
+  if(scanBtn) scanBtn.innerText='Scanning...';
+  if(badge){ badge.innerText='Scanning'; badge.className='badge badgeYellow'; }
+  if(count){ count.innerText='0 broken'; count.className='badge badgeGreen'; }
+  if(summary) summary.innerText='Checking '+targets.length+' image URL(s)... please wait.';
+  if(box) box.innerHTML='<div class="small">Scanning started... 0/'+targets.length+'</div>';
+
+  if(targets.length===0){
+    if(summary) summary.innerText='No valid http/https image URLs found.';
+    if(badge){ badge.innerText='No URLs'; badge.className='badge badgePurple'; }
+    setBrokenScannerButtons(false);
+    if(scanBtn) scanBtn.innerText='Scan Broken Images';
+    BROKEN_SCAN_RUNNING=false;
+    return;
+  }
+
+  let broken=0;
+  for(let i=0;i<targets.length;i++){
+    if(token!==BROKEN_SCAN_TOKEN) break;
+    const target=targets[i];
+    if(badge) badge.innerText='Scanning '+(i+1)+'/'+targets.length;
+    if(summary) summary.innerText='Checking '+(i+1)+' of '+targets.length+': '+target.title;
+    const res=await testImageUrlWorking(target.url,9000);
+    const row={...target,ok:res.ok,reason:res.reason,checkedUrl:res.checkedUrl||target.url};
+    BROKEN_IMAGE_RESULTS.push(row);
+    if(!row.ok) broken++;
+    if(count){ count.innerText=broken+' broken'; count.className=broken?'badge badgeRed':'badge badgeGreen'; }
+    if((i+1)%5===0 || !row.ok || i===targets.length-1) renderBrokenImageResults();
+    await new Promise(r=>setTimeout(r,20));
+  }
+
+  BROKEN_SCAN_RUNNING=false;
+  setBrokenScannerButtons(false);
+  if(scanBtn) scanBtn.innerText='Scan Broken Images';
+  if(badge){ badge.innerText='Scan Done'; badge.className='badge badgePurple'; }
+  if(count){ count.innerText=broken+' broken'; count.className=broken?'badge badgeRed':'badge badgeGreen'; }
+  if(summary) summary.innerText=broken ? 'Found '+broken+' broken image(s). Use Edit / Replace URL / Re-check / Remove.' : 'Scan complete. No broken images found.';
+  renderBrokenImageResults();
+  if(showToastMsg) showToast(broken ? 'Found '+broken+' broken image(s).' : 'No broken images found.');
+}
+
+function renderBrokenImageResults(){
+  const box=document.getElementById('brokenImageList');
+  if(!box) return;
+  const brokenCount=BROKEN_IMAGE_RESULTS.filter(x=>!x.ok).length;
+  const count=document.getElementById('brokenScanCount');
+  if(count){ count.innerText=brokenCount+' broken'; count.className=brokenCount?'badge badgeRed':'badge badgeGreen'; }
+
+  if(BROKEN_IMAGE_RESULTS.length===0){
+    box.innerHTML='<div class="small">No scan results yet. Tap Scan Broken Images.</div>';
+    return;
+  }
+
+  const results=BROKEN_SHOW_ONLY ? BROKEN_IMAGE_RESULTS.filter(x=>!x.ok) : BROKEN_IMAGE_RESULTS;
+  if(results.length===0){
+    box.innerHTML='<div class="small">No broken image links in current filter.</div>';
+    return;
+  }
+
+  box.innerHTML=results.map(item=>{
+    const realIndex=BROKEN_IMAGE_RESULTS.indexOf(item);
+    return `<div class="brokenItem">
+      <div class="brokenItemHead">
+        <div style="min-width:0">
+          <div class="brokenItemTitle">${esc(item.group)} • ${esc(item.title)}</div>
+          <div class="brokenMeta">${esc(item.meta)}${item.reason?' • '+esc(item.reason):''}</div>
+        </div>
+        <span class="badge ${item.ok?'badgeGreen':'badgeRed'}">${item.ok?'OK':'BROKEN'}</span>
+      </div>
+      <div class="brokenUrl">${esc(item.url)}</div>${item.checkedUrl && item.checkedUrl!==item.url ? `<div class="small">Checked as: ${esc(item.checkedUrl)}</div>` : ''}
+      <div class="brokenActions">
+        <button class="btnBlue" onclick="editBrokenImageItem(${realIndex})">Edit</button>
+        <button class="btnGreen" onclick="replaceBrokenImageUrl(${realIndex})">Replace URL</button>
+        <button class="btnDark" onclick="recheckBrokenImage(${realIndex})">Re-check</button>
+        <button class="btnRed" onclick="removeBrokenImageUrl(${realIndex})">Remove</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showOnlyBrokenImages(){
+  BROKEN_SHOW_ONLY=!BROKEN_SHOW_ONLY;
+  renderBrokenImageResults();
+  showToast(BROKEN_SHOW_ONLY?'Showing broken only.':'Showing all scanned images.');
+}
+
+function getBrokenTarget(index){ return BROKEN_IMAGE_RESULTS[index]||null; }
+
+function applyImageUrlToTarget(item,newUrl){
+  if(!item) return false;
+  if(item.type==='skin' && DATA.heroes[item.heroIndex] && DATA.heroes[item.heroIndex].skins[item.skinIndex]){ DATA.heroes[item.heroIndex].skins[item.skinIndex].image=newUrl; markDirty(); render(); return true; }
+  if(item.type==='upgradeBase' && UPGRADE_DATA.skin_upgrades[item.baseIndex]){ UPGRADE_DATA.skin_upgrades[item.baseIndex].base_image=newUrl; markUpgradeDirty(); renderUpgrades(); return true; }
+  if(item.type==='upgradeTarget' && UPGRADE_DATA.skin_upgrades[item.baseIndex] && UPGRADE_DATA.skin_upgrades[item.baseIndex].targets[item.targetIndex]){ UPGRADE_DATA.skin_upgrades[item.baseIndex].targets[item.targetIndex].image=newUrl; markUpgradeDirty(); renderUpgrades(); return true; }
+  if(item.type==='modskin' && MODSKIN_DATA.modskins[item.modskinIndex]){ MODSKIN_DATA.modskins[item.modskinIndex].image=newUrl; markModskinDirty(); renderModskins(); return true; }
+  if(item.type==='tagIcon' && TAG_DATABASE[item.tagIndex]){ TAG_DATABASE[item.tagIndex].icon=newUrl; markTagsDirty(); if(typeof renderSkinTagManager==='function') renderSkinTagManager(); return true; }
+  return false;
+}
+
+function editBrokenImageItem(index){
+  const item=getBrokenTarget(index); if(!item) return;
+  closeBrokenImageScanner();
+  if(item.type==='skin') openEditSkin(item.heroIndex,item.skinIndex);
+  else if(item.type==='upgradeBase') openUpgradeBaseModal(item.baseIndex);
+  else if(item.type==='upgradeTarget') openUpgradeTargetModal(item.baseIndex,item.targetIndex);
+  else if(item.type==='modskin') openModskinModal(item.modskinIndex);
+  else if(item.type==='tagIcon'){ showSkinTagPage(); showToast('Edit tag icon: '+item.title); }
+}
+
+async function replaceBrokenImageUrl(index){
+  const item=getBrokenTarget(index); if(!item) return;
+  const newUrl=prompt('Paste new image URL for:\n'+item.title,item.url);
+  if(newUrl===null) return;
+  const clean=newUrl.trim();
+  if(!clean){ showToast('URL is empty.'); return; }
+  showToast('Checking new URL...');
+  const res=await testImageUrlWorking(clean,9000);
+  if(!res.ok && !confirm('This new URL still looks broken/blocked. Save anyway?')) return;
+  applyImageUrlToTarget(item,clean);
+  BROKEN_IMAGE_RESULTS[index].url=clean;
+  BROKEN_IMAGE_RESULTS[index].ok=res.ok;
+  BROKEN_IMAGE_RESULTS[index].reason=res.reason;
+  addActivity('Fixed image URL',item.group+' • '+item.title);
+  renderBrokenImageResults();
+  showToast(res.ok?'Image URL replaced.':'URL saved but still may be broken.');
+}
+
+async function recheckBrokenImage(index){
+  const item=getBrokenTarget(index); if(!item) return;
+  showToast('Re-checking image...');
+  const res=await testImageUrlWorking(item.url,9000);
+  item.ok=res.ok; item.reason=res.reason;
+  renderBrokenImageResults();
+  showToast(item.ok?'Image is OK now.':'Still broken.');
+}
+
+function removeBrokenImageUrl(index){
+  const item=getBrokenTarget(index); if(!item) return;
+  showConfirm('Remove Image URL','Remove image URL from '+item.group+' • '+item.title+'?',()=>{
+    applyImageUrlToTarget(item,'');
+    BROKEN_IMAGE_RESULTS.splice(index,1);
+    addActivity('Removed broken image URL',item.group+' • '+item.title);
+    renderBrokenImageResults();
+    showToast('Broken image URL removed locally.');
+  });
+}
+
+function exportBrokenImagesList(){
+  const broken=BROKEN_IMAGE_RESULTS.filter(x=>!x.ok);
+  if(broken.length===0){ showToast('No broken images to export.'); return; }
+  const text=broken.map((x,i)=>[(i+1)+'. '+x.group+' - '+x.title,'Meta: '+x.meta,'Reason: '+(x.reason||'failed'),'URL: '+x.url].join('\n')).join('\n\n');
+  const blob=new Blob([text],{type:'text/plain'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='broken-images-'+new Date().toISOString().slice(0,10)+'.txt';
+  document.body.appendChild(a); a.click(); URL.revokeObjectURL(a.href); a.remove();
+}
+
+// Make onclick handlers available even in strict browser contexts.
+window.openBrokenImageScanner=openBrokenImageScanner;
+window.closeBrokenImageScanner=closeBrokenImageScanner;
+window.scanBrokenImages=scanBrokenImages;
+window.showOnlyBrokenImages=showOnlyBrokenImages;
+window.exportBrokenImagesList=exportBrokenImagesList;
+window.editBrokenImageItem=editBrokenImageItem;
+window.replaceBrokenImageUrl=replaceBrokenImageUrl;
+window.recheckBrokenImage=recheckBrokenImage;
+window.removeBrokenImageUrl=removeBrokenImageUrl;
 </script>
+
+<script>
+/* FINAL PATCH: reliable Broken Image Scanner click + fast parallel engine */
+(function(){
+  let scanResults=[];
+  let showBrokenOnly=true;
+  let running=false;
+
+  function byId(id){ return document.getElementById(id); }
+  function safeToast(msg){ if(typeof showToast==='function') showToast(msg); else alert(msg); }
+  function safeEsc(v){ return typeof esc==='function' ? esc(v) : String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+
+  function collectTargetsFinal(){
+    const arr=[];
+    try{ (window.DATA?.heroes||DATA.heroes||[]).forEach((h,hi)=>{ (h.skins||[]).forEach((s,si)=>{ if(String(s.image||'').trim()) arr.push({type:'skin',group:'Hero Skin',title:(h.name||h.id||'Hero')+' • '+(s.name||s.id||'Skin'),meta:'skins.json / '+(h.category||''),url:String(s.image||'').trim(),heroIndex:hi,skinIndex:si}); }); }); }catch(e){}
+    try{ ((window.UPGRADE_DATA?.skin_upgrades||UPGRADE_DATA.skin_upgrades||[])).forEach((b,bi)=>{ if(String(b.base_image||'').trim()) arr.push({type:'upgradeBase',group:'Upgrade Base',title:(b.hero||'Hero')+' • '+(b.base_name||b.id||'Base'),meta:'skin_upgrades.json / base image',url:String(b.base_image||'').trim(),baseIndex:bi}); (b.targets||[]).forEach((t,ti)=>{ if(String(t.image||'').trim()) arr.push({type:'upgradeTarget',group:'Upgrade Target',title:(b.base_name||b.id||'Base')+' → '+(t.name||t.id||'Target'),meta:'skin_upgrades.json / target image',url:String(t.image||'').trim(),baseIndex:bi,targetIndex:ti}); }); }); }catch(e){}
+    try{ ((window.MODSKIN_DATA?.modskins||MODSKIN_DATA.modskins||[])).forEach((m,mi)=>{ if(String(m.image||'').trim()) arr.push({type:'modskin',group:'ModSkin',title:m.name||m.id||'ModSkin',meta:'modskins.json / '+(m.category||''),url:String(m.image||'').trim(),modskinIndex:mi}); }); }catch(e){}
+    try{ ((window.TAG_DATABASE||TAG_DATABASE||[])).forEach((t,ti)=>{ if(String(t.icon||'').trim()) arr.push({type:'tagIcon',group:'Skin Tag Icon',title:t.name||t.id||'Tag',meta:'tags.json / icon',url:String(t.icon||'').trim(),tagIndex:ti}); }); }catch(e){}
+    return arr.filter(x=>/^https?:\/\//i.test(x.url));
+  }
+
+  function normalizeUrlFinal(url){
+    url=String(url||'').trim();
+    if(!url) return url;
+    try{
+      if(typeof normalizeImageScanUrl==='function') return normalizeImageScanUrl(url);
+      const u=new URL(url);
+      if(u.hostname.toLowerCase()==='github.com'){
+        const parts=u.pathname.split('/').filter(Boolean);
+        if(parts.length>=5 && (parts[2]==='raw' || parts[2]==='blob')){
+          const user=parts[0], repo=parts[1];
+          let branch='', fileParts=[];
+          if(parts[3]==='refs' && parts[4]==='heads' && parts.length>=7){ branch='refs/heads/'+parts[5]; fileParts=parts.slice(6); }
+          else{ branch=parts[3]; fileParts=parts.slice(4); }
+          if(branch && fileParts.length) return 'https://raw.githubusercontent.com/'+user+'/'+repo+'/'+branch+'/'+fileParts.join('/');
+        }
+      }
+      return u.href;
+    }catch(e){ return url; }
+  }
+
+  function testUrlFinal(url, timeoutMs=7000){
+    return new Promise(resolve=>{
+      const original=String(url||'').trim();
+      const normalized=normalizeUrlFinal(original);
+      const tries=(normalized && normalized!==original) ? [normalized, original] : [original];
+      let idx=0;
+      function tryOne(lastReason){
+        if(idx>=tries.length){ resolve({ok:false,reason:lastReason||'load_failed',checkedUrl:normalized||original}); return; }
+        const checkUrl=tries[idx++];
+        let done=false, timer=null;
+        const finish=(ok,reason)=>{
+          if(done) return;
+          done=true;
+          clearTimeout(timer);
+          if(ok) resolve({ok:true,reason:checkUrl!==original?'loaded_normalized':'loaded',checkedUrl:checkUrl});
+          else tryOne(reason);
+        };
+        timer=setTimeout(()=>finish(false,'timeout/blocked'),timeoutMs);
+        const img=new Image();
+        try{ img.referrerPolicy='no-referrer'; }catch(e){}
+        img.onload=()=>finish(true,'loaded');
+        img.onerror=()=>finish(false,'load_failed');
+        img.src=checkUrl;
+        if(img.complete && img.naturalWidth>0) finish(true,'cached');
+      }
+      if(!original){ resolve({ok:false,reason:'empty_url',checkedUrl:''}); return; }
+      tryOne('load_failed');
+    });
+  }
+
+  function setBadges(status, broken, scanned, total){
+    const b=byId('brokenScanBadge'), c=byId('brokenScanCount'), s=byId('brokenScanSummary');
+    if(b){ b.innerText=status; b.className='badge '+(running?'badgeYellow':'badgePurple'); }
+    if(c){ c.innerText=broken+' Broken'; c.className='badge '+(broken?'badgeRed':'badgeGreen'); }
+    if(s){ s.innerText= running ? ('Scanning '+scanned+'/'+total+' image URL(s)... Broken: '+broken) : (total ? ('Scan complete: '+scanned+'/'+total+' checked • '+broken+' broken') : 'No valid image URLs found.'); }
+  }
+
+  function renderFinal(){
+    const box=byId('brokenImageList'); if(!box) return;
+    const data=showBrokenOnly ? scanResults.filter(x=>!x.ok) : scanResults;
+    const broken=scanResults.filter(x=>!x.ok).length;
+    const c=byId('brokenScanCount'); if(c){ c.innerText=broken+' Broken'; c.className='badge '+(broken?'badgeRed':'badgeGreen'); }
+    if(scanResults.length===0){ box.innerHTML='<div class="small">No scan results yet. Click Scan Broken Images.</div>'; return; }
+    if(data.length===0){ box.innerHTML='<div class="small">No broken images found. Toggle Show Broken Only to view all checked images.</div>'; return; }
+    box.innerHTML=data.map(item=>{
+      const idx=scanResults.indexOf(item);
+      return `<div class="brokenItem">
+        <div class="brokenItemHead"><div style="min-width:0"><div class="brokenItemTitle">${safeEsc(item.group)} • ${safeEsc(item.title)}</div><div class="brokenMeta">${safeEsc(item.meta)} • ${safeEsc(item.reason||'')}</div></div><span class="badge ${item.ok?'badgeGreen':'badgeRed'}">${item.ok?'OK':'BROKEN'}</span></div>
+        <div class="brokenUrl">${safeEsc(item.url)}</div>${item.checkedUrl&&item.checkedUrl!==item.url?`<div class="small">Checked as: ${safeEsc(item.checkedUrl)}</div>`:''}
+        <div class="brokenActions"><button class="btnBlue" onclick="editBrokenImageItem(${idx})">Edit</button><button class="btnGreen" onclick="replaceBrokenImageUrl(${idx})">Replace URL</button><button class="btnDark" onclick="recheckBrokenImage(${idx})">Re-check</button><button class="btnRed" onclick="removeBrokenImageUrl(${idx})">Remove</button></div>
+      </div>`;
+    }).join('');
+  }
+
+  async function scanFinal(showToastMsg=true){
+    if(running){ safeToast('Scanner is already running.'); return; }
+    const targets=collectTargetsFinal();
+    scanResults=[]; showBrokenOnly=true; running=true;
+    const btn=byId('brokenScanBtn'); if(btn){ btn.disabled=true; btn.innerText='Scanning...'; }
+    const showBtn=byId('brokenShowBtn'); if(showBtn) showBtn.disabled=true;
+    const expBtn=byId('brokenExportBtn'); if(expBtn) expBtn.disabled=true;
+    const box=byId('brokenImageList'); if(box) box.innerHTML='<div class="small">Starting scan... please wait.</div>';
+    let done=0, broken=0;
+    setBadges('Scanning',0,0,targets.length);
+    if(!targets.length){ running=false; if(btn){btn.disabled=false;btn.innerText='Scan Broken Images';} if(showBtn)showBtn.disabled=false; if(expBtn)expBtn.disabled=false; setBadges('No URLs',0,0,0); return; }
+
+    const concurrency=12;
+    let cursor=0;
+    async function worker(){
+      while(cursor<targets.length){
+        const i=cursor++;
+        const t=targets[i];
+        const res=await testUrlFinal(t.url,7000);
+        const row={...t,ok:!!res.ok,reason:res.reason||'',checkedUrl:res.checkedUrl||t.url};
+        scanResults.push(row);
+        done++; if(!row.ok) broken++;
+        if(done%3===0 || !row.ok || done===targets.length){ setBadges('Scanning',broken,done,targets.length); renderFinal(); }
+      }
+    }
+    await Promise.all(Array.from({length:Math.min(concurrency,targets.length)},worker));
+    running=false;
+    if(btn){ btn.disabled=false; btn.innerText='Scan Broken Images'; }
+    if(showBtn) showBtn.disabled=false;
+    if(expBtn) expBtn.disabled=false;
+    setBadges('Scan Done',broken,done,targets.length);
+    renderFinal();
+    if(showToastMsg) safeToast(broken ? ('Found '+broken+' broken image(s).') : 'No broken images found.');
+  }
+
+  function applyFinal(item,newUrl){
+    if(!item) return false;
+    try{
+      if(item.type==='skin' && DATA.heroes[item.heroIndex]?.skins[item.skinIndex]){ DATA.heroes[item.heroIndex].skins[item.skinIndex].image=newUrl; markDirty(); render(); return true; }
+      if(item.type==='upgradeBase' && UPGRADE_DATA.skin_upgrades[item.baseIndex]){ UPGRADE_DATA.skin_upgrades[item.baseIndex].base_image=newUrl; markUpgradeDirty(); renderUpgrades(); return true; }
+      if(item.type==='upgradeTarget' && UPGRADE_DATA.skin_upgrades[item.baseIndex]?.targets[item.targetIndex]){ UPGRADE_DATA.skin_upgrades[item.baseIndex].targets[item.targetIndex].image=newUrl; markUpgradeDirty(); renderUpgrades(); return true; }
+      if(item.type==='modskin' && MODSKIN_DATA.modskins[item.modskinIndex]){ MODSKIN_DATA.modskins[item.modskinIndex].image=newUrl; markModskinDirty(); renderModskins(); return true; }
+      if(item.type==='tagIcon' && TAG_DATABASE[item.tagIndex]){ TAG_DATABASE[item.tagIndex].icon=newUrl; markTagsDirty(); if(typeof renderSkinTagManager==='function') renderSkinTagManager(); return true; }
+    }catch(e){ console.error(e); }
+    return false;
+  }
+
+  window.scanBrokenImages=scanFinal;
+  window.renderBrokenImageResults=renderFinal;
+  window.showOnlyBrokenImages=function(){ showBrokenOnly=!showBrokenOnly; renderFinal(); safeToast(showBrokenOnly?'Showing broken only.':'Showing all scanned images.'); };
+  window.exportBrokenImagesList=function(){ const broken=scanResults.filter(x=>!x.ok); if(!broken.length){ safeToast('No broken images to export.'); return; } const text=broken.map((x,i)=>`${i+1}. ${x.group} - ${x.title}\nMeta: ${x.meta}\nReason: ${x.reason||'failed'}\nURL: ${x.url}${x.checkedUrl&&x.checkedUrl!==x.url?'\nChecked as: '+x.checkedUrl:''}`).join('\n\n'); const blob=new Blob([text],{type:'text/plain'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='broken-images-'+new Date().toISOString().slice(0,10)+'.txt'; document.body.appendChild(a); a.click(); URL.revokeObjectURL(a.href); a.remove(); };
+  window.getBrokenTarget=function(i){ return scanResults[i]||null; };
+  window.replaceBrokenImageUrl=async function(i){ const item=scanResults[i]; if(!item) return; const nu=prompt('Paste new image URL for:\n'+item.title,item.url); if(nu===null) return; const clean=nu.trim(); if(!clean){safeToast('URL is empty.');return;} safeToast('Checking new URL...'); const res=await testUrlFinal(clean,7000); if(!res.ok && !confirm('This new URL still looks broken/blocked. Save anyway?')) return; applyFinal(item,clean); item.url=clean; item.ok=res.ok; item.reason=res.reason; item.checkedUrl=res.checkedUrl||clean; renderFinal(); safeToast(res.ok?'Image URL replaced.':'URL saved but may still be broken.'); };
+  window.recheckBrokenImage=async function(i){ const item=scanResults[i]; if(!item) return; const res=await testUrlFinal(item.url,7000); item.ok=res.ok; item.reason=res.reason; item.checkedUrl=res.checkedUrl||item.url; renderFinal(); safeToast(item.ok?'Image is OK now.':'Still broken.'); };
+  window.removeBrokenImageUrl=function(i){ const item=scanResults[i]; if(!item) return; if(!confirm('Remove image URL from '+item.group+' • '+item.title+'?')) return; applyFinal(item,''); scanResults.splice(i,1); renderFinal(); safeToast('Broken image URL removed locally.'); };
+  window.editBrokenImageItem=function(i){ const item=scanResults[i]; if(!item) return; if(typeof closeBrokenImageScanner==='function') closeBrokenImageScanner(); if(item.type==='skin') openEditSkin(item.heroIndex,item.skinIndex); else if(item.type==='upgradeBase') openUpgradeBaseModal(item.baseIndex); else if(item.type==='upgradeTarget') openUpgradeTargetModal(item.baseIndex,item.targetIndex); else if(item.type==='modskin') openModskinModal(item.modskinIndex); else if(item.type==='tagIcon'){ if(typeof showSkinTagPage==='function') showSkinTagPage(); safeToast('Edit tag icon: '+item.title); } };
+
+  document.addEventListener('click',function(e){
+    const btn=e.target.closest && e.target.closest('#brokenScanBtn');
+    if(btn){ e.preventDefault(); e.stopPropagation(); scanFinal(true); }
+  },true);
+})();
+</script>
+
 </body>
 </html>
