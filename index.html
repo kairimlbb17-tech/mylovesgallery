@@ -680,6 +680,17 @@ button:active{transform:translateY(1px) scale(.99)}
   .modal .actions{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(255,255,255,.82),#fff 30%);padding-top:10px;margin-top:12px;z-index:5;}
 }
 
+
+/* Final mobile overlay fix: hide sticky publish bar while any modal is open */
+body.modal-open .stickyPublish{display:none!important;visibility:hidden!important;pointer-events:none!important;}
+body.modal-open{padding-bottom:0!important;}
+@media(max-width:760px){
+  body.modal-open .app{padding-bottom:12px!important;}
+  body.modal-open .modal{padding-bottom:calc(28px + env(safe-area-inset-bottom))!important;}
+  body.modal-open .modalBox{padding-bottom:18px!important;margin-bottom:calc(30px + env(safe-area-inset-bottom))!important;}
+  body.modal-open .modal .actions{position:relative!important;bottom:auto!important;background:transparent!important;padding-bottom:0!important;}
+}
+
 </style>
 </head>
 
