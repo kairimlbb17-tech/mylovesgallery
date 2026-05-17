@@ -667,6 +667,19 @@ button:active{transform:translateY(1px) scale(.99)}
 .brokenActions button{font-size:11px;min-height:32px;padding:7px 6px}
 @media(max-width:620px){.brokenActions{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
+
+
+/* Mobile modal fix: keep modal action buttons above sticky publish bar */
+.modal{z-index:320 !important; overflow:auto; align-items:flex-start !important;}
+.modalBox{margin:16px auto calc(24px + env(safe-area-inset-bottom));}
+.loading{z-index:500 !important;}
+.toast{z-index:520 !important;}
+@media(max-width:760px){
+  .modal{padding:12px 10px calc(18px + env(safe-area-inset-bottom)) !important;}
+  .modalBox{max-height:none !important; width:100%;}
+  .modal .actions{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(255,255,255,.82),#fff 30%);padding-top:10px;margin-top:12px;z-index:5;}
+}
+
 </style>
 </head>
 
