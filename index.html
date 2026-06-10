@@ -951,8 +951,28 @@ body.modal-open{padding-bottom:0!important;}
           <button class="btnDark" onclick="showDashboardPage()">← Back to Dashboard</button>
           <button class="btnGreen" onclick="publishChanges()">Publish Changes</button>
         </div>
-        <div class="actions" style="grid-template-columns:1fr">
+        <div class="actions" style="grid-template-columns:1fr 1fr">
           <button class="btnBlue" onclick="loadBattleEffects()">Reload Battle Effects</button>
+          <button class="btnDark" onclick="downloadBattleEffects()">Download JSON</button>
+        </div>
+      </div>
+
+      <div class="card cut cardGlow">
+        <div class="title">Category Banners</div>
+        <div class="small" style="margin-bottom:10px">Banner image para sa bawat kategorya. Paste ng image URL, save local, then Publish.</div>
+        <div id="beBannerList"></div>
+        <div class="actions" style="grid-template-columns:1fr">
+          <button class="btnBlue" onclick="loadEffectBanners()">Reload Banners</button>
+        </div>
+      </div>
+
+      <div class="card cut cardGlow">
+        <div class="title">Group Card Images</div>
+        <div class="small" style="margin-bottom:10px">Yung mga card image ng bawat grupo (Classic, Atomic Pop, etc.) per kategorya.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px" id="groupCategoryTabs"></div>
+        <div id="groupImageList"></div>
+        <div class="actions" style="grid-template-columns:1fr">
+          <button class="btnBlue" onclick="loadEffectGroups()">Reload Group Images</button>
         </div>
       </div>
 
@@ -1233,6 +1253,10 @@ const UPGRADE_URL = `https://raw.githubusercontent.com/${OWNER}/${REPO}/refs/hea
 const MODSKIN_URL = `https://raw.githubusercontent.com/${OWNER}/${REPO}/refs/heads/${BRANCH}/${MODSKIN_FILE}`;
 const BATTLE_EFFECTS_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${BATTLE_EFFECTS_FILE}`;
 const BE_CATEGORIES = ["recall","trail","emote","elimination"];
+const BANNERS_FILE = "effectbanners.json";
+const BANNERS_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${BANNERS_FILE}`;
+const GROUPS_FILE = "effectgroups.json";
+const GROUPS_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${GROUPS_FILE}`;
 
 let TOKEN = "";
 let SHA = "";
@@ -1257,6 +1281,15 @@ let BE_DATA = { recall:[], trail:[], emote:[], elimination:[] };
 let BE_ORIGINAL = null;
 let currentBECategory = "recall";
 let currentBEEditIndex = null;
+let dirtyBanners = false;
+let BANNERS_SHA = "";
+let BANNERS_DATA = { recall:"", trail:"", emote:"", elimination:"" };
+let BANNERS_ORIGINAL = null;
+let dirtyGroups = false;
+let GROUPS_SHA = "";
+let GROUPS_DATA = { recall:{}, trail:{}, emote:{}, elimination:{} };
+let GROUPS_ORIGINAL = null;
+let currentGroupsCategory = "recall";
 let collapsedUpgrades = {};
 let currentUpgradeBaseIndex = null;
 let currentUpgradeTargetIndex = null;
@@ -1417,7 +1450,10 @@ function renderBattleEffects(){
 
   listEl.innerHTML = filtered.map(({e,i})=>`
     <div style="margin-bottom:6px;padding:10px 12px;display:flex;align-items:center;gap:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm)">
-      <img src="${esc(e.image||"")}" onerror="this.style.visibility='hidden'" style="width:46px;height:46px;object-fit:cover;border-radius:8px;flex-shrink:0;background:var(--surface-3)">
+      <div style="position:relative;flex-shrink:0;width:46px;height:46px;cursor:pointer" onclick="quickBEImage(${i})" title="Click to replace image URL">
+        <img src="${esc(e.image||"")}" onerror="this.style.opacity='.3'" style="width:46px;height:46px;object-fit:cover;border-radius:8px;background:var(--surface-3);display:block">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border-radius:8px;background:rgba(0,0,0,.38);opacity:0;transition:opacity .15s" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0'" ontouchstart="this.style.opacity='1'" ontouchend="this.style.opacity='0'"><span style="color:#fff;font-size:16px">&#128247;</span></div>
+      </div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(e.name||"Unnamed")}</div>
         <div class="small" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)">${esc(e.script||"No script")}</div>
@@ -1507,6 +1543,181 @@ function deleteBEEffect(index){
     showToast("Effect deleted locally.");
   });
 }
+
+function quickBEImage(index){
+  const e = (BE_DATA[currentBECategory]||[])[index];
+  if(!e) return;
+  const nu = prompt(`Replace image URL for:\n${e.name}`, e.image || "");
+  if(nu === null) return;
+  const clean = nu.trim();
+  BE_DATA[currentBECategory][index].image = clean;
+  markBEDirty();
+  renderBattleEffects();
+  showToast(clean ? "Image URL updated locally." : "Image URL cleared.");
+}
+
+function downloadBattleEffects(){
+  const blob = new Blob([JSON.stringify(BE_DATA, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "battleeffects.json";
+  document.body.appendChild(a);
+  a.click();
+  URL.revokeObjectURL(a.href);
+  a.remove();
+  showToast("battleeffects.json downloaded.");
+}
+
+function markBannersDirty(){
+  dirtyBanners = true;
+  const s = document.getElementById("saveStatus");
+  if(s){ s.innerText = "Unsaved Changes"; s.className = "badge unsavedBadge"; }
+}
+function markBannersSaved(){ dirtyBanners = false; }
+
+async function loadEffectBanners(silent){
+  try{
+    if(!silent) setBusy(true,"Loading effectbanners.json...");
+    const res = await fetch(`${BANNERS_API}?ref=${BRANCH}&v=${Date.now()}`,{
+      headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json"},
+      cache:"no-store"
+    });
+    const file = await res.json();
+    if(!res.ok) throw new Error(JSON.stringify(file));
+    BANNERS_SHA = file.sha || "";
+    const text = decodeURIComponent(escape(atob(file.content.replace(/\n/g,""))));
+    BANNERS_DATA = JSON.parse(text);
+    BE_CATEGORIES.forEach(c=>{ if(typeof BANNERS_DATA[c] !== "string") BANNERS_DATA[c] = ""; });
+    BANNERS_ORIGINAL = clone(BANNERS_DATA);
+    markBannersSaved();
+    renderBanners();
+    if(!silent) showToast("Banners loaded.");
+  }catch(e){
+    console.error(e);
+    if(!silent) showToast("Failed to load effectbanners.json — upload it to GitHub first.");
+  }finally{
+    if(!silent) setBusy(false);
+  }
+}
+
+function renderBanners(){
+  const el = document.getElementById("beBannerList");
+  if(!el) return;
+  el.innerHTML = BE_CATEGORIES.map(c=>`
+    <div style="margin-bottom:12px;padding:10px 12px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm)">
+      <div style="font-weight:600;font-size:13px;margin-bottom:6px;text-transform:capitalize">${capitalize(c)}</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <img id="banner_img_${c}" src="${esc(BANNERS_DATA[c]||"")}" onerror="this.style.opacity='.25'" onload="this.style.opacity='1'" style="width:72px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;background:var(--surface-3);opacity:${BANNERS_DATA[c]?'1':'.25'}">
+        <input id="banner_input_${c}" value="${esc(BANNERS_DATA[c]||"")}" placeholder="Paste banner image URL..." oninput="previewBannerInput('${c}')" style="flex:1">
+        <button class="btnGreen" style="padding:6px 10px;font-size:12px;flex-shrink:0" onclick="saveBannerEdit('${c}')">Save</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function previewBannerInput(cat){
+  const val = (document.getElementById("banner_input_"+cat)||{}).value || "";
+  const img = document.getElementById("banner_img_"+cat);
+  if(img){ img.src = val; img.style.opacity = val ? "1" : ".25"; }
+}
+
+function saveBannerEdit(cat){
+  const val = ((document.getElementById("banner_input_"+cat)||{}).value||"").trim();
+  BANNERS_DATA[cat] = val;
+  const img = document.getElementById("banner_img_"+cat);
+  if(img){ img.src = val; img.style.opacity = val ? "1" : ".25"; }
+  markBannersDirty();
+  showToast(`${capitalize(cat)} banner saved locally.`);
+}
+
+function markGroupsDirty(){
+  dirtyGroups = true;
+  const s = document.getElementById("saveStatus");
+  if(s){ s.innerText = "Unsaved Changes"; s.className = "badge unsavedBadge"; }
+}
+function markGroupsSaved(){ dirtyGroups = false; }
+
+async function loadEffectGroups(silent){
+  try{
+    if(!silent) setBusy(true,"Loading effectgroups.json...");
+    const res = await fetch(`${GROUPS_API}?ref=${BRANCH}&v=${Date.now()}`,{
+      headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json"},
+      cache:"no-store"
+    });
+    const file = await res.json();
+    if(!res.ok) throw new Error(JSON.stringify(file));
+    GROUPS_SHA = file.sha || "";
+    const text = decodeURIComponent(escape(atob(file.content.replace(/\n/g,""))));
+    GROUPS_DATA = JSON.parse(text);
+    BE_CATEGORIES.forEach(c=>{ if(typeof GROUPS_DATA[c] !== "object" || Array.isArray(GROUPS_DATA[c])) GROUPS_DATA[c] = {}; });
+    GROUPS_ORIGINAL = clone(GROUPS_DATA);
+    markGroupsSaved();
+    renderGroupImages();
+    if(!silent) showToast("Group images loaded.");
+  }catch(e){
+    console.error(e);
+    if(!silent) showToast("Failed to load effectgroups.json — upload it to GitHub first.");
+  }finally{
+    if(!silent) setBusy(false);
+  }
+}
+
+function renderGroupImages(){
+  const tabsEl = document.getElementById("groupCategoryTabs");
+  const listEl = document.getElementById("groupImageList");
+  if(!tabsEl || !listEl) return;
+
+  tabsEl.innerHTML = BE_CATEGORIES.map(c=>{
+    const count = Object.keys(GROUPS_DATA[c]||{}).length;
+    const active = c === currentGroupsCategory;
+    return `<button class="${active?"btnBlue":"btnDark"}" onclick="setGroupsCategory('${c}')">${capitalize(c)} (${count})</button>`;
+  }).join("");
+
+  const groups = GROUPS_DATA[currentGroupsCategory] || {};
+  const keys = Object.keys(groups);
+
+  if(!keys.length){
+    listEl.innerHTML = `<div class="small" style="padding:14px;color:var(--muted);text-align:center">No groups — upload effectgroups.json first.</div>`;
+    return;
+  }
+
+  listEl.innerHTML = keys.map(name=>{
+    const url = groups[name] || "";
+    const safeId = "grp_" + currentGroupsCategory + "_" + name.replace(/[^a-z0-9]/gi,"_");
+    return `
+      <div style="margin-bottom:10px;padding:10px 12px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm)">
+        <div style="font-weight:600;font-size:13px;margin-bottom:6px">${esc(name)}</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <img id="${safeId}_img" src="${esc(url)}" onerror="this.style.opacity='.25'" onload="this.style.opacity='1'" style="width:80px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0;background:var(--surface-3);opacity:${url?'1':'.25'}">
+          <input id="${safeId}_inp" value="${esc(url)}" placeholder="Paste image URL..." oninput="previewGroupInput('${safeId}')" style="flex:1">
+          <button class="btnGreen" style="padding:6px 10px;font-size:12px;flex-shrink:0" onclick="saveGroupEdit('${currentGroupsCategory}','${name.replace(/'/g,"\\'")}','${safeId}')">Save</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function setGroupsCategory(cat){
+  currentGroupsCategory = cat;
+  renderGroupImages();
+}
+
+function previewGroupInput(safeId){
+  const val = (document.getElementById(safeId+"_inp")||{}).value || "";
+  const img = document.getElementById(safeId+"_img");
+  if(img){ img.src = val; img.style.opacity = val ? "1" : ".25"; }
+}
+
+function saveGroupEdit(cat, name, safeId){
+  const val = ((document.getElementById(safeId+"_inp")||{}).value||"").trim();
+  if(!GROUPS_DATA[cat]) GROUPS_DATA[cat] = {};
+  GROUPS_DATA[cat][name] = val;
+  const img = document.getElementById(safeId+"_img");
+  if(img){ img.src = val; img.style.opacity = val ? "1" : ".25"; }
+  markGroupsDirty();
+  showToast(`"${name}" image saved locally.`);
+}
+
 function esc(text){
   return String(text ?? "").replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
 }
@@ -1867,6 +2078,8 @@ async function loadData(){
     await loadUpgradeData(false);
     await loadModskinData(false);
     await loadBattleEffects(true);
+    await loadEffectBanners(true);
+    await loadEffectGroups(true);
     log("Loaded.");
     showToast("Dashboard updated.");
   }catch(e){
@@ -1878,12 +2091,12 @@ async function loadData(){
 }
 
 async function publishChanges(){
-  if(!dirty && !dirtyTags && !dirtyUpgrade && !dirtyModskin && !dirtyBE){
+  if(!dirty && !dirtyTags && !dirtyUpgrade && !dirtyModskin && !dirtyBE && !dirtyBanners && !dirtyGroups){
     showToast("No changes to publish.");
     return;
   }
 
-  showConfirm("Publish Changes","This will commit local edits to GitHub. It can update skins.json, tags.json, skin_upgrades.json, modskins.json, and battleeffects.json. Continue?",async()=>{
+  showConfirm("Publish Changes","This will commit local edits to GitHub. It can update skins.json, tags.json, skin_upgrades.json, modskins.json, battleeffects.json, and effectbanners.json. Continue?",async()=>{
     try{
       normalizeData();
       createBackupDownload("before_publish");
@@ -2130,16 +2343,62 @@ async function publishChanges(){
         log("battleeffects.json published.");
       }
 
+      if(dirtyBanners){
+        const latestBan=await fetch(`${BANNERS_API}?ref=${BRANCH}`,{
+          headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json"}
+        });
+        const latestBanFile=await latestBan.json();
+        if(!latestBan.ok){ log(JSON.stringify(latestBanFile,null,2)); showToast("Cannot get latest effectbanners SHA"); return; }
+        BANNERS_SHA=latestBanFile.sha;
+        const banContent=btoa(unescape(encodeURIComponent(JSON.stringify(BANNERS_DATA,null,2))));
+        const banRes=await fetch(BANNERS_API,{
+          method:"PUT",
+          headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json","Content-Type":"application/json"},
+          body:JSON.stringify({message:"Update effectbanners.json from Warlito Admin Panel",content:banContent,sha:BANNERS_SHA,branch:BRANCH})
+        });
+        const banResult=await banRes.json();
+        if(!banRes.ok){ log(JSON.stringify(banResult,null,2)); showToast("effectbanners.json publish failed."); return; }
+        BANNERS_SHA=banResult.content.sha;
+        BANNERS_ORIGINAL=clone(BANNERS_DATA);
+        markBannersSaved();
+        log("effectbanners.json published.");
+      }
+
+      if(dirtyGroups){
+        const latestGrp=await fetch(`${GROUPS_API}?ref=${BRANCH}`,{
+          headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json"}
+        });
+        const latestGrpFile=await latestGrp.json();
+        if(!latestGrp.ok){ log(JSON.stringify(latestGrpFile,null,2)); showToast("Cannot get latest effectgroups SHA"); return; }
+        GROUPS_SHA=latestGrpFile.sha;
+        const grpContent=btoa(unescape(encodeURIComponent(JSON.stringify(GROUPS_DATA,null,2))));
+        const grpRes=await fetch(GROUPS_API,{
+          method:"PUT",
+          headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json","Content-Type":"application/json"},
+          body:JSON.stringify({message:"Update effectgroups.json from Warlito Admin Panel",content:grpContent,sha:GROUPS_SHA,branch:BRANCH})
+        });
+        const grpResult=await grpRes.json();
+        if(!grpRes.ok){ log(JSON.stringify(grpResult,null,2)); showToast("effectgroups.json publish failed."); return; }
+        GROUPS_SHA=grpResult.content.sha;
+        GROUPS_ORIGINAL=clone(GROUPS_DATA);
+        markGroupsSaved();
+        log("effectgroups.json published.");
+      }
+
       markSaved();
       markTagsSaved();
       markUpgradeSaved();
       markModskinSaved();
       markBESaved();
+      markBannersSaved();
+      markGroupsSaved();
       render();
       renderUpgrades();
       renderModskins();
       renderSkinTagManager();
       renderBattleEffects();
+      renderBanners();
+      renderGroupImages();
       log("Published.");
       showToast("Published to GitHub.");
     }catch(e){
@@ -2177,6 +2436,16 @@ function discardChanges(){
     if(BE_ORIGINAL){
       BE_DATA=clone(BE_ORIGINAL);
       markBESaved();
+    }
+    if(BANNERS_ORIGINAL){
+      BANNERS_DATA=clone(BANNERS_ORIGINAL);
+      markBannersSaved();
+      renderBanners();
+    }
+    if(GROUPS_ORIGINAL){
+      GROUPS_DATA=clone(GROUPS_ORIGINAL);
+      markGroupsSaved();
+      renderGroupImages();
     }
     render();
     renderUpgrades();
