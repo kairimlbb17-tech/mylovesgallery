@@ -732,6 +732,7 @@ body.modal-open{padding-bottom:0!important;}
         <button class="btnBlue" onclick="showUpgradePage()">Go to Upgrade Skin Manager</button>
         <button class="btnGreen" onclick="showModskinPage()">Go to ModSkin Manager</button>
         <button class="btnYellow" onclick="showSkinTagPage()">Go to Skin Tag Manager</button>
+        <button class="btnBlue" onclick="showBattleEffectsPage()">Go to Battle Effects Manager</button>
       </div>
       <div class="actions" style="grid-template-columns:1fr 1fr">
         <button class="btnDark" onclick="logout()">Logout</button>
@@ -940,6 +941,61 @@ body.modal-open{padding-bottom:0!important;}
       </div>
     </div>
 
+    <div id="battleEffectsPage" class="hidden">
+      <div class="card cut cardGlow">
+        <div class="title">Battle Effects Manager</div>
+        <div class="badges">
+          <span id="beStatus" class="badge badgeBlue">Effects: 0</span>
+        </div>
+        <div class="actions" style="grid-template-columns:1fr 1fr">
+          <button class="btnDark" onclick="showDashboardPage()">← Back to Dashboard</button>
+          <button class="btnGreen" onclick="publishChanges()">Publish Changes</button>
+        </div>
+        <div class="actions" style="grid-template-columns:1fr">
+          <button class="btnBlue" onclick="loadBattleEffects()">Reload Battle Effects</button>
+        </div>
+      </div>
+
+      <div class="card cut cardGlow">
+        <div class="title">Category</div>
+        <div id="beCategoryTabs" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+      </div>
+
+      <div class="card cut cardGlow">
+        <div class="title" id="beListTitle">Effects</div>
+        <div class="toolbar">
+          <input id="beSearch" placeholder="Search effect name..." oninput="renderBattleEffects()">
+          <button class="btnGreen" onclick="openBEModal()">+ Add Effect</button>
+        </div>
+        <div id="beList"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="modal" id="beModal">
+  <div class="modalBox cut">
+    <div class="title" id="beModalTitle">Add Effect</div>
+    <div class="small">Category</div>
+    <select id="beModalCategory">
+      <option value="recall">Recall</option>
+      <option value="trail">Trail</option>
+      <option value="emote">Emote</option>
+      <option value="elimination">Elimination</option>
+    </select>
+    <input id="beName" placeholder="Effect name ex: Butterfly">
+    <input id="beImage" placeholder="Image URL (preview thumbnail)" oninput="updateBEPreview(this.value); debounceImageTest('beImage','beImageStatus')">
+    <div id="beImageStatus" class="urlStatus">Image tester ready.</div>
+    <input id="beScript" placeholder="Script ZIP URL">
+    <div class="preview cut">
+      <img id="bePreviewImg" src="" onerror="this.style.display='none'" onload="this.style.display='block'" style="width:60px;height:60px;object-fit:cover;border-radius:8px">
+      <div><b>Preview</b><div class="small" id="bePreviewText">Paste image URL...</div></div>
+    </div>
+    <div class="actions">
+      <button class="btnGreen" onclick="saveBEModal()">Save Local</button>
+      <button class="btnDark" onclick="closeBEModal()">Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -1165,6 +1221,7 @@ const FILE = "skins.json";
 const TAG_FILE = "tags.json";
 const UPGRADE_FILE = "skin_upgrades.json";
 const MODSKIN_FILE = "modskins.json";
+const BATTLE_EFFECTS_FILE = "battleeffects.json";
 const BRANCH = "main";
 const CATEGORIES = ["assassin","fighter","mage","marksman","tank","support"];
 const API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
@@ -1174,6 +1231,8 @@ const MODSKIN_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${MO
 const TAG_URL = `https://raw.githubusercontent.com/${OWNER}/${REPO}/refs/heads/${BRANCH}/${TAG_FILE}`;
 const UPGRADE_URL = `https://raw.githubusercontent.com/${OWNER}/${REPO}/refs/heads/${BRANCH}/${UPGRADE_FILE}`;
 const MODSKIN_URL = `https://raw.githubusercontent.com/${OWNER}/${REPO}/refs/heads/${BRANCH}/${MODSKIN_FILE}`;
+const BATTLE_EFFECTS_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${BATTLE_EFFECTS_FILE}`;
+const BE_CATEGORIES = ["recall","trail","emote","elimination"];
 
 let TOKEN = "";
 let SHA = "";
@@ -1192,6 +1251,12 @@ let MODSKIN_SHA = "";
 let MODSKIN_DATA = { version:1, type:"modskins", modskins:[] };
 let MODSKIN_ORIGINAL = null;
 let currentModskinIndex = null;
+let dirtyBE = false;
+let BE_SHA = "";
+let BE_DATA = { recall:[], trail:[], emote:[], elimination:[] };
+let BE_ORIGINAL = null;
+let currentBECategory = "recall";
+let currentBEEditIndex = null;
 let collapsedUpgrades = {};
 let currentUpgradeBaseIndex = null;
 let currentUpgradeTargetIndex = null;
@@ -1280,6 +1345,168 @@ function markUpgradeSaved(){
 }
 
 function clone(obj){return JSON.parse(JSON.stringify(obj))}
+
+function capitalize(s){ return s ? s[0].toUpperCase() + s.slice(1) : ""; }
+
+function markBEDirty(){
+  dirtyBE = true;
+  const s = document.getElementById("saveStatus");
+  if(s){ s.innerText = "Unsaved Changes"; s.className = "badge unsavedBadge"; }
+  updateBEStatus();
+}
+function markBESaved(){
+  dirtyBE = false;
+  updateBEStatus();
+}
+function updateBEStatus(){
+  const total = BE_CATEGORIES.reduce((n,c)=>n+(BE_DATA[c]||[]).length, 0);
+  const s = document.getElementById("beStatus");
+  if(s) s.innerText = "Effects: " + total + (dirtyBE ? " *" : "");
+}
+
+async function loadBattleEffects(silent){
+  try{
+    if(!silent) setBusy(true,"Loading battleeffects.json...");
+    const res = await fetch(`${BATTLE_EFFECTS_API}?ref=${BRANCH}&v=${Date.now()}`,{
+      headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json"},
+      cache:"no-store"
+    });
+    const file = await res.json();
+    if(!res.ok) throw new Error(JSON.stringify(file));
+    BE_SHA = file.sha || "";
+    const text = decodeURIComponent(escape(atob(file.content.replace(/\n/g,""))));
+    BE_DATA = JSON.parse(text);
+    BE_CATEGORIES.forEach(c=>{ if(!Array.isArray(BE_DATA[c])) BE_DATA[c] = []; });
+    BE_ORIGINAL = clone(BE_DATA);
+    markBESaved();
+    if(!silent) showToast("Battle effects loaded.");
+    renderBattleEffects();
+    if(!silent) log("battleeffects.json loaded.");
+  }catch(e){
+    console.error(e);
+    if(!silent) showToast("Failed to load battleeffects.json");
+    if(!silent) log("battleeffects.json load failed: " + e.toString());
+  }finally{
+    if(!silent) setBusy(false);
+  }
+}
+
+function renderBattleEffects(){
+  const tabsEl = document.getElementById("beCategoryTabs");
+  const listEl = document.getElementById("beList");
+  const titleEl = document.getElementById("beListTitle");
+  if(!tabsEl || !listEl) return;
+
+  tabsEl.innerHTML = BE_CATEGORIES.map(c=>{
+    const count = (BE_DATA[c]||[]).length;
+    const active = c === currentBECategory;
+    return `<button class="${active?"btnBlue":"btnDark"}" onclick="setBECategory('${c}')">${capitalize(c)} (${count})</button>`;
+  }).join("");
+
+  const effects = BE_DATA[currentBECategory] || [];
+  if(titleEl) titleEl.innerText = capitalize(currentBECategory) + " Effects — " + effects.length + " total";
+
+  const q = ((document.getElementById("beSearch")||{}).value||"").toLowerCase();
+  const filtered = effects.map((e,i)=>({e,i})).filter(({e})=>!q || (e.name||"").toLowerCase().includes(q));
+
+  if(!filtered.length){
+    listEl.innerHTML = `<div class="small" style="padding:14px;text-align:center;color:var(--muted)">No effects found.</div>`;
+    updateBEStatus();
+    return;
+  }
+
+  listEl.innerHTML = filtered.map(({e,i})=>`
+    <div style="margin-bottom:6px;padding:10px 12px;display:flex;align-items:center;gap:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm)">
+      <img src="${esc(e.image||"")}" onerror="this.style.visibility='hidden'" style="width:46px;height:46px;object-fit:cover;border-radius:8px;flex-shrink:0;background:var(--surface-3)">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(e.name||"Unnamed")}</div>
+        <div class="small" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)">${esc(e.script||"No script")}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="btnBlue" style="padding:6px 10px;font-size:12px" onclick="openBEModal(${i})">Edit</button>
+        <button class="btnRed" style="padding:6px 10px;font-size:12px" onclick="deleteBEEffect(${i})">Del</button>
+      </div>
+    </div>
+  `).join("");
+
+  updateBEStatus();
+}
+
+function setBECategory(cat){
+  currentBECategory = cat;
+  renderBattleEffects();
+}
+
+function openBEModal(index){
+  currentBEEditIndex = (index !== undefined && index !== null) ? index : null;
+  const title = document.getElementById("beModalTitle");
+  const catSel = document.getElementById("beModalCategory");
+  if(currentBEEditIndex !== null){
+    const e = (BE_DATA[currentBECategory]||[])[currentBEEditIndex];
+    if(!e) return;
+    title.innerText = "Edit Effect";
+    catSel.value = currentBECategory;
+    document.getElementById("beName").value = e.name || "";
+    document.getElementById("beImage").value = e.image || "";
+    document.getElementById("beScript").value = e.script || "";
+    updateBEPreview(e.image || "");
+  }else{
+    title.innerText = "Add Effect";
+    catSel.value = currentBECategory;
+    document.getElementById("beName").value = "";
+    document.getElementById("beImage").value = "";
+    document.getElementById("beScript").value = "";
+    updateBEPreview("");
+  }
+  document.getElementById("beModal").style.display = "flex";
+}
+
+function closeBEModal(){
+  document.getElementById("beModal").style.display = "none";
+  currentBEEditIndex = null;
+}
+
+function updateBEPreview(url){
+  const img = document.getElementById("bePreviewImg");
+  const txt = document.getElementById("bePreviewText");
+  if(img){ img.src = url || ""; img.style.visibility = url ? "visible" : "hidden"; }
+  if(txt) txt.innerText = url ? url : "Paste image URL...";
+}
+
+function saveBEModal(){
+  const name = document.getElementById("beName").value.trim();
+  const image = document.getElementById("beImage").value.trim();
+  const script = document.getElementById("beScript").value.trim();
+  const cat = document.getElementById("beModalCategory").value;
+  if(!name){ showToast("Enter effect name"); return; }
+  if(!script){ showToast("Enter script URL"); return; }
+  if(!BE_DATA[cat]) BE_DATA[cat] = [];
+  if(currentBEEditIndex !== null && cat === currentBECategory){
+    BE_DATA[cat][currentBEEditIndex] = { name, image, script };
+  } else if(currentBEEditIndex !== null && cat !== currentBECategory){
+    BE_DATA[currentBECategory].splice(currentBEEditIndex, 1);
+    BE_DATA[cat].push({ name, image, script });
+    currentBECategory = cat;
+  } else {
+    BE_DATA[cat].push({ name, image, script });
+    currentBECategory = cat;
+  }
+  closeBEModal();
+  markBEDirty();
+  renderBattleEffects();
+  showToast("Effect saved locally.");
+}
+
+function deleteBEEffect(index){
+  const e = (BE_DATA[currentBECategory]||[])[index];
+  if(!e) return;
+  showConfirm("Delete Effect", `Delete "${esc(e.name)}" from ${capitalize(currentBECategory)}?`, ()=>{
+    BE_DATA[currentBECategory].splice(index, 1);
+    markBEDirty();
+    renderBattleEffects();
+    showToast("Effect deleted locally.");
+  });
+}
 function esc(text){
   return String(text ?? "").replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
 }
@@ -1308,11 +1535,14 @@ function upgradeLog(msg){
   box.scrollTop=box.scrollHeight;
 }
 
+function hideBEPage(){ const p=document.getElementById("battleEffectsPage"); if(p) p.classList.add("hidden"); }
+
 function showUpgradePage(){
   document.getElementById("dashboardPage").classList.add("hidden");
   document.getElementById("upgradePage").classList.remove("hidden");
   document.getElementById("modskinPage").classList.add("hidden");
   const tagPage=document.getElementById("skinTagPage"); if(tagPage) tagPage.classList.add("hidden");
+  hideBEPage();
   renderUpgrades();
   window.scrollTo(0,0);
 }
@@ -1322,6 +1552,7 @@ function showModskinPage(){
   document.getElementById("upgradePage").classList.add("hidden");
   document.getElementById("modskinPage").classList.remove("hidden");
   const tagPage=document.getElementById("skinTagPage"); if(tagPage) tagPage.classList.add("hidden");
+  hideBEPage();
   renderModskins();
   window.scrollTo(0,0);
 }
@@ -1331,7 +1562,18 @@ function showSkinTagPage(){
   document.getElementById("upgradePage").classList.add("hidden");
   document.getElementById("modskinPage").classList.add("hidden");
   const tagPage=document.getElementById("skinTagPage"); if(tagPage) tagPage.classList.remove("hidden");
+  hideBEPage();
   renderSkinTagManager();
+  window.scrollTo(0,0);
+}
+
+function showBattleEffectsPage(){
+  document.getElementById("dashboardPage").classList.add("hidden");
+  document.getElementById("upgradePage").classList.add("hidden");
+  document.getElementById("modskinPage").classList.add("hidden");
+  const tagPage=document.getElementById("skinTagPage"); if(tagPage) tagPage.classList.add("hidden");
+  document.getElementById("battleEffectsPage").classList.remove("hidden");
+  renderBattleEffects();
   window.scrollTo(0,0);
 }
 
@@ -1339,6 +1581,7 @@ function showDashboardPage(){
   document.getElementById("upgradePage").classList.add("hidden");
   document.getElementById("modskinPage").classList.add("hidden");
   const tagPage=document.getElementById("skinTagPage"); if(tagPage) tagPage.classList.add("hidden");
+  hideBEPage();
   document.getElementById("dashboardPage").classList.remove("hidden");
   render();
   window.scrollTo(0,0);
@@ -1623,6 +1866,7 @@ async function loadData(){
     render();
     await loadUpgradeData(false);
     await loadModskinData(false);
+    await loadBattleEffects(true);
     log("Loaded.");
     showToast("Dashboard updated.");
   }catch(e){
@@ -1634,12 +1878,12 @@ async function loadData(){
 }
 
 async function publishChanges(){
-  if(!dirty && !dirtyTags && !dirtyUpgrade && !dirtyModskin){
+  if(!dirty && !dirtyTags && !dirtyUpgrade && !dirtyModskin && !dirtyBE){
     showToast("No changes to publish.");
     return;
   }
 
-  showConfirm("Publish Changes","This will commit local edits to GitHub. It can update skins.json, tags.json, skin_upgrades.json, and modskins.json. Continue?",async()=>{
+  showConfirm("Publish Changes","This will commit local edits to GitHub. It can update skins.json, tags.json, skin_upgrades.json, modskins.json, and battleeffects.json. Continue?",async()=>{
     try{
       normalizeData();
       createBackupDownload("before_publish");
@@ -1857,14 +2101,45 @@ async function publishChanges(){
         log("modskins.json published.");
       }
 
+      if(dirtyBE){
+        const latestBE=await fetch(`${BATTLE_EFFECTS_API}?ref=${BRANCH}`,{
+          headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json"}
+        });
+        const latestBEFile=await latestBE.json();
+        if(!latestBE.ok){
+          log(JSON.stringify(latestBEFile,null,2));
+          showToast("Cannot get latest battleeffects SHA");
+          return;
+        }
+        BE_SHA=latestBEFile.sha;
+        const beContent=btoa(unescape(encodeURIComponent(JSON.stringify(BE_DATA,null,2))));
+        const beRes=await fetch(BATTLE_EFFECTS_API,{
+          method:"PUT",
+          headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json","Content-Type":"application/json"},
+          body:JSON.stringify({message:"Update battleeffects.json from Warlito Admin Panel",content:beContent,sha:BE_SHA,branch:BRANCH})
+        });
+        const beResult=await beRes.json();
+        if(!beRes.ok){
+          log(JSON.stringify(beResult,null,2));
+          showToast("battleeffects.json publish failed. Reload then try again.");
+          return;
+        }
+        BE_SHA=beResult.content.sha;
+        BE_ORIGINAL=clone(BE_DATA);
+        markBESaved();
+        log("battleeffects.json published.");
+      }
+
       markSaved();
       markTagsSaved();
       markUpgradeSaved();
       markModskinSaved();
+      markBESaved();
       render();
       renderUpgrades();
       renderModskins();
       renderSkinTagManager();
+      renderBattleEffects();
       log("Published.");
       showToast("Published to GitHub.");
     }catch(e){
@@ -1899,12 +2174,17 @@ function discardChanges(){
       MODSKIN_DATA=clone(MODSKIN_ORIGINAL);
       markModskinSaved();
     }
+    if(BE_ORIGINAL){
+      BE_DATA=clone(BE_ORIGINAL);
+      markBESaved();
+    }
     render();
     renderUpgrades();
     renderModskins();
     renderTagDropdown();
     renderSkinTagManager();
     renderSelectedTags();
+    renderBattleEffects();
     showToast("Local changes discarded.");
   });
 }
