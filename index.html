@@ -958,15 +958,6 @@ body.modal-open{padding-bottom:0!important;}
       </div>
 
       <div class="card cut cardGlow">
-        <div class="title">Category Banners</div>
-        <div class="small" style="margin-bottom:10px">Banner image para sa bawat kategorya. Paste ng image URL, save local, then Publish.</div>
-        <div id="beBannerList"></div>
-        <div class="actions" style="grid-template-columns:1fr">
-          <button class="btnBlue" onclick="loadEffectBanners()">Reload Banners</button>
-        </div>
-      </div>
-
-      <div class="card cut cardGlow">
         <div class="title">Group Card Images</div>
         <div class="small" style="margin-bottom:10px">Yung mga card image ng bawat grupo (Classic, Atomic Pop, etc.) per kategorya.</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px" id="groupCategoryTabs"></div>
@@ -1516,6 +1507,8 @@ function renderRecallGrouped(q){
       ungrouped.push({e,i});
     }
   });
+
+  groupOrder.sort((a,b)=>groupMap[b].length - groupMap[a].length);
 
   let html = `<div style="margin-bottom:10px"><button class="btnGreen" style="width:100%;padding:9px" onclick="openBEModalForGroup(null)">+ Add New Recall Group</button></div>`;
 
