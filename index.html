@@ -1287,7 +1287,7 @@ let BANNERS_DATA = { recall:"", trail:"", emote:"", elimination:"" };
 let BANNERS_ORIGINAL = null;
 let dirtyGroups = false;
 let GROUPS_SHA = "";
-let GROUPS_DATA = { recall:{}, trail:{}, emote:{}, elimination:{} };
+let GROUPS_DATA = { recall:{} };
 let GROUPS_ORIGINAL = null;
 let currentGroupsCategory = "recall";
 let collapsedUpgrades = {};
@@ -1649,7 +1649,7 @@ async function loadEffectGroups(silent){
     GROUPS_SHA = file.sha || "";
     const text = decodeURIComponent(escape(atob(file.content.replace(/\n/g,""))));
     GROUPS_DATA = JSON.parse(text);
-    BE_CATEGORIES.forEach(c=>{ if(typeof GROUPS_DATA[c] !== "object" || Array.isArray(GROUPS_DATA[c])) GROUPS_DATA[c] = {}; });
+    ["recall"].forEach(c=>{ if(typeof GROUPS_DATA[c] !== "object" || Array.isArray(GROUPS_DATA[c])) GROUPS_DATA[c] = {}; });
     GROUPS_ORIGINAL = clone(GROUPS_DATA);
     markGroupsSaved();
     renderGroupImages();
@@ -1667,7 +1667,7 @@ function renderGroupImages(){
   const listEl = document.getElementById("groupImageList");
   if(!tabsEl || !listEl) return;
 
-  tabsEl.innerHTML = BE_CATEGORIES.map(c=>{
+  tabsEl.innerHTML = ["recall"].map(c=>{
     const count = Object.keys(GROUPS_DATA[c]||{}).length;
     const active = c === currentGroupsCategory;
     return `<button class="${active?"btnBlue":"btnDark"}" onclick="setGroupsCategory('${c}')">${capitalize(c)} (${count})</button>`;
