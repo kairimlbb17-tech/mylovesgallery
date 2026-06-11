@@ -874,6 +874,13 @@ body.modal-open{padding-bottom:0!important}
       </div>
 
       <div class="card cut cardGlow">
+        <div class="title">Shizuku Tutorial Link</div>
+        <div class="small">Yung "▶ Watch Full Tutorial on YouTube" button sa Shizuku guide (Permission Setup → How to use Shizuku?). Ilagay dito yung specific tutorial VIDEO mo (hal. https://youtu.be/...). Blank = channel link na lang ang bubuksan.</div>
+        <div class="small" style="margin-top:8px">Tutorial video / link</div>
+        <input id="ytShizukuLink" placeholder="https://youtu.be/XXXXXXX (o channel link)" oninput="onYTInput()">
+      </div>
+
+      <div class="card cut cardGlow">
         <div class="title">Update Check</div>
         <div class="small">Update dialog (lalabas pag latest version &gt; version ng naka-install na app, currently version 7).</div>
         <div class="small" style="margin-top:8px">Enabled</div>
@@ -1352,6 +1359,7 @@ let currentNewsEditIndex = null;
 let dirtyYT = false;
 let YT_SHA = "";
 let YT_DATA = {
+  shizuku_tutorial:"",
   subscribe:{ enabled:true, version:1, banner:"", message:"", channel_link:"" },
   sponsor:{ enabled:true, app_open_enabled:false, button_enabled:false, rotation_enabled:false, rotation_minutes:30, claim_links:[], claim_link:"" },
   update_enabled:false, force_update:false, latest_version:1, update_title:"", update_message:"", update_link:""
@@ -2181,6 +2189,7 @@ function syncYTInputs(){
   set("ytSubBanner", sub.banner || "");
   set("ytSubMessage", sub.message || "");
   set("ytSubLink", sub.channel_link || "");
+  set("ytShizukuLink", YT_DATA.shizuku_tutorial || "");
   updateSubPreview(sub.banner || "");
   set("ytUpdateEnabled", !!YT_DATA.update_enabled);
   set("ytForceUpdate", !!YT_DATA.force_update);
@@ -2206,6 +2215,7 @@ function onYTInput(){
   YT_DATA.subscribe.banner = val("ytSubBanner").trim();
   YT_DATA.subscribe.message = val("ytSubMessage");
   YT_DATA.subscribe.channel_link = val("ytSubLink").trim();
+  YT_DATA.shizuku_tutorial = val("ytShizukuLink").trim();
   YT_DATA.update_enabled = val("ytUpdateEnabled") === "true";
   YT_DATA.force_update = val("ytForceUpdate") === "true";
   YT_DATA.latest_version = parseInt(val("ytLatestVersion"),10) || 1;
@@ -2246,6 +2256,7 @@ async function loadYT(silent){
     const sp = parsed.sponsor || {};
     const sub = parsed.subscribe || {};
     YT_DATA = {
+      shizuku_tutorial: parsed.shizuku_tutorial || "",
       subscribe:{
         enabled: sub.enabled !== false,
         version: parseInt(sub.version,10) || 1,
