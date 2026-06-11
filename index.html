@@ -754,6 +754,163 @@ body.modal-open{padding-bottom:0!important}
       </div>
     </div>
 
+    <div id="carouselPage" class="hidden">
+      <div class="card cut cardGlow">
+        <div class="title">Carousel Manager</div>
+        <div class="badges">
+          <span id="carouselStatus" class="badge badgeBlue">Items: 0</span>
+        </div>
+        <div class="small" style="margin-bottom:10px">Home-screen carousel ng app (carousel.json — hiwalay sa YouTube dialog JSON). Banner image + skin name + role + script. Pag may script, clickable yung card sa app at maa-apply yung skin.</div>
+        <div class="actions" style="grid-template-columns:1fr 1fr">
+          <button class="btnDark" onclick="showDashboardPage()">← Back to Dashboard</button>
+          <button class="btnGreen" onclick="publishChanges()">Publish Changes</button>
+        </div>
+        <div class="actions" style="grid-template-columns:1fr 1fr">
+          <button class="btnBlue" onclick="loadCarousel()">Reload Carousel</button>
+          <button class="btnDark" onclick="downloadCarousel()">Download JSON</button>
+        </div>
+      </div>
+
+      <div class="card cut cardGlow">
+        <div class="title">Carousel Items</div>
+        <div class="toolbar">
+          <input id="carouselSearch" placeholder="Search skin name or role..." oninput="renderCarousel()">
+          <button class="btnGreen" onclick="openCarouselModal()">+ Add Item</button>
+        </div>
+        <div class="small">Order is based sa list order. Use ↑ / ↓ para ayusin kung anong banner mauuna sa carousel.</div>
+        <div id="carouselList"></div>
+      </div>
+    </div>
+
+    <div id="newsPage" class="hidden">
+      <div class="card cut cardGlow">
+        <div class="title">What's New Manager</div>
+        <div class="badges">
+          <span id="newsStatus" class="badge badgeBlue">Entries: 0</span>
+          <span id="newsVersionBadge" class="badge badgePurple">Version: 1</span>
+        </div>
+        <div class="small" style="margin-bottom:10px">Announcement dialog ng app (whatsnew.json). Lalabas ito ONCE per version sa users — pag nag-publish ka ng bagong entries, i-BUMP ang version para lumabas ulit sa lahat. May bell button din sa app para mabuksan nila ulit anytime.</div>
+        <div class="small">Dialog title</div>
+        <input id="newsTitle" placeholder="What's New" oninput="onNewsTitleInput()">
+        <div class="small" style="margin-top:8px">Version (taasan para lumabas ulit ang dialog sa users)</div>
+        <div class="toolbar">
+          <input id="newsVersion" type="number" min="1" oninput="onNewsVersionInput()">
+          <button class="btnBlue" onclick="bumpNewsVersion()">Bump +1</button>
+        </div>
+        <div class="actions" style="grid-template-columns:1fr 1fr">
+          <button class="btnDark" onclick="showDashboardPage()">← Back to Dashboard</button>
+          <button class="btnGreen" onclick="publishChanges()">Publish Changes</button>
+        </div>
+        <div class="actions" style="grid-template-columns:1fr 1fr">
+          <button class="btnBlue" onclick="loadNews()">Reload What's New</button>
+          <button class="btnDark" onclick="downloadNews()">Download JSON</button>
+        </div>
+      </div>
+
+      <div class="card cut cardGlow">
+        <div class="title">Entries</div>
+        <div class="toolbar">
+          <input id="newsSearch" placeholder="Search entry..." oninput="renderNews()">
+          <button class="btnGreen" onclick="openNewsModal()">+ Add Entry</button>
+        </div>
+        <div class="small">Order is based sa list order — unang entry ang pinaka-taas sa dialog.</div>
+        <div id="newsList"></div>
+      </div>
+    </div>
+
+    <div id="ytPage" class="hidden">
+      <div class="card cut cardGlow">
+        <div class="title">YouTube / Sponsor Dialog</div>
+        <div class="badges">
+          <span id="ytStatus" class="badge badgeBlue">Saved</span>
+        </div>
+        <div class="small" style="margin-bottom:10px">Config ng update-check dialog at sponsor/claim (YouTube) dialog ng app — youtube.json. Hiwalay ito sa carousel at What's New.</div>
+        <div class="actions" style="grid-template-columns:1fr 1fr">
+          <button class="btnDark" onclick="showDashboardPage()">← Back to Dashboard</button>
+          <button class="btnGreen" onclick="publishChanges()">Publish Changes</button>
+        </div>
+        <div class="actions" style="grid-template-columns:1fr 1fr">
+          <button class="btnBlue" onclick="loadYT()">Reload Config</button>
+          <button class="btnDark" onclick="downloadYT()">Download JSON</button>
+        </div>
+      </div>
+
+      <div class="card cut cardGlow">
+        <div class="title">YouTube Subscribe Dialog</div>
+        <div class="small">Yung subscribe dialog ng channel mo — lalabas EVERY app open habang Enabled. (Hindi na once-per-version; palaging lalabas.)</div>
+        <div class="small" style="margin-top:8px">Enabled</div>
+        <select id="ytSubEnabled" onchange="onYTInput()">
+          <option value="true">Enabled</option>
+          <option value="false">Disabled</option>
+        </select>
+        <div class="small" style="margin-top:8px">Version (taasan para lumabas ulit sa users)</div>
+        <div class="toolbar">
+          <input id="ytSubVersion" type="number" min="1" oninput="onYTInput()">
+          <button class="btnBlue" onclick="bumpSubVersion()">Bump +1</button>
+        </div>
+        <div class="small" style="margin-top:8px">Banner image URL (optional — blank = yung built-in banner ng app)</div>
+        <input id="ytSubBanner" placeholder="https://... (channel banner art)" oninput="onYTInput(); updateSubPreview(this.value); debounceImageTest('ytSubBanner','ytSubBannerStatus')">
+        <div id="ytSubBannerStatus" class="urlStatus">Image tester ready.</div>
+        <div class="preview cut">
+          <img id="ytSubPreviewImg" src="" onerror="this.style.display='none'" onload="this.style.display='block'" style="width:106px;height:60px;object-fit:cover;border-radius:8px">
+          <div><b>Banner Preview</b><div class="small" id="ytSubPreviewText">Paste banner URL...</div></div>
+        </div>
+        <div class="small" style="margin-top:8px">Message (optional — blank = default text)</div>
+        <textarea id="ytSubMessage" rows="3" placeholder="Subscribing is FREE and keeps this app alive 🐼 ..." oninput="onYTInput()" style="width:100%"></textarea>
+        <div class="small" style="margin-top:8px">Channel link</div>
+        <input id="ytSubLink" placeholder="https://www.youtube.com/@yourchannel" oninput="onYTInput()">
+      </div>
+
+      <div class="card cut cardGlow">
+        <div class="title">Update Check</div>
+        <div class="small">Update dialog (lalabas pag latest version &gt; version ng naka-install na app, currently version 7).</div>
+        <div class="small" style="margin-top:8px">Enabled</div>
+        <select id="ytUpdateEnabled" onchange="onYTInput()">
+          <option value="true">Enabled</option>
+          <option value="false">Disabled</option>
+        </select>
+        <div class="small" style="margin-top:8px">Cancelable? (force update)</div>
+        <select id="ytForceUpdate" onchange="onYTInput()">
+          <option value="false">Cancelable — may "Maybe Later"</option>
+          <option value="true">Forced — WALANG "Maybe Later" (di ma-skip)</option>
+        </select>
+        <div class="small" style="margin-top:8px">Latest version (number)</div>
+        <input id="ytLatestVersion" type="number" min="1" oninput="onYTInput()">
+        <div class="small" style="margin-top:8px">Dialog title</div>
+        <input id="ytUpdateTitle" placeholder="✨ New Update Available ✨" oninput="onYTInput()">
+        <div class="small" style="margin-top:8px">Dialog message</div>
+        <textarea id="ytUpdateMessage" rows="4" placeholder="Update message..." oninput="onYTInput()" style="width:100%"></textarea>
+        <div class="small" style="margin-top:8px">Update link (Play Store / APK link)</div>
+        <input id="ytUpdateLink" placeholder="https://play.google.com/..." oninput="onYTInput()">
+      </div>
+
+      <div class="card cut cardGlow">
+        <div class="title">Sponsor / Claim Dialog</div>
+        <div class="small">Yung dialog na may claim link (YouTube/Temu/etc). "App open" = lalabas pag binuksan ang app. "Button" = yung sponsor button sa app.</div>
+        <div class="small" style="margin-top:8px">Show on app open</div>
+        <select id="ytAppOpen" onchange="onYTInput()">
+          <option value="true">Enabled</option>
+          <option value="false">Disabled</option>
+        </select>
+        <div class="small" style="margin-top:8px">Sponsor button</div>
+        <select id="ytButton" onchange="onYTInput()">
+          <option value="true">Enabled</option>
+          <option value="false">Disabled</option>
+        </select>
+        <div class="small" style="margin-top:8px">Link rotation (umiikot ang claim links bawat X minuto)</div>
+        <select id="ytRotation" onchange="onYTInput()">
+          <option value="true">Enabled</option>
+          <option value="false">Disabled</option>
+        </select>
+        <div class="small" style="margin-top:8px">Rotation minutes</div>
+        <input id="ytRotationMinutes" type="number" min="1" oninput="onYTInput()">
+        <div class="small" style="margin-top:8px">Main claim link (fallback pag walang rotation)</div>
+        <input id="ytClaimLink" placeholder="https://..." oninput="onYTInput()">
+        <div class="small" style="margin-top:8px">Rotation claim links (isa kada line)</div>
+        <textarea id="ytClaimLinks" rows="4" placeholder="https://link1&#10;https://link2" oninput="onYTInput()" style="width:100%"></textarea>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -778,6 +935,18 @@ body.modal-open{padding-bottom:0!important}
     <button class="bnTab" id="bnEffects" onclick="showBattleEffectsPage()">
       <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
       Effects
+    </button>
+    <button class="bnTab" id="bnCarousel" onclick="showCarouselPage()">
+      <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="19" r="0.5"/><circle cx="12" cy="19" r="0.5"/><circle cx="16" cy="19" r="0.5"/></svg>
+      Carousel
+    </button>
+    <button class="bnTab" id="bnNews" onclick="showNewsPage()">
+      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      News
+    </button>
+    <button class="bnTab" id="bnYT" onclick="showYTPage()">
+      <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      YT
     </button>
   </div>
 </nav>
@@ -812,6 +981,68 @@ body.modal-open{padding-bottom:0!important}
     <div class="actions">
       <button class="btnGreen" onclick="saveBEModal()">Save Local</button>
       <button class="btnDark" onclick="closeBEModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="carouselModal">
+  <div class="modalBox cut">
+    <div class="title" id="carouselModalTitle">Add Carousel Item</div>
+    <div class="small">Banner image link (landscape / banner size)</div>
+    <input id="carouselBanner" data-required="Banner URL" placeholder="Banner image URL" oninput="updateCarouselPreview(this.value); validateRequiredInput(this); debounceImageTest('carouselBanner','carouselBannerStatus')">
+    <div id="carouselBannerStatus" class="urlStatus">Image tester ready.</div>
+    <div class="small" style="margin-top:8px">Skin name (lalabas sa box sa baba-kaliwa ng banner)</div>
+    <input id="carouselName" placeholder="ex: Fanny · Skylark">
+    <div class="small" style="margin-top:8px">Role (role icon galing sa app, hindi sa JSON)</div>
+    <select id="carouselRole">
+      <option value="">— None —</option>
+      <option value="Tank">Tank</option>
+      <option value="Fighter">Fighter</option>
+      <option value="Assassin">Assassin</option>
+      <option value="Mage">Mage</option>
+      <option value="Marksman">Marksman</option>
+      <option value="Support">Support</option>
+    </select>
+    <div class="small" style="margin-top:8px">Script ZIP URL (optional — pag wala, image-only banner, hindi clickable)</div>
+    <input id="carouselScript" placeholder="Script ZIP URL">
+    <div class="small" style="margin-top:8px">Hero icon image (optional — AUTO ito galing sa hero DB ng app pag "Hero · Skin" ang name format; lagyan lang pag gusto mong i-override)</div>
+    <input id="carouselImage" placeholder="Hero icon URL (optional, auto from app)">
+    <div class="preview cut">
+      <img id="carouselPreviewImg" src="" onerror="this.style.display='none'" onload="this.style.display='block'" style="width:106px;height:60px;object-fit:cover;border-radius:8px">
+      <div><b>Banner Preview</b><div class="small" id="carouselPreviewText">Paste banner URL...</div></div>
+    </div>
+    <div class="actions">
+      <button class="btnGreen" onclick="saveCarouselModal()">Save Local</button>
+      <button class="btnDark" onclick="closeCarouselModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="newsModal">
+  <div class="modalBox cut">
+    <div class="title" id="newsModalTitle">Add Entry</div>
+    <div class="small">Name / headline (required)</div>
+    <input id="newsName" data-required="Name" placeholder="ex: Fanny · Skylark" oninput="validateRequiredInput(this)">
+    <div class="small" style="margin-top:8px">Tag</div>
+    <select id="newsTag">
+      <option value="NEW SKIN">NEW SKIN</option>
+      <option value="NEW FEATURE">NEW FEATURE</option>
+      <option value="UPDATE">UPDATE</option>
+      <option value="FIX">FIX</option>
+      <option value="">— None —</option>
+    </select>
+    <div class="small" style="margin-top:8px">Description (optional)</div>
+    <input id="newsDesc" placeholder="ex: Available na sa Assassin section!">
+    <div class="small" style="margin-top:8px">Image / thumbnail URL (optional)</div>
+    <input id="newsImage" placeholder="Image URL" oninput="updateNewsPreview(this.value); debounceImageTest('newsImage','newsImageStatus')">
+    <div id="newsImageStatus" class="urlStatus">Image tester ready.</div>
+    <div class="preview cut">
+      <img id="newsPreviewImg" src="" onerror="this.style.display='none'" onload="this.style.display='block'" style="width:60px;height:60px;object-fit:cover;border-radius:8px">
+      <div><b>Preview</b><div class="small" id="newsPreviewText">Paste image URL...</div></div>
+    </div>
+    <div class="actions">
+      <button class="btnGreen" onclick="saveNewsModal()">Save Local</button>
+      <button class="btnDark" onclick="closeNewsModal()">Cancel</button>
     </div>
   </div>
 </div>
@@ -1054,6 +1285,14 @@ const BANNERS_FILE = "effectbanners.json";
 const BANNERS_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${BANNERS_FILE}`;
 const GROUPS_FILE = "effectgroups.json";
 const GROUPS_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${GROUPS_FILE}`;
+const CAROUSEL_FILE = "carousel.json";
+const CAROUSEL_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${CAROUSEL_FILE}`;
+const CAROUSEL_ROLES = ["Tank","Fighter","Assassin","Mage","Marksman","Support"];
+const NEWS_FILE = "whatsnew.json";
+const NEWS_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${NEWS_FILE}`;
+const NEWS_TAGS = ["NEW SKIN","NEW FEATURE","UPDATE","FIX"];
+const YT_FILE = "youtube.json";
+const YT_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${YT_FILE}`;
 
 let TOKEN = "";
 let SHA = "";
@@ -1088,6 +1327,24 @@ let dirtyGroups = false;
 let GROUPS_SHA = "";
 let GROUPS_DATA = { recall:{} };
 let GROUPS_ORIGINAL = null;
+let dirtyCarousel = false;
+let CAROUSEL_SHA = "";
+let CAROUSEL_DATA = [];
+let CAROUSEL_ORIGINAL = null;
+let currentCarouselEditIndex = null;
+let dirtyNews = false;
+let NEWS_SHA = "";
+let NEWS_DATA = { version:1, title:"What's New", items:[] };
+let NEWS_ORIGINAL = null;
+let currentNewsEditIndex = null;
+let dirtyYT = false;
+let YT_SHA = "";
+let YT_DATA = {
+  subscribe:{ enabled:true, version:1, banner:"", message:"", channel_link:"" },
+  sponsor:{ enabled:true, app_open_enabled:false, button_enabled:false, rotation_enabled:false, rotation_minutes:30, claim_links:[], claim_link:"" },
+  update_enabled:false, force_update:false, latest_version:1, update_title:"", update_message:"", update_link:""
+};
+let YT_ORIGINAL = null;
 let currentGroupsCategory = "recall";
 let collapsedUpgrades = {};
 let currentUpgradeBaseIndex = null;
@@ -1537,6 +1794,512 @@ function downloadBattleEffects(){
   showToast("battleeffects.json downloaded.");
 }
 
+/* ===== Carousel (carousel.json — home-screen carousel ng app) ===== */
+
+function markCarouselDirty(){
+  dirtyCarousel = true;
+  const s = document.getElementById("saveStatus");
+  if(s){ s.innerText = "Unsaved Changes"; s.className = "badge unsavedBadge"; }
+  updateCarouselStatus();
+}
+function markCarouselSaved(){
+  dirtyCarousel = false;
+  updateCarouselStatus();
+}
+function updateCarouselStatus(){
+  const s = document.getElementById("carouselStatus");
+  if(s) s.innerText = "Items: " + CAROUSEL_DATA.length + (dirtyCarousel ? " *" : "");
+}
+
+async function loadCarousel(silent){
+  try{
+    if(!silent) setBusy(true,"Loading carousel.json...");
+    const res = await fetch(`${CAROUSEL_API}?ref=${BRANCH}&v=${Date.now()}`,{
+      headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json"},
+      cache:"no-store"
+    });
+    if(res.status === 404){
+      // File not created yet — start empty; publish will create it (PUT w/o sha).
+      CAROUSEL_SHA = "";
+      CAROUSEL_DATA = [];
+      CAROUSEL_ORIGINAL = [];
+      markCarouselSaved();
+      renderCarousel();
+      if(!silent){ showToast("carousel.json wala pa sa repo — magagawa ito sa unang Publish."); log("carousel.json not found (will be created on publish)."); }
+      return;
+    }
+    const file = await res.json();
+    if(!res.ok) throw new Error(JSON.stringify(file));
+    CAROUSEL_SHA = file.sha || "";
+    const text = decodeURIComponent(escape(atob(file.content.replace(/\n/g,""))));
+    const parsed = JSON.parse(text);
+    const arr = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.carousel) ? parsed.carousel : []);
+    CAROUSEL_DATA = arr.map(x => (typeof x === "string")
+      ? { banner:x, name:"", role:"", script:"", image:"" }
+      : { banner:x.banner || "", name:x.name || "", role:x.role || "", script:x.script || "", image:x.image || "" });
+    CAROUSEL_ORIGINAL = clone(CAROUSEL_DATA);
+    markCarouselSaved();
+    renderCarousel();
+    if(!silent){ showToast("Carousel loaded."); log("carousel.json loaded."); }
+  }catch(e){
+    console.error(e);
+    if(!silent){ showToast("Failed to load carousel.json"); log("carousel.json load failed: " + e.toString()); }
+  }finally{
+    if(!silent) setBusy(false);
+  }
+}
+
+function renderCarousel(){
+  updateCarouselStatus();
+  const list = document.getElementById("carouselList");
+  if(!list) return;
+  const search = document.getElementById("carouselSearch");
+  const q = (search ? search.value : "").toLowerCase().trim();
+  const items = CAROUSEL_DATA.map((it,i)=>({it,i}))
+    .filter(x=>!q || [x.it.name,x.it.role].join(" ").toLowerCase().includes(q));
+  if(items.length === 0){
+    list.innerHTML = `<div class="small" style="margin-top:10px">No carousel items yet. Tap "+ Add Item".</div>`;
+    return;
+  }
+  list.innerHTML = items.map(({it,i})=>`
+    <div class="tagManagerCard cut" style="margin-top:10px">
+      <img src="${esc(it.banner)}" style="width:96px;height:54px;object-fit:cover;border-radius:8px" onerror="this.style.opacity=.25">
+      <div style="min-width:0;flex:1">
+        <div class="tagManagerName">${esc(it.name || "(image only)")}</div>
+        <div class="small">Role: ${esc(it.role || "—")}</div>
+        <div class="badges">${it.script
+          ? '<span class="badge badgeGreen">Clickable — may script</span>'
+          : '<span class="badge badgePurple">Image only</span>'}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <button class="btnDark" style="padding:5px 10px;font-size:12px" onclick="moveCarouselItem(${i},-1)">↑</button>
+        <button class="btnDark" style="padding:5px 10px;font-size:12px" onclick="moveCarouselItem(${i},1)">↓</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <button class="btnBlue" style="padding:5px 10px;font-size:12px" onclick="openCarouselModal(${i})">Edit</button>
+        <button class="btnRed" style="padding:5px 10px;font-size:12px" onclick="deleteCarouselItem(${i})">Del</button>
+      </div>
+    </div>`).join("");
+}
+
+function moveCarouselItem(index, dir){
+  const to = index + dir;
+  if(to < 0 || to >= CAROUSEL_DATA.length) return;
+  const tmp = CAROUSEL_DATA[index];
+  CAROUSEL_DATA[index] = CAROUSEL_DATA[to];
+  CAROUSEL_DATA[to] = tmp;
+  markCarouselDirty();
+  renderCarousel();
+}
+
+function deleteCarouselItem(index){
+  const it = CAROUSEL_DATA[index];
+  if(!it) return;
+  showConfirm("Delete Carousel Item", `Delete "${it.name || "image-only banner"}" from the carousel?`, ()=>{
+    CAROUSEL_DATA.splice(index,1);
+    markCarouselDirty();
+    renderCarousel();
+    showToast("Carousel item deleted locally.");
+  });
+}
+
+function openCarouselModal(index){
+  currentCarouselEditIndex = (typeof index === "number") ? index : null;
+  const it = (currentCarouselEditIndex !== null) ? CAROUSEL_DATA[currentCarouselEditIndex] : null;
+  document.getElementById("carouselModalTitle").innerText = it ? "Edit Carousel Item" : "Add Carousel Item";
+  document.getElementById("carouselBanner").value = it ? it.banner : "";
+  document.getElementById("carouselName").value = it ? it.name : "";
+  document.getElementById("carouselRole").value = (it && CAROUSEL_ROLES.includes(it.role)) ? it.role : "";
+  document.getElementById("carouselScript").value = it ? it.script : "";
+  document.getElementById("carouselImage").value = (it && it.image) ? it.image : "";
+  updateCarouselPreview(it ? it.banner : "");
+  document.getElementById("carouselModal").style.display = "flex";
+}
+
+function closeCarouselModal(){
+  document.getElementById("carouselModal").style.display = "none";
+  currentCarouselEditIndex = null;
+}
+
+function updateCarouselPreview(url){
+  const img = document.getElementById("carouselPreviewImg");
+  const txt = document.getElementById("carouselPreviewText");
+  url = String(url || "").trim();
+  if(img){ img.src = url; if(!url) img.style.display = "none"; }
+  if(txt) txt.innerText = url ? "Banner-size preview" : "Paste banner URL...";
+}
+
+function saveCarouselModal(){
+  if(!validateRequiredFields(["carouselBanner"])) return;
+  const item = {
+    banner: document.getElementById("carouselBanner").value.trim(),
+    name: document.getElementById("carouselName").value.trim(),
+    role: document.getElementById("carouselRole").value,
+    script: document.getElementById("carouselScript").value.trim(),
+    image: document.getElementById("carouselImage").value.trim()
+  };
+  if(item.script && !item.name){ showToast("Lagyan ng skin name ang clickable item."); return; }
+  if(currentCarouselEditIndex !== null) CAROUSEL_DATA[currentCarouselEditIndex] = item;
+  else CAROUSEL_DATA.push(item);
+  markCarouselDirty();
+  renderCarousel();
+  closeCarouselModal();
+  showToast("Carousel item saved locally. Publish para umakyat sa GitHub.");
+}
+
+function downloadCarousel(){
+  const blob = new Blob([JSON.stringify(CAROUSEL_DATA, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "carousel.json";
+  document.body.appendChild(a);
+  a.click();
+  URL.revokeObjectURL(a.href);
+  a.remove();
+  showToast("carousel.json downloaded.");
+}
+
+/* ===== What's New (whatsnew.json — announcement dialog ng app) ===== */
+
+function markNewsDirty(){
+  dirtyNews = true;
+  const s = document.getElementById("saveStatus");
+  if(s){ s.innerText = "Unsaved Changes"; s.className = "badge unsavedBadge"; }
+  updateNewsStatus();
+}
+function markNewsSaved(){
+  dirtyNews = false;
+  updateNewsStatus();
+}
+function updateNewsStatus(){
+  const s = document.getElementById("newsStatus");
+  if(s) s.innerText = "Entries: " + (NEWS_DATA.items||[]).length + (dirtyNews ? " *" : "");
+  const v = document.getElementById("newsVersionBadge");
+  if(v) v.innerText = "Version: " + (NEWS_DATA.version||1);
+}
+function syncNewsInputs(){
+  const t = document.getElementById("newsTitle");
+  if(t && document.activeElement !== t) t.value = NEWS_DATA.title || "";
+  const v = document.getElementById("newsVersion");
+  if(v && document.activeElement !== v) v.value = NEWS_DATA.version || 1;
+}
+function onNewsTitleInput(){
+  NEWS_DATA.title = document.getElementById("newsTitle").value;
+  markNewsDirty();
+}
+function onNewsVersionInput(){
+  const n = parseInt(document.getElementById("newsVersion").value, 10);
+  if(!isNaN(n) && n > 0){ NEWS_DATA.version = n; markNewsDirty(); updateNewsStatus(); }
+}
+function bumpNewsVersion(){
+  NEWS_DATA.version = (parseInt(NEWS_DATA.version,10) || 1) + 1;
+  markNewsDirty();
+  syncNewsInputs();
+  updateNewsStatus();
+  showToast("Version bumped to " + NEWS_DATA.version + ". Publish para lumabas ulit sa users.");
+}
+
+async function loadNews(silent){
+  try{
+    if(!silent) setBusy(true,"Loading whatsnew.json...");
+    const res = await fetch(`${NEWS_API}?ref=${BRANCH}&v=${Date.now()}`,{
+      headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json"},
+      cache:"no-store"
+    });
+    if(res.status === 404){
+      NEWS_SHA = "";
+      NEWS_DATA = { version:1, title:"What's New", items:[] };
+      NEWS_ORIGINAL = clone(NEWS_DATA);
+      markNewsSaved();
+      renderNews();
+      if(!silent){ showToast("whatsnew.json wala pa sa repo — magagawa ito sa unang Publish."); log("whatsnew.json not found (will be created on publish)."); }
+      return;
+    }
+    const file = await res.json();
+    if(!res.ok) throw new Error(JSON.stringify(file));
+    NEWS_SHA = file.sha || "";
+    const text = decodeURIComponent(escape(atob(file.content.replace(/\n/g,""))));
+    const parsed = JSON.parse(text);
+    NEWS_DATA = {
+      version: parseInt(parsed.version,10) || 1,
+      title: parsed.title || "What's New",
+      items: Array.isArray(parsed.items) ? parsed.items.map(x=>({
+        image: x.image || "", name: x.name || "", tag: x.tag || "", desc: x.desc || ""
+      })) : []
+    };
+    NEWS_ORIGINAL = clone(NEWS_DATA);
+    markNewsSaved();
+    renderNews();
+    if(!silent){ showToast("What's New loaded."); log("whatsnew.json loaded."); }
+  }catch(e){
+    console.error(e);
+    if(!silent){ showToast("Failed to load whatsnew.json"); log("whatsnew.json load failed: " + e.toString()); }
+  }finally{
+    if(!silent) setBusy(false);
+  }
+}
+
+function renderNews(){
+  updateNewsStatus();
+  syncNewsInputs();
+  const list = document.getElementById("newsList");
+  if(!list) return;
+  const search = document.getElementById("newsSearch");
+  const q = (search ? search.value : "").toLowerCase().trim();
+  const items = (NEWS_DATA.items||[]).map((it,i)=>({it,i}))
+    .filter(x=>!q || [x.it.name,x.it.tag,x.it.desc].join(" ").toLowerCase().includes(q));
+  if(items.length === 0){
+    list.innerHTML = `<div class="small" style="margin-top:10px">No entries yet. Tap "+ Add Entry".</div>`;
+    return;
+  }
+  list.innerHTML = items.map(({it,i})=>`
+    <div class="tagManagerCard cut" style="margin-top:10px">
+      ${it.image ? `<img src="${esc(it.image)}" style="width:54px;height:54px;object-fit:cover;border-radius:8px" onerror="this.style.opacity=.25">` : `<span class="badge badgePurple">NEWS</span>`}
+      <div style="min-width:0;flex:1">
+        <div class="tagManagerName">${esc(it.name||"Untitled")}</div>
+        ${it.tag ? `<div class="badges"><span class="badge badgeGreen">${esc(it.tag)}</span></div>` : ""}
+        <div class="small">${esc(it.desc||"")}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <button class="btnDark" style="padding:5px 10px;font-size:12px" onclick="moveNewsItem(${i},-1)">↑</button>
+        <button class="btnDark" style="padding:5px 10px;font-size:12px" onclick="moveNewsItem(${i},1)">↓</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <button class="btnBlue" style="padding:5px 10px;font-size:12px" onclick="openNewsModal(${i})">Edit</button>
+        <button class="btnRed" style="padding:5px 10px;font-size:12px" onclick="deleteNewsItem(${i})">Del</button>
+      </div>
+    </div>`).join("");
+}
+
+function moveNewsItem(index, dir){
+  const to = index + dir;
+  const arr = NEWS_DATA.items;
+  if(to < 0 || to >= arr.length) return;
+  const tmp = arr[index]; arr[index] = arr[to]; arr[to] = tmp;
+  markNewsDirty();
+  renderNews();
+}
+
+function deleteNewsItem(index){
+  const it = NEWS_DATA.items[index];
+  if(!it) return;
+  showConfirm("Delete Entry", `Delete "${it.name || "Untitled"}" from What's New?`, ()=>{
+    NEWS_DATA.items.splice(index,1);
+    markNewsDirty();
+    renderNews();
+    showToast("Entry deleted locally.");
+  });
+}
+
+function openNewsModal(index){
+  currentNewsEditIndex = (typeof index === "number") ? index : null;
+  const it = (currentNewsEditIndex !== null) ? NEWS_DATA.items[currentNewsEditIndex] : null;
+  document.getElementById("newsModalTitle").innerText = it ? "Edit Entry" : "Add Entry";
+  document.getElementById("newsName").value = it ? it.name : "";
+  document.getElementById("newsTag").value = (it && NEWS_TAGS.includes(it.tag)) ? it.tag : (it && !it.tag ? "" : "NEW SKIN");
+  document.getElementById("newsDesc").value = it ? it.desc : "";
+  document.getElementById("newsImage").value = it ? it.image : "";
+  updateNewsPreview(it ? it.image : "");
+  document.getElementById("newsModal").style.display = "flex";
+}
+
+function closeNewsModal(){
+  document.getElementById("newsModal").style.display = "none";
+  currentNewsEditIndex = null;
+}
+
+function updateNewsPreview(url){
+  const img = document.getElementById("newsPreviewImg");
+  const txt = document.getElementById("newsPreviewText");
+  url = String(url || "").trim();
+  if(img){ img.src = url; if(!url) img.style.display = "none"; }
+  if(txt) txt.innerText = url ? "Thumbnail preview" : "Paste image URL...";
+}
+
+function saveNewsModal(){
+  if(!validateRequiredFields(["newsName"])) return;
+  const item = {
+    image: document.getElementById("newsImage").value.trim(),
+    name: document.getElementById("newsName").value.trim(),
+    tag: document.getElementById("newsTag").value,
+    desc: document.getElementById("newsDesc").value.trim()
+  };
+  if(currentNewsEditIndex !== null) NEWS_DATA.items[currentNewsEditIndex] = item;
+  else NEWS_DATA.items.push(item);
+  markNewsDirty();
+  renderNews();
+  closeNewsModal();
+  showToast("Entry saved locally. Wag kalimutan i-bump ang version bago mag-Publish.");
+}
+
+function downloadNews(){
+  const blob = new Blob([JSON.stringify(NEWS_DATA, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "whatsnew.json";
+  document.body.appendChild(a);
+  a.click();
+  URL.revokeObjectURL(a.href);
+  a.remove();
+  showToast("whatsnew.json downloaded.");
+}
+
+/* ===== YouTube / Sponsor dialog (youtube.json — update check + claim dialog) ===== */
+
+function markYTDirty(){
+  dirtyYT = true;
+  const s = document.getElementById("saveStatus");
+  if(s){ s.innerText = "Unsaved Changes"; s.className = "badge unsavedBadge"; }
+  updateYTStatus();
+}
+function markYTSaved(){
+  dirtyYT = false;
+  updateYTStatus();
+}
+function updateYTStatus(){
+  const s = document.getElementById("ytStatus");
+  if(s) s.innerText = dirtyYT ? "Unsaved *" : "Saved";
+}
+
+function syncYTInputs(){
+  const set = (id,val)=>{ const el=document.getElementById(id); if(el && document.activeElement!==el) el.value = String(val); };
+  const sub = YT_DATA.subscribe || {};
+  set("ytSubEnabled", sub.enabled !== false);
+  set("ytSubVersion", sub.version || 1);
+  set("ytSubBanner", sub.banner || "");
+  set("ytSubMessage", sub.message || "");
+  set("ytSubLink", sub.channel_link || "");
+  updateSubPreview(sub.banner || "");
+  set("ytUpdateEnabled", !!YT_DATA.update_enabled);
+  set("ytForceUpdate", !!YT_DATA.force_update);
+  set("ytLatestVersion", YT_DATA.latest_version || 1);
+  set("ytUpdateTitle", YT_DATA.update_title || "");
+  set("ytUpdateMessage", YT_DATA.update_message || "");
+  set("ytUpdateLink", YT_DATA.update_link || "");
+  const sp = YT_DATA.sponsor || {};
+  set("ytAppOpen", !!sp.app_open_enabled);
+  set("ytButton", !!sp.button_enabled);
+  set("ytRotation", !!sp.rotation_enabled);
+  set("ytRotationMinutes", sp.rotation_minutes || 30);
+  set("ytClaimLink", sp.claim_link || "");
+  const links = document.getElementById("ytClaimLinks");
+  if(links && document.activeElement!==links) links.value = (sp.claim_links||[]).join("\n");
+}
+
+function onYTInput(){
+  const val = id=>{ const el=document.getElementById(id); return el ? el.value : ""; };
+  if(!YT_DATA.subscribe) YT_DATA.subscribe = {};
+  YT_DATA.subscribe.enabled = val("ytSubEnabled") === "true";
+  YT_DATA.subscribe.version = parseInt(val("ytSubVersion"),10) || 1;
+  YT_DATA.subscribe.banner = val("ytSubBanner").trim();
+  YT_DATA.subscribe.message = val("ytSubMessage");
+  YT_DATA.subscribe.channel_link = val("ytSubLink").trim();
+  YT_DATA.update_enabled = val("ytUpdateEnabled") === "true";
+  YT_DATA.force_update = val("ytForceUpdate") === "true";
+  YT_DATA.latest_version = parseInt(val("ytLatestVersion"),10) || 1;
+  YT_DATA.update_title = val("ytUpdateTitle");
+  YT_DATA.update_message = val("ytUpdateMessage");
+  YT_DATA.update_link = val("ytUpdateLink").trim();
+  if(!YT_DATA.sponsor) YT_DATA.sponsor = {};
+  YT_DATA.sponsor.enabled = true;
+  YT_DATA.sponsor.app_open_enabled = val("ytAppOpen") === "true";
+  YT_DATA.sponsor.button_enabled = val("ytButton") === "true";
+  YT_DATA.sponsor.rotation_enabled = val("ytRotation") === "true";
+  YT_DATA.sponsor.rotation_minutes = parseInt(val("ytRotationMinutes"),10) || 30;
+  YT_DATA.sponsor.claim_link = val("ytClaimLink").trim();
+  YT_DATA.sponsor.claim_links = val("ytClaimLinks").split("\n").map(s=>s.trim()).filter(Boolean);
+  markYTDirty();
+}
+
+async function loadYT(silent){
+  try{
+    if(!silent) setBusy(true,"Loading youtube.json...");
+    const res = await fetch(`${YT_API}?ref=${BRANCH}&v=${Date.now()}`,{
+      headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json"},
+      cache:"no-store"
+    });
+    if(res.status === 404){
+      YT_SHA = "";
+      YT_ORIGINAL = clone(YT_DATA);
+      markYTSaved();
+      renderYT();
+      if(!silent){ showToast("youtube.json wala pa sa repo — magagawa ito sa unang Publish."); log("youtube.json not found (will be created on publish)."); }
+      return;
+    }
+    const file = await res.json();
+    if(!res.ok) throw new Error(JSON.stringify(file));
+    YT_SHA = file.sha || "";
+    const text = decodeURIComponent(escape(atob(file.content.replace(/\n/g,""))));
+    const parsed = JSON.parse(text);
+    const sp = parsed.sponsor || {};
+    const sub = parsed.subscribe || {};
+    YT_DATA = {
+      subscribe:{
+        enabled: sub.enabled !== false,
+        version: parseInt(sub.version,10) || 1,
+        banner: sub.banner || "",
+        message: sub.message || "",
+        channel_link: sub.channel_link || ""
+      },
+      sponsor:{
+        enabled: sp.enabled !== false,
+        app_open_enabled: !!sp.app_open_enabled,
+        button_enabled: !!sp.button_enabled,
+        rotation_enabled: !!sp.rotation_enabled,
+        rotation_minutes: parseInt(sp.rotation_minutes,10) || 30,
+        claim_links: Array.isArray(sp.claim_links) ? sp.claim_links : [],
+        claim_link: sp.claim_link || ""
+      },
+      update_enabled: !!parsed.update_enabled,
+      force_update: !!parsed.force_update,
+      latest_version: parseInt(parsed.latest_version,10) || 1,
+      update_title: parsed.update_title || "",
+      update_message: parsed.update_message || "",
+      update_link: parsed.update_link || ""
+    };
+    YT_ORIGINAL = clone(YT_DATA);
+    markYTSaved();
+    renderYT();
+    if(!silent){ showToast("YouTube config loaded."); log("youtube.json loaded."); }
+  }catch(e){
+    console.error(e);
+    if(!silent){ showToast("Failed to load youtube.json"); log("youtube.json load failed: " + e.toString()); }
+  }finally{
+    if(!silent) setBusy(false);
+  }
+}
+
+function renderYT(){
+  updateYTStatus();
+  syncYTInputs();
+}
+
+function downloadYT(){
+  const blob = new Blob([JSON.stringify(YT_DATA, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "youtube.json";
+  document.body.appendChild(a);
+  a.click();
+  URL.revokeObjectURL(a.href);
+  a.remove();
+  showToast("youtube.json downloaded.");
+}
+
+function bumpSubVersion(){
+  const el = document.getElementById("ytSubVersion");
+  const v = (parseInt(el && el.value, 10) || 1) + 1;
+  if(el) el.value = v;
+  onYTInput();
+}
+
+function updateSubPreview(url){
+  const img = document.getElementById("ytSubPreviewImg");
+  const txt = document.getElementById("ytSubPreviewText");
+  if(img) img.src = url || "";
+  if(txt) txt.innerText = url ? url : "Paste banner URL...";
+}
+
 function markBannersDirty(){
   dirtyBanners = true;
   const s = document.getElementById("saveStatus");
@@ -1716,10 +2479,13 @@ function upgradeLog(msg){
 }
 
 function hideBEPage(){ const p=document.getElementById("battleEffectsPage"); if(p) p.classList.add("hidden"); }
+function hideCarouselPage(){ const p=document.getElementById("carouselPage"); if(p) p.classList.add("hidden"); }
+function hideNewsPage(){ const p=document.getElementById("newsPage"); if(p) p.classList.add("hidden"); }
+function hideYTPage(){ const p=document.getElementById("ytPage"); if(p) p.classList.add("hidden"); }
 
 function setActiveTab(id){
-  var labels={'bnHome':'Dashboard','bnUpgrade':'Upgrade Skins','bnModskin':'ModSkins','bnTags':'Skin Tags','bnEffects':'Battle Effects'};
-  ['bnHome','bnUpgrade','bnModskin','bnTags','bnEffects'].forEach(function(t){
+  var labels={'bnHome':'Dashboard','bnUpgrade':'Upgrade Skins','bnModskin':'ModSkins','bnTags':'Skin Tags','bnEffects':'Battle Effects','bnCarousel':'Carousel','bnNews':"What's New",'bnYT':'YouTube / Sponsor'};
+  ['bnHome','bnUpgrade','bnModskin','bnTags','bnEffects','bnCarousel','bnNews','bnYT'].forEach(function(t){
     var el=document.getElementById(t); if(el) el.classList.remove('active');
   });
   var a=document.getElementById(id); if(a) a.classList.add('active');
@@ -1732,6 +2498,9 @@ function showUpgradePage(){
   document.getElementById("modskinPage").classList.add("hidden");
   const tagPage=document.getElementById("skinTagPage"); if(tagPage) tagPage.classList.add("hidden");
   hideBEPage();
+  hideCarouselPage();
+  hideNewsPage();
+  hideYTPage();
   setActiveTab('bnUpgrade');
   renderUpgrades();
   window.scrollTo(0,0);
@@ -1743,6 +2512,9 @@ function showModskinPage(){
   document.getElementById("modskinPage").classList.remove("hidden");
   const tagPage=document.getElementById("skinTagPage"); if(tagPage) tagPage.classList.add("hidden");
   hideBEPage();
+  hideCarouselPage();
+  hideNewsPage();
+  hideYTPage();
   setActiveTab('bnModskin');
   renderModskins();
   window.scrollTo(0,0);
@@ -1754,6 +2526,9 @@ function showSkinTagPage(){
   document.getElementById("modskinPage").classList.add("hidden");
   const tagPage=document.getElementById("skinTagPage"); if(tagPage) tagPage.classList.remove("hidden");
   hideBEPage();
+  hideCarouselPage();
+  hideNewsPage();
+  hideYTPage();
   setActiveTab('bnTags');
   renderSkinTagManager();
   window.scrollTo(0,0);
@@ -1764,9 +2539,54 @@ function showBattleEffectsPage(){
   document.getElementById("upgradePage").classList.add("hidden");
   document.getElementById("modskinPage").classList.add("hidden");
   const tagPage=document.getElementById("skinTagPage"); if(tagPage) tagPage.classList.add("hidden");
+  hideCarouselPage();
+  hideNewsPage();
+  hideYTPage();
   document.getElementById("battleEffectsPage").classList.remove("hidden");
   setActiveTab('bnEffects');
   renderBattleEffects();
+  window.scrollTo(0,0);
+}
+
+function showCarouselPage(){
+  document.getElementById("dashboardPage").classList.add("hidden");
+  document.getElementById("upgradePage").classList.add("hidden");
+  document.getElementById("modskinPage").classList.add("hidden");
+  const tagPage=document.getElementById("skinTagPage"); if(tagPage) tagPage.classList.add("hidden");
+  hideBEPage();
+  hideNewsPage();
+  hideYTPage();
+  document.getElementById("carouselPage").classList.remove("hidden");
+  setActiveTab('bnCarousel');
+  renderCarousel();
+  window.scrollTo(0,0);
+}
+
+function showNewsPage(){
+  document.getElementById("dashboardPage").classList.add("hidden");
+  document.getElementById("upgradePage").classList.add("hidden");
+  document.getElementById("modskinPage").classList.add("hidden");
+  const tagPage=document.getElementById("skinTagPage"); if(tagPage) tagPage.classList.add("hidden");
+  hideBEPage();
+  hideCarouselPage();
+  hideYTPage();
+  document.getElementById("newsPage").classList.remove("hidden");
+  setActiveTab('bnNews');
+  renderNews();
+  window.scrollTo(0,0);
+}
+
+function showYTPage(){
+  document.getElementById("dashboardPage").classList.add("hidden");
+  document.getElementById("upgradePage").classList.add("hidden");
+  document.getElementById("modskinPage").classList.add("hidden");
+  const tagPage=document.getElementById("skinTagPage"); if(tagPage) tagPage.classList.add("hidden");
+  hideBEPage();
+  hideCarouselPage();
+  hideNewsPage();
+  document.getElementById("ytPage").classList.remove("hidden");
+  setActiveTab('bnYT');
+  renderYT();
   window.scrollTo(0,0);
 }
 
@@ -1775,6 +2595,9 @@ function showDashboardPage(){
   document.getElementById("modskinPage").classList.add("hidden");
   const tagPage=document.getElementById("skinTagPage"); if(tagPage) tagPage.classList.add("hidden");
   hideBEPage();
+  hideCarouselPage();
+  hideNewsPage();
+  hideYTPage();
   document.getElementById("dashboardPage").classList.remove("hidden");
   setActiveTab('bnHome');
   render();
@@ -2066,6 +2889,9 @@ async function loadData(){
     await loadBattleEffects(true);
     await loadEffectBanners(true);
     await loadEffectGroups(true);
+    await loadCarousel(true);
+    await loadNews(true);
+    await loadYT(true);
     log("Loaded.");
     showToast("Dashboard updated.");
   }catch(e){
@@ -2077,12 +2903,12 @@ async function loadData(){
 }
 
 async function publishChanges(){
-  if(!dirty && !dirtyTags && !dirtyUpgrade && !dirtyModskin && !dirtyBE && !dirtyBanners && !dirtyGroups){
+  if(!dirty && !dirtyTags && !dirtyUpgrade && !dirtyModskin && !dirtyBE && !dirtyBanners && !dirtyGroups && !dirtyCarousel && !dirtyNews && !dirtyYT){
     showToast("No changes to publish.");
     return;
   }
 
-  showConfirm("Publish Changes","This will commit local edits to GitHub. It can update skins.json, tags.json, skin_upgrades.json, modskins.json, battleeffects.json, and effectbanners.json. Continue?",async()=>{
+  showConfirm("Publish Changes","This will commit local edits to GitHub. It can update skins.json, tags.json, skin_upgrades.json, modskins.json, battleeffects.json, effectbanners.json, carousel.json, whatsnew.json, and youtube.json. Continue?",async()=>{
     try{
       normalizeData();
       createBackupDownload("before_publish");
@@ -2371,6 +3197,87 @@ async function publishChanges(){
         log("effectgroups.json published.");
       }
 
+      if(dirtyCarousel){
+        // carousel.json may not exist yet — a 404 here means "create on first publish".
+        let carSha = "";
+        const latestCar=await fetch(`${CAROUSEL_API}?ref=${BRANCH}`,{
+          headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json"}
+        });
+        if(latestCar.status !== 404){
+          const latestCarFile=await latestCar.json();
+          if(!latestCar.ok){ log(JSON.stringify(latestCarFile,null,2)); showToast("Cannot get latest carousel SHA"); return; }
+          carSha = latestCarFile.sha || "";
+        }
+        const carContent=btoa(unescape(encodeURIComponent(JSON.stringify(CAROUSEL_DATA,null,2))));
+        const carBody={message:"Update carousel.json from Warlito Admin Panel",content:carContent,branch:BRANCH};
+        if(carSha) carBody.sha = carSha;
+        const carRes=await fetch(CAROUSEL_API,{
+          method:"PUT",
+          headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json","Content-Type":"application/json"},
+          body:JSON.stringify(carBody)
+        });
+        const carResult=await carRes.json();
+        if(!carRes.ok){ log(JSON.stringify(carResult,null,2)); showToast("carousel.json publish failed."); return; }
+        CAROUSEL_SHA=carResult.content.sha;
+        CAROUSEL_ORIGINAL=clone(CAROUSEL_DATA);
+        markCarouselSaved();
+        log("carousel.json published.");
+      }
+
+      if(dirtyNews){
+        // whatsnew.json may not exist yet — a 404 here means "create on first publish".
+        let newsSha = "";
+        const latestNews=await fetch(`${NEWS_API}?ref=${BRANCH}`,{
+          headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json"}
+        });
+        if(latestNews.status !== 404){
+          const latestNewsFile=await latestNews.json();
+          if(!latestNews.ok){ log(JSON.stringify(latestNewsFile,null,2)); showToast("Cannot get latest whatsnew SHA"); return; }
+          newsSha = latestNewsFile.sha || "";
+        }
+        const newsContent=btoa(unescape(encodeURIComponent(JSON.stringify(NEWS_DATA,null,2))));
+        const newsBody={message:"Update whatsnew.json from Warlito Admin Panel",content:newsContent,branch:BRANCH};
+        if(newsSha) newsBody.sha = newsSha;
+        const newsRes=await fetch(NEWS_API,{
+          method:"PUT",
+          headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json","Content-Type":"application/json"},
+          body:JSON.stringify(newsBody)
+        });
+        const newsResult=await newsRes.json();
+        if(!newsRes.ok){ log(JSON.stringify(newsResult,null,2)); showToast("whatsnew.json publish failed."); return; }
+        NEWS_SHA=newsResult.content.sha;
+        NEWS_ORIGINAL=clone(NEWS_DATA);
+        markNewsSaved();
+        log("whatsnew.json published.");
+      }
+
+      if(dirtyYT){
+        // youtube.json may not exist yet — a 404 here means "create on first publish".
+        let ytSha = "";
+        const latestYT=await fetch(`${YT_API}?ref=${BRANCH}`,{
+          headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json"}
+        });
+        if(latestYT.status !== 404){
+          const latestYTFile=await latestYT.json();
+          if(!latestYT.ok){ log(JSON.stringify(latestYTFile,null,2)); showToast("Cannot get latest youtube SHA"); return; }
+          ytSha = latestYTFile.sha || "";
+        }
+        const ytContent=btoa(unescape(encodeURIComponent(JSON.stringify(YT_DATA,null,2))));
+        const ytBody={message:"Update youtube.json from Warlito Admin Panel",content:ytContent,branch:BRANCH};
+        if(ytSha) ytBody.sha = ytSha;
+        const ytRes=await fetch(YT_API,{
+          method:"PUT",
+          headers:{"Authorization":`Bearer ${TOKEN}`,"Accept":"application/vnd.github+json","Content-Type":"application/json"},
+          body:JSON.stringify(ytBody)
+        });
+        const ytResult=await ytRes.json();
+        if(!ytRes.ok){ log(JSON.stringify(ytResult,null,2)); showToast("youtube.json publish failed."); return; }
+        YT_SHA=ytResult.content.sha;
+        YT_ORIGINAL=clone(YT_DATA);
+        markYTSaved();
+        log("youtube.json published.");
+      }
+
       markSaved();
       markTagsSaved();
       markUpgradeSaved();
@@ -2378,6 +3285,9 @@ async function publishChanges(){
       markBESaved();
       markBannersSaved();
       markGroupsSaved();
+      markCarouselSaved();
+      markNewsSaved();
+      markYTSaved();
       render();
       renderUpgrades();
       renderModskins();
@@ -2385,6 +3295,8 @@ async function publishChanges(){
       renderBattleEffects();
       renderBanners();
       renderGroupImages();
+      renderCarousel();
+      renderNews();
       log("Published.");
       showToast("Published to GitHub.");
     }catch(e){
@@ -2432,6 +3344,21 @@ function discardChanges(){
       GROUPS_DATA=clone(GROUPS_ORIGINAL);
       markGroupsSaved();
       renderGroupImages();
+    }
+    if(CAROUSEL_ORIGINAL){
+      CAROUSEL_DATA=clone(CAROUSEL_ORIGINAL);
+      markCarouselSaved();
+      renderCarousel();
+    }
+    if(NEWS_ORIGINAL){
+      NEWS_DATA=clone(NEWS_ORIGINAL);
+      markNewsSaved();
+      renderNews();
+    }
+    if(YT_ORIGINAL){
+      YT_DATA=clone(YT_ORIGINAL);
+      markYTSaved();
+      renderYT();
     }
     render();
     renderUpgrades();
