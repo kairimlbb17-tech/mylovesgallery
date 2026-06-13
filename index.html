@@ -436,6 +436,71 @@ body.modal-open{padding-bottom:0!important}
   .brand h1{font-size:15px}
   .modalBox{padding:16px}
 }
+
+/* ============================================================
+   BEGINNER UI — guide callouts, numbered steps, collapsible data
+   Added so new admins can understand each section, and so heavy
+   data lists stay hidden until a "Show" button is tapped.
+   ============================================================ */
+
+/* Help callout box (explains what a section does) */
+.guide{
+  display:flex;gap:11px;align-items:flex-start;
+  background:linear-gradient(135deg,#eff6ff,#eef2ff);
+  border:1px solid #c7d2fe;border-radius:var(--radius-sm);
+  padding:12px 14px;margin-bottom:12px;
+}
+.guide>svg{flex:0 0 auto;width:18px;height:18px;color:var(--blue);margin-top:1px}
+.guide .gtext{font-size:12.5px;line-height:1.55;color:#334155;white-space:normal}
+.guide .gtext b{color:var(--text);font-weight:800}
+.guide.green{background:linear-gradient(135deg,#ecfdf5,#f0fdf4);border-color:#a7f3d0}
+.guide.green>svg{color:var(--green)}
+.guide.yellow{background:linear-gradient(135deg,#fffbeb,#fefce8);border-color:#fde68a}
+.guide.yellow>svg{color:var(--yellow)}
+.guide.purple{background:linear-gradient(135deg,#faf5ff,#f5f3ff);border-color:#ddd6fe}
+.guide.purple>svg{color:var(--purple)}
+.guide.red{background:linear-gradient(135deg,#fef2f2,#fff1f2);border-color:#fecaca}
+.guide.red>svg{color:var(--red)}
+
+/* Numbered step list (how-to inside a guide) */
+.steps{list-style:none;margin:7px 0 0;padding:0;counter-reset:s}
+.steps li{
+  counter-increment:s;position:relative;padding:3px 0 3px 27px;
+  font-size:12.5px;line-height:1.55;color:#334155;white-space:normal;
+}
+.steps li::before{
+  content:counter(s);position:absolute;left:0;top:2px;
+  width:19px;height:19px;background:var(--blue);color:#fff;border-radius:50%;
+  font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;
+}
+
+/* Collapsible data section: hidden until "Show" is tapped */
+.dataSection{margin-top:2px}
+.dataHead{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  cursor:pointer;user-select:none;padding:2px 0;
+}
+.dataHead .dhTitle{
+  font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em;
+  display:flex;align-items:center;gap:9px;min-width:0;
+}
+.dataHead .dhTitle>svg{width:18px;height:18px;flex:0 0 auto;color:var(--blue)}
+.dataHead .dhCount{
+  font-size:11px;font-weight:800;color:var(--muted);
+  background:var(--surface-3);padding:2px 9px;border-radius:var(--r999);flex:0 0 auto;
+}
+.dataToggle{
+  display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;
+  font-size:12.5px;font-weight:800;color:var(--blue);
+  background:var(--blue-lt);border:none;border-radius:var(--r999);
+  padding:8px 15px;cursor:pointer;min-height:36px;transition:filter .15s;
+}
+.dataToggle:active{filter:brightness(.95)}
+.dataToggle .chev{width:15px;height:15px;transition:transform .2s}
+.dataSection.open .dataToggle .chev{transform:rotate(180deg)}
+.dataWrap{display:none;margin-top:13px}
+.dataSection.open .dataWrap{display:block}
+.dataHint{font-size:11.5px;color:var(--muted-lt);margin-top:3px;white-space:normal}
 </style>
 </head>
 
@@ -472,7 +537,27 @@ body.modal-open{padding-bottom:0!important}
     <div id="dashboardPage">
 
     <div class="card cut cardGlow">
+      <div class="title" style="display:flex;align-items:center;gap:8px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Welcome, Admin!</div>
+      <div class="guide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <div class="gtext">
+          Ito ang control panel ng app. Lahat ng binago mo dito ay <b>naka-save muna sa device mo</b> — hindi pa ito nakikita ng users hangga't hindi mo pinindot ang <b>Publish</b>.
+          <ol class="steps">
+            <li>Pumili ng section sa baba (Heroes, ModSkins, Battle Effects, atbp.).</li>
+            <li>Mag-<b>Add</b> o mag-<b>Edit</b> ng laman.</li>
+            <li>Pindutin ang <b>Preview</b> para tingnan muna bago i-save.</li>
+            <li>Pindutin ang <b>Publish</b> para mai-save online at makita ng users.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div class="card cut cardGlow">
       <div class="title">Publish Center</div>
+      <div class="guide green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <div class="gtext"><b>Publish</b> = i-save ang changes online (makikita na ng users). <b>Preview</b> = tingnan muna bago i-save. <b>Discard / Reload</b> = kanselahin ang mga hindi pa na-publish na changes.</div>
+      </div>
       <div class="badges">
         <span id="saveStatus" class="badge badgeGreen">Saved</span>
         <span id="tagStatus" class="badge badgePurple">Tags: 0</span>
@@ -597,19 +682,43 @@ body.modal-open{padding-bottom:0!important}
       </div>
     </div>
     <div class="card cut">
-      <div class="title">Heroes</div>
-      <div id="heroesList" class="grid"></div>
+      <div id="heroesSection" class="dataSection">
+        <div class="dataHead" onclick="toggleData('heroes')">
+          <div class="dhTitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>All Heroes &amp; Skins</div>
+          <button class="dataToggle" type="button"><span id="heroesLbl">Show</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+        </div>
+        <div class="dataHint">Naka-hide muna ang listahan para malinis. Tapikin ang <b>Show</b> para makita at i-edit ang bawat hero at skin.</div>
+        <div class="dataWrap">
+          <div id="heroesList" class="grid"></div>
+        </div>
+      </div>
     </div>
 
     <div class="card cut">
-      <div class="title">Logs</div>
-      <div id="log" class="cut"></div>
+      <div id="logsSection" class="dataSection">
+        <div class="dataHead" onclick="toggleData('logs')">
+          <div class="dhTitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Logs</div>
+          <button class="dataToggle" type="button"><span id="logsLbl">Show</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+        </div>
+        <div class="dataHint">Technical na record ng load/publish. Para lang ito kapag may error na ipa-check.</div>
+        <div class="dataWrap">
+          <div id="log" class="cut"></div>
+        </div>
+      </div>
     </div>
 
     <div class="card cut">
-      <div class="title">Activity History</div>
-      <div id="activityList" class="activityList"><div class="activityItem">No local activity yet.</div></div>
-      <div class="toolStrip"><button class="btnDark" onclick="clearActivityHistory()">Clear Activity</button></div>
+      <div id="activitySection" class="dataSection">
+        <div class="dataHead" onclick="toggleData('activity')">
+          <div class="dhTitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Activity History</div>
+          <button class="dataToggle" type="button"><span id="activityLbl">Show</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+        </div>
+        <div class="dataHint">Listahan ng mga ginawa mo sa device na ito (add, edit, delete) bago mag-publish.</div>
+        <div class="dataWrap">
+          <div id="activityList" class="activityList"><div class="activityItem">No local activity yet.</div></div>
+          <div class="toolStrip"><button class="btnDark" onclick="clearActivityHistory()">Clear Activity</button></div>
+        </div>
+      </div>
     </div>
 
     </div>
@@ -628,12 +737,24 @@ body.modal-open{padding-bottom:0!important}
         <span id="upgradeStatus" class="badge badgePurple">Upgrades: 0</span>
         <span id="upgradeTargetStatus" class="badge badgeGreen">Targets: 0</span>
       </div>
+      <div class="guide purple">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        <div class="gtext">Dito ang mga skin na may <b>upgrade path</b> (base skin → mas mataas na bersyon). Mag-<b>Add Base</b> muna, tapos lagyan ng mga target/upgrade na skin.</div>
+      </div>
       <div class="toolbar">
         <input id="upgradeSearch" placeholder="Search hero, base, target, tag..." oninput="renderUpgrades()">
         <button class="btnGreen" onclick="openUpgradeBaseModal()">+ Add Base</button>
         <button class="btnDark" onclick="loadUpgradeData()">Reload Upgrades</button>
       </div>
-      <div id="upgradeList" class="upgradeList"></div>
+      <div id="upgradeSection" class="dataSection">
+        <div class="dataHead" onclick="toggleData('upgrade')">
+          <div class="dhTitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Upgrade List</div>
+          <button class="dataToggle" type="button"><span id="upgradeLbl">Show</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+        </div>
+        <div class="dataWrap">
+          <div id="upgradeList" class="upgradeList"></div>
+        </div>
+      </div>
     </div>
 
 
@@ -686,7 +807,15 @@ body.modal-open{padding-bottom:0!important}
           <button class="btnBlue" onclick="renderSkinTagManager()">Refresh List</button>
           <button class="btnDark" onclick="sortTagsByUsage()">Sort by Usage</button>
         </div>
-        <div id="tagManagerList" class="tagManagerList"></div>
+        <div id="tagsSection" class="dataSection">
+          <div class="dataHead" onclick="toggleData('tags')">
+            <div class="dhTitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>All Skin Tags</div>
+            <button class="dataToggle" type="button"><span id="tagsLbl">Show</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+          </div>
+          <div class="dataWrap">
+            <div id="tagManagerList" class="tagManagerList"></div>
+          </div>
+        </div>
       </div>
 
       <div class="card cut">
@@ -710,13 +839,24 @@ body.modal-open{padding-bottom:0!important}
 
       <div class="card cut cardGlow">
         <div class="title">Add / Manage ModSkins</div>
+        <div class="guide green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          <div class="gtext"><b>ModSkins</b> = mga custom/standalone skins na walang specific hero. Pindutin ang <b>+ Add ModSkin</b>, punan ang name + image + script URL, tapos i-save. Gamitin ang ↑ / ↓ para sa order sa app.</div>
+        </div>
         <div class="toolbar">
           <input id="modskinSearch" placeholder="Search modskin, category, series, tag..." oninput="renderModskins()">
           <button class="btnGreen" onclick="openModskinModal()">+ Add ModSkin</button>
           <button class="btnDark" onclick="loadModskinData()">Reload ModSkins</button>
         </div>
-        <div class="small">Order is based sa list order. Use ↑ / ↓ para piliin kung anong skin mauuna sa app.</div>
-        <div id="modskinList" class="modskinList"></div>
+        <div id="modskinSection" class="dataSection">
+          <div class="dataHead" onclick="toggleData('modskin')">
+            <div class="dhTitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>All ModSkins</div>
+            <button class="dataToggle" type="button"><span id="modskinLbl">Show</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+          </div>
+          <div class="dataWrap">
+            <div id="modskinList" class="modskinList"></div>
+          </div>
+        </div>
       </div>
 
       <div class="card cut">
@@ -758,11 +898,23 @@ body.modal-open{padding-bottom:0!important}
 
       <div class="card cut cardGlow">
         <div class="title" id="beListTitle">Effects</div>
+        <div class="guide yellow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <div class="gtext">Pumili muna ng <b>Category</b> sa taas (Recall, Trail, Emote, Elimination), tapos <b>+ Add Effect</b>. Punan ang effect name + image + script URL.</div>
+        </div>
         <div class="toolbar">
           <input id="beSearch" placeholder="Search effect name..." oninput="renderBattleEffects()">
           <button class="btnGreen" onclick="openBEModal()">+ Add Effect</button>
         </div>
-        <div id="beList"></div>
+        <div id="effectsSection" class="dataSection">
+          <div class="dataHead" onclick="toggleData('effects')">
+            <div class="dhTitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Effects List</div>
+            <button class="dataToggle" type="button"><span id="effectsLbl">Show</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+          </div>
+          <div class="dataWrap">
+            <div id="beList"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -790,7 +942,15 @@ body.modal-open{padding-bottom:0!important}
           <button class="btnGreen" onclick="openCarouselModal()">+ Add Item</button>
         </div>
         <div class="small">Order is based sa list order. Use ↑ / ↓ para ayusin kung anong banner mauuna sa carousel.</div>
-        <div id="carouselList"></div>
+        <div id="carouselSection" class="dataSection">
+          <div class="dataHead" onclick="toggleData('carousel')">
+            <div class="dhTitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Carousel Items</div>
+            <button class="dataToggle" type="button"><span id="carouselLbl">Show</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+          </div>
+          <div class="dataWrap">
+            <div id="carouselList"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -826,7 +986,15 @@ body.modal-open{padding-bottom:0!important}
           <button class="btnGreen" onclick="openNewsModal()">+ Add Entry</button>
         </div>
         <div class="small">Order is based sa list order — unang entry ang pinaka-taas sa dialog.</div>
-        <div id="newsList"></div>
+        <div id="newsSection" class="dataSection">
+          <div class="dataHead" onclick="toggleData('news')">
+            <div class="dhTitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>What's New Entries</div>
+            <button class="dataToggle" type="button"><span id="newsLbl">Show</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+          </div>
+          <div class="dataWrap">
+            <div id="newsList"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -3497,7 +3665,7 @@ function openEditSkin(heroIndex,skinIndex){
   currentSelectedTags = normalizeSkinTags(skin.tags || []);
 
   document.getElementById("modalTitle").innerText=`Edit Skin - ${hero.name}`;
-  document.getElementById("skinName").value=skin.name||"";
+  document.getElementById("skinName").value=skin.skin_name||skin.name||"";
   document.getElementById("skinImage").value=skin.image||"";
   document.getElementById("skinScript").value=skin.script||"";
   document.getElementById("tagSearch").value="";
@@ -3551,12 +3719,13 @@ function saveSkinModal(){
 
   const skinData={
     id:old?old.id:makeSkinId(hero),
-    name:skinName,
+    skin_name:skinName,
     image,
     script,
     featured,
     enabled,
-    tags
+    tags,
+    name:old&&old.name!==undefined?old.name:""
   };
 
   if(currentSkinIndex===null){
@@ -3618,6 +3787,17 @@ function toggleSkin(heroIndex,skinIndex){
 function toggleCollapse(heroId){
   collapsed[heroId]=!collapsed[heroId];
   render();
+}
+
+/* Show/Hide a collapsible data section. Keeps the heavy lists hidden by
+   default so the panel stays clean; the list id never changes so all the
+   existing render functions keep working whether it is open or not. */
+function toggleData(key){
+  var sec=document.getElementById(key+'Section');
+  if(!sec)return;
+  var open=sec.classList.toggle('open');
+  var lbl=document.getElementById(key+'Lbl');
+  if(lbl)lbl.textContent=open?'Hide':'Show';
 }
 
 function livePreview(){
@@ -4383,7 +4563,7 @@ function render(){
         <img src="${skin.image}" onerror="this.style.opacity=.25">
         <div class="skinBody">
           <label class="selectSkinBox"><input type="checkbox" onchange="toggleSkinSelection(${hi},${realIndex},this.checked)" ${selectedSkinKeys[skinKey(hi,realIndex)]?"checked":""}> Select</label>
-          <div class="skinTitle">${skin.featured?"Featured Skin":"Skin"} • ${skin.name ? esc(skin.name) : "No Name"} • ${skin.enabled?"Visible":"Hidden"}</div>
+          <div class="skinTitle">${skin.featured?"Featured Skin":"Skin"} • ${(skin.skin_name||skin.name) ? esc(skin.skin_name||skin.name) : "No Name"} • ${skin.enabled?"Visible":"Hidden"}</div>
           <div class="small">ID: ${skin.id}</div>
           <div class="small">IMG: ${skin.image}</div>
           <div class="small">ZIP: ${skin.script}</div>
@@ -4670,7 +4850,7 @@ function collectImageTargets(){
   try{
     (DATA.heroes||[]).forEach((hero,heroIndex)=>{
       (hero.skins||[]).forEach((skin,skinIndex)=>{
-        targets.push({type:'skin',group:'Hero Skin',title:(hero.name||hero.id||'Hero')+' • '+(skin.name||skin.id||'Skin'),meta:'skins.json / '+(hero.category||'')+' / '+(skin.enabled?'visible':'hidden'),url:String(skin.image||'').trim(),heroIndex,skinIndex});
+        targets.push({type:'skin',group:'Hero Skin',title:(hero.name||hero.id||'Hero')+' • '+(skin.skin_name||skin.name||skin.id||'Skin'),meta:'skins.json / '+(hero.category||'')+' / '+(skin.enabled?'visible':'hidden'),url:String(skin.image||'').trim(),heroIndex,skinIndex});
       });
     });
   }catch(e){console.warn('collect skins failed',e)}
@@ -4990,7 +5170,7 @@ window.removeBrokenImageUrl=removeBrokenImageUrl;
 
   function collectTargetsFinal(){
     const arr=[];
-    try{ (window.DATA?.heroes||DATA.heroes||[]).forEach((h,hi)=>{ (h.skins||[]).forEach((s,si)=>{ if(String(s.image||'').trim()) arr.push({type:'skin',group:'Hero Skin',title:(h.name||h.id||'Hero')+' • '+(s.name||s.id||'Skin'),meta:'skins.json / '+(h.category||''),url:String(s.image||'').trim(),heroIndex:hi,skinIndex:si}); }); }); }catch(e){}
+    try{ (window.DATA?.heroes||DATA.heroes||[]).forEach((h,hi)=>{ (h.skins||[]).forEach((s,si)=>{ if(String(s.image||'').trim()) arr.push({type:'skin',group:'Hero Skin',title:(h.name||h.id||'Hero')+' • '+(s.skin_name||s.name||s.id||'Skin'),meta:'skins.json / '+(h.category||''),url:String(s.image||'').trim(),heroIndex:hi,skinIndex:si}); }); }); }catch(e){}
     try{ ((window.UPGRADE_DATA?.skin_upgrades||UPGRADE_DATA.skin_upgrades||[])).forEach((b,bi)=>{ if(String(b.base_image||'').trim()) arr.push({type:'upgradeBase',group:'Upgrade Base',title:(b.hero||'Hero')+' • '+(b.base_name||b.id||'Base'),meta:'skin_upgrades.json / base image',url:String(b.base_image||'').trim(),baseIndex:bi}); (b.targets||[]).forEach((t,ti)=>{ if(String(t.image||'').trim()) arr.push({type:'upgradeTarget',group:'Upgrade Target',title:(b.base_name||b.id||'Base')+' → '+(t.name||t.id||'Target'),meta:'skin_upgrades.json / target image',url:String(t.image||'').trim(),baseIndex:bi,targetIndex:ti}); }); }); }catch(e){}
     try{ ((window.MODSKIN_DATA?.modskins||MODSKIN_DATA.modskins||[])).forEach((m,mi)=>{ if(String(m.image||'').trim()) arr.push({type:'modskin',group:'ModSkin',title:m.name||m.id||'ModSkin',meta:'modskins.json / '+(m.category||''),url:String(m.image||'').trim(),modskinIndex:mi}); }); }catch(e){}
     try{ ((window.TAG_DATABASE||TAG_DATABASE||[])).forEach((t,ti)=>{ if(String(t.icon||'').trim()) arr.push({type:'tagIcon',group:'Skin Tag Icon',title:t.name||t.id||'Tag',meta:'tags.json / icon',url:String(t.icon||'').trim(),tagIndex:ti}); }); }catch(e){}
